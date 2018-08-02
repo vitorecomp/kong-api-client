@@ -1,0 +1,65 @@
+{
+	"env": {
+		"es6": true,
+		"node": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"ecmaVersion": 8,
+		"sourceType": "module"
+	},
+	"rules": {
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"single"
+		],
+		"semi": [
+			"error",
+			"never"
+		],
+		"no-undef": "warn",
+		"no-unused-vars": "warn",
+		"no-console": "off",
+		"max-len": [
+			"error",
+			80
+		],
+		"keyword-spacing": [
+			"warn"
+		],
+		"key-spacing": [
+			"warn"
+		],
+		"object-curly-spacing": [
+			"warn",
+			"always"
+		],
+		"comma-spacing": [
+			"warn"
+		],
+		"arrow-spacing": [
+			"warn"
+		],
+		"space-infix-ops": [
+			"warn"
+		],
+		"space-before-blocks": [
+			"warn"
+		],
+		"array-bracket-spacing": [
+			"warn",
+			"never"
+		]
+	}
+}
