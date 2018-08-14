@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/vitorecomp/kong-api-client/issues"
   },
-  "homepage": "https://github.com/vitorecomp/kong-api-client#readme"
+  "homepage": "https://github.com/vitorecomp/kong-api-client#readme",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
 }
