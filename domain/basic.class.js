@@ -7,41 +7,39 @@ class BasicApi {
 	}
 
 	getConsumers(limit){
-		return Consumer.getAll(url, limit)
+		return Consumer.getAll(this.url, limit)
 	}
 	getConsumer(id){
-		return Consumer.getOne(url, id)
+		return Consumer.getOne(this.url, id)
 	}
 	addConsumer(consumer){
-		return Consumer.add(url, consumer)
+		return Consumer.add(this.url, consumer)
 	}
 	updateConsumer(id, consumer){
-		return Consumer.update(url, id, consumer)
+		return Consumer.update(this.url, id, consumer)
 	}
 	deleteConsumer(id){
-		return Consumer.remove(url, id)
+		return Consumer.remove(this.url, id)
 	}
 	
 	
 	async getPlugins(limit){
-		return Plugin.getAll(url, limit)
+		return Plugin.getAll(this.url, limit)
 	}
 	
 	getPlugin(id){
-		return Plugin.getOne(url, id)
+		return Plugin.getOne(this.url, id)
 	}
 
 	addPlugin(plugin){
-		return Plugin.add(url, plugin)
+		return Plugin.add(this.url, plugin)
 	}
 	updatePlugin(id, plugin){
-		return Plugin.update(url, id, plugin)
+		return Plugin.update(this.url, id, plugin)
 	}
 	deletePlugin(id){
-		return Plugin.remove(url, id)
+		return Plugin.remove(this.url, id)
 	}
-
-	getOne(){}
 }
 
 module.exports  = BasicApi

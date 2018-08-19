@@ -2,6 +2,7 @@ let BasicApi = require('../domain/basic.class')
 let KongError = require('../domain/kong.error')
 let Service = require('../libs/service.lib')
 
+
 var assert = require('assert');
 const axios = require('axios');
 
@@ -13,25 +14,29 @@ let aux = {
 addService = async function (url_entry, sync, input) {
 	let url = url_entry + 'services'
 	let service = null
+	
 	try {
 		//cop
 		service = await axios.post(url, input)
-		service = new Service(service)
-
-		//adding plugins on service 
-		await aux.addPlugins(service, sync, input.plugins ? input.plugins : [])
-
-		//adding routes
-		await aux.addRoutes(service, sync, input.routes ? input.routes : [])
-
-		//adding consumers
-		let consumers = input.consumers ? input.consumers : []
-		await aux.addConsumer(service, sync, consumers)
-
+		service = new Service(service, url_entry)
 	} catch (error) {
-		if (!(sync && error))
+		if (!(sync && error.response.status == 409))
 			throw error
+
+		//buid the existing service here
+		service = await axios.get(url + '/' + input.name);
+		service = new Service(service.data, url_entry)
 	}
+
+	//adding plugins on service 
+	await aux.addPlugins(service, sync, input.plugins ? input.plugins : [])
+
+	//adding routes
+	await aux.addRoutes(service, sync, input.routes ? input.routes : [])
+
+	//adding consumers
+	let consumers = input.consumers ? input.consumers : []
+	await aux.addConsumers(service, sync, consumers)
 }
 
 
@@ -155,7 +160,7 @@ aux.addPlugins = async function (plugin) {
 	})
 }
 
-aux.addConsumer = async function (plugin) {
+aux.addConsumers = async function (plugin) {
 	plugins.forEach((plugin) => {
 		try {
 			service.addPlugin(plugin)
