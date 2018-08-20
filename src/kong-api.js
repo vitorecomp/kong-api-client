@@ -26,7 +26,7 @@ addService = async function (url_entry, sync, input) {
 	try {
 		//cop
 		service = await axios.post(url, input)
-		service = new Service(service, url_entry)
+		service = new Service(service.data, url_entry)
 
 		//adding routes
 		await aux.addRoutes(service, sync, routes ? routes : [])
