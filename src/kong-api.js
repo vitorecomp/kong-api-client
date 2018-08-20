@@ -15,10 +15,21 @@ addService = async function (url_entry, sync, input) {
 	let url = url_entry + 'services'
 	let service = null
 	
+	let routes = input.routes
+	delete input.routes
+	let consumers = input.consumers
+	delete input.consumers
+	let plugins = input.plugins
+	delete input.plugins
+
 	try {
 		//cop
 		service = await axios.post(url, input)
 		service = new Service(service, url_entry)
+
+		//adding routes
+		await aux.addRoutes(service, sync, routes ? routes : [])
+
 	} catch (error) {
 		if (!(sync && error.response.status == 409))
 			throw error
@@ -29,14 +40,11 @@ addService = async function (url_entry, sync, input) {
 	}
 
 	//adding plugins on service 
-	await aux.addPlugins(service, sync, input.plugins ? input.plugins : [])
+	await aux.addPlugins(service, sync, plugins ? plugins : [])
 
-	//adding routes
-	await aux.addRoutes(service, sync, input.routes ? input.routes : [])
 
 	//adding consumers
-	let consumers = input.consumers ? input.consumers : []
-	await aux.addConsumers(service, sync, consumers)
+	await aux.addConsumers(service, sync, consumers ? consumers : [])
 }
 
 
@@ -63,7 +71,6 @@ class KongApi extends BasicApi {
 
 		this.plugins = options.plugins
 		this.consumers = options.consumers
-		this.routes = options.routes
 	}
 
 	async init(){
@@ -92,20 +99,6 @@ class KongApi extends BasicApi {
 			let proms = this.consumers.map(async (e) => {
 				try {
 					await this.addConsumer(e)
-				} catch (error) {
-					if (this.sync && error instanceof KongError) {
-						//do same thing
-					} else
-						throw error
-				}
-			})
-			await Promise.all(proms)
-		}
-
-		if (this.routes) {
-			let proms = this.routes.map(async (e) => {
-				try {
-					await this.addRoute(e)
 				} catch (error) {
 					if (this.sync && error instanceof KongError) {
 						//do same thing
@@ -155,11 +148,12 @@ class KongApi extends BasicApi {
 module.exports = KongApi
 
 
-aux.addRoutes = async function (sync, service, routes) {
+aux.addRoutes = async function (service, sync, routes) {
 	let proms = routes.map(async (route) => {
 		try {
 			await service.addRoute(route)
 		} catch (error) {
+			console.log(error)
 			if (!(sync && error instanceof KongError && error.code == 'R401'))
 				throw error
 		}
@@ -168,7 +162,7 @@ aux.addRoutes = async function (sync, service, routes) {
 	await Promise.all(proms)
 }
 
-aux.addPlugins = async function (sync, service, plugins) {
+aux.addPlugins = async function (service, sync, plugins) {
 	let proms = plugins.map(async (plugin) => {
 		try {
 			await service.addPlugin(plugin)
@@ -180,7 +174,7 @@ aux.addPlugins = async function (sync, service, plugins) {
 	await Promise.all(proms)
 }
 
-aux.addConsumers = async function (sync, service, consumers) {
+aux.addConsumers = async function (service, sync, consumers) {
 	let proms = consumers.map(async (consumer) => {
 		try {
 			await service.addConsumer(consumer)

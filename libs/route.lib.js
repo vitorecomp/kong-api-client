@@ -16,7 +16,7 @@ class Route{
 		//[repare the url
 		url = urlPrep(url)
 		//call for the service
-		route = axios.post(url, data)
+		let route = await axios.post(url, data)
 		//return the response
 		return route.data
 	}

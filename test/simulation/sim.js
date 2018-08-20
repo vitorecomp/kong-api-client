@@ -7,7 +7,12 @@ let kong = new KongApi({
 		name:'user-service',
 		protocol:'http',
 		host:'172.16.238.110',
-		port:5000
+		port:5000,
+		routes: [{
+			paths: [
+				'/user-service'
+			]
+		}]
 	},
 	plugins:[
 		{

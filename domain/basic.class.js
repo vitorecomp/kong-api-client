@@ -1,11 +1,11 @@
 let Plugin  = require('../libs/plugin.lib')
 let Consumer  = require('../libs/consumer.lib')
-let Route  = require('../libs/route.lib')
+
 
 
 Plugin = new Plugin()
 Consumer = new Consumer()
-Route = new Route()
+
 
 class BasicApi {
 	constructor(Service){
@@ -49,19 +49,6 @@ class BasicApi {
 
 	async getPlugins(limit){
 		return Plugin.getAll(this.url, limit)
-	}
-	
-	getRoute(id){
-		return Route.getOne(this.url, id)
-	}
-	addRoute(route){
-		return Route.add(this.url, route)
-	}
-	updateRoute(id, route){
-		return Route.update(this.url, id, route)
-	}
-	deleteRoute(id){
-		return Route.remove(this.url, id)
 	}
 }
 
