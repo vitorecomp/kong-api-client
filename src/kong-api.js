@@ -16,11 +16,12 @@ addService = async function (url_entry, sync, input) {
 	let service = null
 	
 	let routes = input.routes
-	delete input.routes
 	let consumers = input.consumers
-	delete input.consumers
 	let plugins = input.plugins
-	delete input.plugins
+
+	input.consumers = undefined
+	input.routes = undefined
+	input.plugins = undefined
 
 	try {
 		//cop

@@ -37,9 +37,10 @@ class BasicApi {
 		return Plugin.getOne(this.url, id)
 	}
 
-	addPlugin(plugin){
-		return Plugin.add(this.url, plugin)
+	async addPlugin(plugin){
+		return await Plugin.add(this.url, plugin)
 	}
+	
 	updatePlugin(id, plugin){
 		return Plugin.update(this.url, id, plugin)
 	}
