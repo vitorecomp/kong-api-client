@@ -63,6 +63,7 @@ class KongApi extends BasicApi {
 
 		this.plugins = options.plugins
 		this.consumers = options.consumers
+		this.routes = options.routes
 	}
 
 	async init(){
@@ -74,29 +75,45 @@ class KongApi extends BasicApi {
 		}
 
 		if (this.plugins) {
-			this.plugins.forEach()((e) => {
+			let proms = this.plugins.map(async (e) => {
 				try {
-					this.addPlugin(e)
+					await this.addPlugin(e)
 				} catch (error) {
-					if (sync && error instanceof KongError) {
-
+					if (this.sync && error instanceof KongError) {
+						//do same thing
 					} else
 						throw error
 				}
 			})
+			await Promise.all(proms)
 		}
 
-		if (this.consumer) {
-			this.consumer.forEach()((e) => {
+		if (this.consumers) {
+			let proms = this.consumers.map(async (e) => {
 				try {
-					this.addConsumer(e)
+					await this.addConsumer(e)
 				} catch (error) {
-					if (sync && error instanceof KongError) {
-
+					if (this.sync && error instanceof KongError) {
+						//do same thing
 					} else
 						throw error
 				}
 			})
+			await Promise.all(proms)
+		}
+
+		if (this.routes) {
+			let proms = this.routes.map(async (e) => {
+				try {
+					await this.addRoute(e)
+				} catch (error) {
+					if (this.sync && error instanceof KongError) {
+						//do same thing
+					} else
+						throw error
+				}
+			})
+			await Promise.all(proms)
 		}
 	}
 
@@ -138,36 +155,40 @@ class KongApi extends BasicApi {
 module.exports = KongApi
 
 
-aux.addRoutes = async function (sync, service, plugins) {
-	plugins.forEach((plugin) => {
+aux.addRoutes = async function (sync, service, routes) {
+	let proms = routes.map(async (route) => {
 		try {
-			service.addPlugin(plugin)
+			await service.addRoute(route)
 		} catch (error) {
 			if (!(sync && error instanceof KongError && error.code == 'R401'))
 				throw error
 		}
 	})
+
+	await Promise.all(proms)
 }
 
-aux.addPlugins = async function (plugin) {
-	plugins.forEach((plugin) => {
+aux.addPlugins = async function (sync, service, plugins) {
+	let proms = plugins.map(async (plugin) => {
 		try {
-			service.addPlugin(plugin)
+			await service.addPlugin(plugin)
 		} catch (error) {
 			if (!(sync && error instanceof KongError && error.code == 'P401'))
 				throw error
 		}
 	})
+	await Promise.all(proms)
 }
 
-aux.addConsumers = async function (plugin) {
-	plugins.forEach((plugin) => {
+aux.addConsumers = async function (sync, service, consumers) {
+	let proms = consumers.map(async (consumer) => {
 		try {
-			service.addPlugin(plugin)
+			await service.addConsumer(consumer)
 		} catch (error) {
 			if (!(sync && error instanceof KongError && error.code == 'C401'))
 				throw error
 		}
 	})
+	await Promise.all(proms)
 }
 

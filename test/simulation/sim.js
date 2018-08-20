@@ -8,7 +8,18 @@ let kong = new KongApi({
 		protocol:'http',
 		host:'172.16.238.110',
 		port:5000
-	}
+	},
+	plugins:[
+		{
+			name:'jwt'
+		}
+	],
+	consumers:[
+		{
+			username:'admin',
+			custom_id:1010
+		}
+	]
 })
 
 kong.init()

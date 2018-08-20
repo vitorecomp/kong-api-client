@@ -3,23 +3,23 @@ const axios = require('axios');
 
 let urlPrep = (url) => {
 	if(url[url.length - 1] != '/')
-		url += '/'
-	url += 'plugins'
+			url += '/'
+	url += 'routes'
 	return url
 }
 
-class Plugin{
+class Route{
 	
 	constructor(){}
 
-	async add(url, data){ 
+	async add(url, data){
 		//[repare the url
 		url = urlPrep(url)
 		//call for the service
-		let plugin = await axios.post(url, data)
+		route = axios.post(url, data)
 		//return the response
-		return plugin.data
+		return route.data
 	}
 }
 
-module.exports = Plugin
+module.exports = Route
