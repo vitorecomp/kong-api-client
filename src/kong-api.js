@@ -128,7 +128,7 @@ class KongApi extends BasicApi {
 
 	async addService(service) {
 		//add service
-		return addService(this.url, service)
+		return await addService(this.url, false, service)
 	}
 
 	async updateService(id, service) {

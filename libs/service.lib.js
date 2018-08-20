@@ -14,23 +14,23 @@ class Service extends BasicApi {
 		this.url += input.name
 	}
 
-	getRoute(id){
-		return Route.getOne(this.url, id)
+	async getRoute(id){
+		return await Route.getOne(this.url, id)
 	}
 
-	addRoute(route){
+	async addRoute(route){
 		route.service = {
 			id:this.id
 		}
-		return Route.add(this.basic_url, route)
+		return await Route.add(this.basic_url, route)
 	}
 
-	updateRoute(id, route){
-		return Route.update(this.basic_url, id, route)
+	async updateRoute(id, route){
+		return await Route.update(this.basic_url, id, route)
 	}
 
-	deleteRoute(id){
-		return Route.remove(this.basic_url, id)
+	async deleteRoute(id){
+		return await Route.remove(this.basic_url, id)
 	}
 }
 

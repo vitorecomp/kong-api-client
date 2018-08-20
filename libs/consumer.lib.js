@@ -16,7 +16,7 @@ class Consumer{
 		//[repare the url
 		url = urlPrep(url)
 		//call for the service
-		consumer = axios.post(url, data)
+		consumer = await axios.post(url, data)
 		//return the response
 		return consumer.data
 	}

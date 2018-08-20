@@ -12,44 +12,47 @@ class BasicApi {
 		
 	}
 
-	getConsumers(limit){
-		return Consumer.getAll(this.url, limit)
+	async getConsumers(limit){
+		return await Consumer.getAll(this.url, limit)
 	}
-	getConsumer(id){
-		return Consumer.getOne(this.url, id)
+
+	async getConsumer(id){
+		return await Consumer.getOne(this.url, id)
 	}
-	addConsumer(consumer){
-		return Consumer.add(this.url, consumer)
+	
+	async addConsumer(consumer){
+		return await Consumer.add(this.url, consumer)
 	}
-	updateConsumer(id, consumer){
-		return Consumer.update(this.url, id, consumer)
+	async updateConsumer(id, consumer){
+		return await Consumer.update(this.url, id, consumer)
 	}
-	deleteConsumer(id){
-		return Consumer.remove(this.url, id)
+	async deleteConsumer(id){
+		return await Consumer.remove(this.url, id)
 	}
 	
 	
 	async getPlugins(limit){
-		return Plugin.getAll(this.url, limit)
+		return await Plugin.getAll(this.url, limit)
 	}
 	
-	getPlugin(id){
-		return Plugin.getOne(this.url, id)
+	async getPlugin(id){
+		return await Plugin.getOne(this.url, id)
 	}
 
 	async addPlugin(plugin){
 		return await Plugin.add(this.url, plugin)
 	}
 	
-	updatePlugin(id, plugin){
-		return Plugin.update(this.url, id, plugin)
+	async updatePlugin(id, plugin){
+		return await Plugin.update(this.url, id, plugin)
 	}
-	deletePlugin(id){
-		return Plugin.remove(this.url, id)
+	
+	async deletePlugin(id){
+		return await Plugin.remove(this.url, id)
 	}
 
 	async getPlugins(limit){
-		return Plugin.getAll(this.url, limit)
+		return await Plugin.getAll(this.url, limit)
 	}
 }
 
