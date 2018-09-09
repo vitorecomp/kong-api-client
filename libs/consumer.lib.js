@@ -1,22 +1,22 @@
 
-const axios = require('axios');
+const axios = require('axios')
 
 let urlPrep = (url) => {
-	if(url[url.length - 1] != '/')
-			url += '/'
+	if (url[url.length - 1] != '/')
+		url += '/'
 	url += 'consumers'
 	return url
 }
 
-class Consumer{
-	
-	constructor(){}
+class Consumer {
 
-	async add(url, data){
+	constructor() { }
+
+	async add(url, data) {
 		//[repare the url
 		url = urlPrep(url)
 		//call for the service
-		consumer = await axios.post(url, data)
+		let consumer = await axios.post(url, data)
 		//return the response
 		return consumer.data
 	}
