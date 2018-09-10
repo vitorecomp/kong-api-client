@@ -3,18 +3,18 @@ let KongError = require('../domain/kong.error')
 let Service = require('../libs/service.lib')
 
 
-var assert = require('assert');
-const axios = require('axios');
+var assert = require('assert')
+const axios = require('axios')
 
 let aux = {
 	sync: false,
 	service: null
 }
 
-addService = async function (url_entry, sync, input) {
+let addService = async function (url_entry, sync, input) {
 	let url = url_entry + 'services'
 	let service = null
-	
+
 	let routes = input.routes
 	let consumers = input.consumers
 	let plugins = input.plugins
@@ -32,11 +32,13 @@ addService = async function (url_entry, sync, input) {
 		await aux.addRoutes(service, sync, routes ? routes : [])
 
 	} catch (error) {
+		if (!error.response)
+			throw error
 		if (!(sync && error.response.status == 409))
 			throw error
 
 		//buid the existing service here
-		service = await axios.get(url + '/' + input.name);
+		service = await axios.get(url + '/' + input.name)
 		service = new Service(service.data, url_entry)
 	}
 
@@ -53,7 +55,7 @@ addService = async function (url_entry, sync, input) {
 class KongApi extends BasicApi {
 	constructor(options) {
 		super(options)
-		
+
 		assert.notEqual(options, undefined, 'options not defined')
 		assert.notEqual(options.admin_url, undefined, 'admin_url not defined')
 
@@ -64,17 +66,17 @@ class KongApi extends BasicApi {
 		this.sync = options.sync
 
 		this.services = []
-		if(options.services){
-			this.services = Array.isArray(options.services) 
+		if (options.services) {
+			this.services = Array.isArray(options.services)
 				? options.services
 				: [options.services]
-			}
+		}
 
 		this.plugins = options.plugins
 		this.consumers = options.consumers
 	}
 
-	async init(){
+	async init() {
 		if (this.services) {
 			let proms = this.services.map(async (ser) => {
 				await addService(this.url, this.sync, ser)
@@ -134,9 +136,9 @@ class KongApi extends BasicApi {
 	async updateService(id, service) {
 		//update service
 
-		let service = null
+		let serviceOn = service
 		//convert to class
-		return new Service(service)
+		return new Service(serviceOn)
 	}
 
 	async deleteService(id) {
