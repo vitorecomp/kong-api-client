@@ -45,6 +45,7 @@ let test = async () => {
 	}
 
 	console.log(consumer)
+	console.log("teste")
 
 	// try{
 	// 	kongApi.addPlugin({
