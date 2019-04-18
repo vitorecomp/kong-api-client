@@ -1,6 +1,4 @@
 let test = async () => {
-
-
 	let KongApi = require('../../index.js')
 	let config = {
 		admin_url: 'http://' + process.env.KONG_IP + ':8001',
