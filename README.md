@@ -1,46 +1,36 @@
 # kong-api-client
 
-##Documentation
+This is a sdk, to the Kong Gateway Admin API (https://konghq.com/solutions/gateway/). The implemented endpois are:
 
-Work in progrees
+- Services
+- Custumers
+- Plugins
+- Routes
 
-##Start a simple api
+The version of the kong api, is 1.1.x decribed on https://docs.konghq.com/1.1.x/getting-started/introduction
 
+Is possible to find examples on the examples folder, and the complete reference guide to this lib on
+the documentation folder.
+
+## How connect to the kong instance:
+
+```
 let KongApi = require('../../index.js')
 let config = {
 	admin_url: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
+```
+### How save new service:
 
-###save new service
-
-###add a plugin
+### How update new service:
 
 ###save a new custumer
 
 
-###Complete documentation
+### Complete documentation
     //add link here to the complete documentation
-Work in progrees (Not working yet)
-
-##Config
-
-- add the code here as a basisic example
-
-- show the capablitictes fo the contrutuctions
-
-##Service
-
-###Route
-
-###Plugin
-
-###Consumer
-
-##Plugin
-
-##Consumer
 
 # Need fix
  - good msg on kong offline
