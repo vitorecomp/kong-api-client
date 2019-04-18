@@ -14,23 +14,8 @@ let test = async () => {
 				custom_id: 1010
 			}
 		]
-
-	}
-
-	console.log(process.env.KONG_IP)
-
-	config.services = [{
-		name: 'user-service',
-		protocol: 'http',
-		host: process.env.KONG_IP,
-		port: 5000,
-		routes: [{
-			paths: [
-				'/user-service'
-			]
-		}]
 	}]
-	let kong = new KongApi(config)
+		let kong = new KongApi(config)
 
 	kong.init()
 	try {

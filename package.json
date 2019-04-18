@@ -1,15 +1,19 @@
 {
-  "name": "kong-api-client",
-  "version": "1.5.4",
+  "author": {
+    "name": "Vitor de Araujo",
+    "email": "vitor.ecomp@gmail.com",
+    "url": "http://nobuffer.dev"
+  },
+  "bugs": {
+    "url": "https://github.com/vitorecomp/kong-api-client/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "axios": "^0.18.0"
+  },
+  "deprecated": false,
   "description": "Binding to consume kond admin interface",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vitorecomp/kong-api-client.git"
-  },
+  "homepage": "https://github.com/vitorecomp/kong-api-client#readme",
   "keywords": [
     "Kong",
     "Api",
@@ -17,13 +21,17 @@
     "Interface",
     "Gateway"
   ],
-  "author": "Your Name <email@example.com> (http://example.com)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/vitorecomp/kong-api-client/issues"
+  "main": "index.js",
+  "name": "kong-api-client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitorecomp/kong-api-client.git"
   },
-  "homepage": "https://github.com/vitorecomp/kong-api-client#readme",
-  "dependencies": {
-    "axios": "^0.18.0"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Error: no test specified\" && exit 1",
+    "lint-fix": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.5.6"
 }

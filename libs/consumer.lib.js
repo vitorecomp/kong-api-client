@@ -1,18 +1,18 @@
 
-const axios = require('axios')
+const axios = require('axios');
 
 let urlPrep = (url) => {
-	if (url[url.length - 1] != '/')
-		url += '/'
+	if(url[url.length - 1] != '/')
+			url += '/'
 	url += 'consumers'
 	return url
 }
 
-class Consumer {
+class Consumer{
+	
+	constructor(){}
 
-	constructor() { }
-
-	async add(url, data) {
+	async add(url, data){
 		//[repare the url
 		url = urlPrep(url)
 		//call for the service

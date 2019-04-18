@@ -3,8 +3,8 @@ let KongError = require('../domain/kong.error')
 let Service = require('../libs/service.lib')
 
 
-var assert = require('assert')
-const axios = require('axios')
+var assert = require('assert');
+const axios = require('axios');
 
 //Agregation of all the non public funcions
 let _KongApi = {
@@ -14,22 +14,22 @@ let _KongApi = {
 
 class KongApi extends BasicApi {
 	constructor(options) {
-	    //call the cntructor of the basic API
+		//call the cntructor of the basic API
 		super(options)
 
-        //validate if the argument have the necessary parameters
-        //TODO tranform the errors messagens to a file
+		//validate if the argument have the necessary parameters
+		//TODO tranform the errors messagens to a file
 		assert.notEqual(options, undefined, 'options not defined')
 		assert.notEqual(options.admin_url, undefined, 'admin_url not defined: examples { admin_url:"http://kong_uri:kong_port"}')
 
-        //Add / on kong url
+		//Add / on kong url
 		this.url = options.admin_url
 		if (this.url[this.url.length - 1] != '/')
 			this.url += '/'
 
 		this.sync = options.sync
-        
-        //transforme services in a array
+
+		//transforme services in a array
 		this.services = []
 		//TODO tranform to a function that always return a array (to_array())
 		if (options.services) {
@@ -38,22 +38,22 @@ class KongApi extends BasicApi {
 				: [options.services]
 		}
 
-        //TODO use to_array() function
+		//TODO use to_array() function
 		this.plugins = options.plugins
 		//TODO use to_array() function
 		this.consumers = options.consumers
 	}
 
 	async init() {
-	    //save all services of options
+		//save all services of options
 		if (this.services) {
 			let proms = this.services.map(async (ser) => {
 				await addService(this.url, this.sync, ser)
 			})
 			await Promise.all(proms)
 		}
-        
-        //save all puglins of options
+
+		//save all puglins of options
 		if (this.plugins) {
 			let proms = this.plugins.map(async (e) => {
 				try {
@@ -67,8 +67,8 @@ class KongApi extends BasicApi {
 			})
 			await Promise.all(proms)
 		}
-    
-        //save all custumers of options
+
+		//save all custumers of options
 		if (this.consumers) {
 			let proms = this.consumers.map(async (e) => {
 				try {
@@ -107,9 +107,9 @@ class KongApi extends BasicApi {
 	async updateService(id, service) {
 		//update service
 
-		let serviceOn = service
+		let service = null
 		//convert to class
-		return new Service(serviceOn)
+		return new Service(service)
 	}
 
 	async deleteService(id) {
