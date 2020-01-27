@@ -18,7 +18,7 @@ before_install:
     -e "KONG_DATABASE=postgres"
     -e "KONG_PG_HOST=kong-database"
     -e "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
-    kong:2.0 kong:2.0 migrations bootstrap
+    kong:2.0 kong migrations bootstrap
   - docker run -d --name kong
     -e "KONG_DATABASE=postgres"
     -e "KONG_PG_HOST=kong-database"
