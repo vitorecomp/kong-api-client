@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.com/vitorecomp/kong-api-client.svg?branch=master)](https://travis-ci.com/vitorecomp/kong-api-client)
-
 language: node_js
 node_js:
   - "8"
@@ -9,10 +7,10 @@ node_js:
 
 before_install:
   - docker pull postgres:9.6
-  - docker run -d --name kong-database \
-    -p 5432:5432 \
-    -e "POSTGRES_USER=kong" \
-    -e "POSTGRES_DB=kong" \
+  - docker run -d --name kong-database
+    -p 5432:5432
+    -e "POSTGRES_USER=kong"
+    -e "POSTGRES_DB=kong"
     postgres:9.6
   - docker run --rm \
     --link kong-database:kong-database \
