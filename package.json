@@ -1,37 +1,40 @@
 {
-  "author": {
-    "name": "Vitor de Araujo",
-    "email": "vitor.ecomp@gmail.com",
-    "url": "http://nobuffer.dev"
-  },
-  "bugs": {
-    "url": "https://github.com/vitorecomp/kong-api-client/issues"
-  },
-  "bundleDependencies": false,
-  "dependencies": {
-    "axios": "^0.18.1"
-  },
-  "deprecated": false,
-  "description": "Binding to consume kond admin interface",
-  "homepage": "https://github.com/vitorecomp/kong-api-client#readme",
-  "keywords": [
-    "Kong",
-    "Api",
-    "Admin",
-    "Interface",
-    "Gateway"
-  ],
-  "license": "MIT",
-  "main": "index.js",
-  "name": "kong-api-client",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vitorecomp/kong-api-client.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"Error: no test specified\" && exit 1",
-    "lint-fix": "echo \"Error: no test specified\" && exit 1"
-  },
-  "version": "1.5.6"
+	"author": {
+		"name": "Vitor de Araujo",
+		"email": "vitor.ecomp@gmail.com",
+		"url": "http://nobuffer.dev"
+	},
+	"bugs": {
+		"url": "https://github.com/vitorecomp/kong-api-client/issues"
+	},
+	"bundleDependencies": [],
+	"dependencies": {
+		"axios": "^0.18.1"
+	},
+	"devDependencies": {
+		"eslint": "^6.8.0"
+	},
+	"deprecated": false,
+	"description": "Binding to consume kond admin interface",
+	"homepage": "https://github.com/vitorecomp/kong-api-client#readme",
+	"keywords": [
+		"Kong",
+		"Api",
+		"Admin",
+		"Interface",
+		"Gateway"
+	],
+	"license": "MIT",
+	"main": "index.js",
+	"name": "kong-api-client",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/vitorecomp/kong-api-client.git"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "echo \"Error: no test specified\" && exit 1",
+		"lint-fix": "echo \"Error: no test specified\" && exit 1"
+	},
+	"version": "1.5.6"
 }

@@ -1,4 +1,4 @@
 let kongApi = require('./src/kong-api')
 
 
-module.exports = kongApi;
+module.exports = kongApi

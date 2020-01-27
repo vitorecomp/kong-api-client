@@ -24,10 +24,6 @@
 			"error",
 			"single"
 		],
-		"semi": [
-			"error",
-			"never"
-		],
 		"no-undef": "warn",
 		"no-unused-vars": "warn",
 		"no-console": "off",
