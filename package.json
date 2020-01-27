@@ -9,7 +9,7 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.1"
   },
   "deprecated": false,
   "description": "Binding to consume kond admin interface",
