@@ -1,7 +1,5 @@
-//recover all files from modules
+console.log('Setting up the test');
 
-//for each file on modules run test suite
-    //recover the results
-    //make the final relatory
-    
-//
+
+
+console.log('Finishing the the test setup');
