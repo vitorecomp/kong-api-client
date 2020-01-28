@@ -1,3 +1,3 @@
-class KongError {}
+class KongError { }
 
-module.exports = KongError
+module.exports = KongError;

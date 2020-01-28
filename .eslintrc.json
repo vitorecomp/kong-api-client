@@ -6,7 +6,12 @@
 	"extends": "eslint:recommended",
 	"parserOptions": {
 		"ecmaVersion": 8,
-		"sourceType": "module"
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true,
+			"modules": true,
+			"experimentalObjectRestSpread": true
+		}
 	},
 	"rules": {
 		"indent": [
