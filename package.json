@@ -12,7 +12,8 @@
 		"axios": "^0.18.1"
 	},
 	"devDependencies": {
-		"eslint": "^6.8.0"
+		"eslint": "^6.8.0",
+		"jest": "^24.8.0"
 	},
 	"deprecated": false,
 	"description": "Binding to consume kond admin interface",
@@ -32,7 +33,8 @@
 		"url": "git+https://github.com/vitorecomp/kong-api-client.git"
 	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest --config=jest.config.json",
+		"test-dev": "jest --config=jest.config.json --watch",
 		"lint": "echo \"Error: no test specified\" && exit 1",
 		"lint-fix": "echo \"Error: no test specified\" && exit 1"
 	},

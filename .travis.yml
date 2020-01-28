@@ -31,7 +31,7 @@ before_install:
     kong
   - docker ps -a
 
-script: echo "Running tests against $(node -v) ..."
+script: npm test
 
 services:
   - docker
