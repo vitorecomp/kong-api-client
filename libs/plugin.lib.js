@@ -1,22 +1,22 @@
-const axios = require('axios')
+const axios = require('axios');
 
 let urlPrep = url => {
-	if (url[url.length - 1] != '/') url += '/'
-	url += 'plugins'
-	return url
-}
+	if (url[url.length - 1] != '/') url += '/';
+	url += 'plugins';
+	return url;
+};
 
 class Plugin {
 	constructor() { }
 
 	async add(url, data) {
 		//[repare the url
-		url = urlPrep(url)
+		url = urlPrep(url);
 		//call for the service
-		let plugin = await axios.post(url, data)
+		let plugin = await axios.post(url, data);
 		//return the response
-		return plugin.data
+		return plugin.data;
 	}
 }
 
-module.exports = Plugin
+module.exports = Plugin;
