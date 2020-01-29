@@ -1,7 +1,11 @@
 let BasicApi = require('../domain/basic.class');
 let KongError = require('../domain/kong.error');
 let Service = require('../libs/service.lib');
+let Plugin = require('../libs/plugin.lib');
+let Consumer = require('../libs/consumer.lib');
 
+
+let utils = require('../helpers/converters');
 
 var assert = require('assert');
 const axios = require('axios');
@@ -19,6 +23,7 @@ class KongApi extends BasicApi {
 
 		//validate if the argument have the necessary parameters
 		//TODO tranform the errors messagens to a file
+		//TODO pass all validations to a helper validation
 		assert.notEqual(options, undefined, 'options not defined');
 		assert.notEqual(options.admin_url, undefined,
 			'admin_url not defined: examples ' +
@@ -32,18 +37,31 @@ class KongApi extends BasicApi {
 		this.sync = options.sync;
 
 		//transforme services in a array
-		this.services = [];
-		//TODO tranform to a function that always return a array (to_array())
-		if (options.services) {
-			this.services = Array.isArray(options.services)
-				? options.services
-				: [options.services];
-		}
+		this.services = utils.toArray(options.services);
+		this.plugins = utils.toArray(options.plugins);
+		this.consumers = utils.toArray(options.consumers);
 
-		//TODO use to_array() function
-		this.plugins = options.plugins;
-		//TODO use to_array() function
-		this.consumers = options.consumers;
+		//TODO traform to conversors functions
+		//validate if all the services are a Service, if not transform
+		this.services = this.services.map(service =>
+			(service instanceof Service)
+				? service
+				: new Service(service)
+		);
+
+		//validate if all the plugins are a Plugin, if not transform
+		this.plugins = this.plugins.map(plugin =>
+			(plugin instanceof Plugin)
+				? plugin
+				: new Plugin(plugin)
+		);
+
+		//validate if all the consumers are a Consumer, if not transform
+		this.consumers = this.consumers.map(consumer =>
+			(consumer instanceof Consumer)
+				? consumer
+				: new Consumer(consumer)
+		);
 	}
 
 	async init() {
@@ -76,6 +94,7 @@ class KongApi extends BasicApi {
 				try {
 					await this.addConsumer(e);
 				} catch (error) {
+					//Valida se já nao existe, se sync ele forca a criar
 					if (this.sync && error instanceof KongError) {
 						//do same thing
 					} else
@@ -86,6 +105,9 @@ class KongApi extends BasicApi {
 		}
 	}
 
+	async clean() {
+
+	}
 
 	async getServices(limit) {
 		//llok for the services
