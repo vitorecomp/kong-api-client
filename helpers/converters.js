@@ -10,4 +10,13 @@ utils.toArray = (inputArray) => {
 	return array;
 };
 
+utils.convertList = (list, Class) => {
+	return list.map(item =>
+		(item instanceof Class)
+			? item
+			: new Class(item)
+	);
+};
+
+
 module.exports = utils;
