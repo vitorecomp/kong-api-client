@@ -5,9 +5,8 @@ let Plugin = require('../libs/plugin.lib');
 let Consumer = require('../libs/consumer.lib');
 
 
-let utils = require('../helpers/converters');
+const utils = require('../helpers/converters');
 
-var assert = require('assert');
 const axios = require('axios');
 
 //Agregation of all the non public funcions
@@ -17,130 +16,87 @@ let _KongApi = {
 };
 
 class KongApi extends BasicApi {
-	constructor(options) {
-		//call the cntructor of the basic API
-		super(options);
-
-		//validate if the argument have the necessary parameters
-		//TODO tranform the errors messagens to a file
-		//TODO pass all validations to a helper validation
-		assert.notEqual(options, undefined, 'options not defined');
-		assert.notEqual(options.admin_url, undefined,
-			'admin_url not defined: examples ' +
-			'{ admin_url:"http://kong_uri:kong_port"}');
+	constructor({ admin_url, services, plugins, consumers } = {}) {
+		super();
+		if (typeof admin_url === 'undefined') {
+			throw KongError.UndefinedUrl;
+		}
 
 		//Add / on kong url
-		this.url = options.admin_url;
+		this.url = admin_url;
 		if (this.url[this.url.length - 1] != '/')
 			this.url += '/';
 
-		this.sync = options.sync;
-
 		//transforme services in a array
-		this.services = utils.toArray(options.services);
-		this.plugins = utils.toArray(options.plugins);
-		this.consumers = utils.toArray(options.consumers);
+		this.services = utils.toArray(services);
+		this.plugins = utils.toArray(plugins);
+		this.consumers = utils.toArray(consumers);
 
-		//TODO traform to conversors functions
-		//validate if all the services are a Service, if not transform
-		this.services = this.services.map(service =>
-			(service instanceof Service)
-				? service
-				: new Service(service)
-		);
-
-		//validate if all the plugins are a Plugin, if not transform
-		this.plugins = this.plugins.map(plugin =>
-			(plugin instanceof Plugin)
-				? plugin
-				: new Plugin(plugin)
-		);
-
-		//validate if all the consumers are a Consumer, if not transform
-		this.consumers = this.consumers.map(consumer =>
-			(consumer instanceof Consumer)
-				? consumer
-				: new Consumer(consumer)
-		);
+		//validate if all the services are a Kong Class, if not transform
+		this.services = utils.convertList(this.services, Service);
+		this.plugins = utils.convertList(this.plugins, Plugin);
+		this.consumers = utils.convertList(this.consumers, Consumer);
 	}
 
 	async init() {
 		//save all services of options
-		if (this.services) {
-			let proms = this.services.map(async (ser) => {
-				await _KongApi.addService(this.url, this.sync, ser);
-			});
-			await Promise.all(proms);
-		}
-
+		this.addServices(this.services);
 		//save all puglins of options
-		if (this.plugins) {
-			let proms = this.plugins.map(async (e) => {
-				try {
-					await this.addPlugin(e);
-				} catch (error) {
-					if (this.sync && error instanceof KongError) {
-						//do same thing
-					} else
-						throw error;
-				}
-			});
-			await Promise.all(proms);
-		}
-
+		this.addPlugins(this.plugins);
 		//save all custumers of options
-		if (this.consumers) {
-			let proms = this.consumers.map(async (e) => {
-				try {
-					await this.addConsumer(e);
-				} catch (error) {
-					//Valida se já nao existe, se sync ele forca a criar
-					if (this.sync && error instanceof KongError) {
-						//do same thing
-					} else
-						throw error;
-				}
-			});
-			await Promise.all(proms);
-		}
+		this.addConsumers(this.consumers);
 	}
 
 	async clean() {
+		//get all services
+		const services = await this.findServices(this.url);
+		const serviceProms = services.map(el => this.deleteService(el.id));
 
+		//get all plugins
+		const plugins = await this.findPlugins(this.url);
+		const pluginProms = plugins.map(el => this.deletePlugin(el.id));
+
+		//get all consumers
+		const consumers = await this.findConsumers(this.url);
+		const consumerProms = consumers.map(el => this.deleteConsumer(el.id));
+
+		let proms = consumerProms + pluginProms + serviceProms;
+		await Promise.all(proms);
 	}
 
-	async getServices(limit) {
-		//llok for the services
-		console.log(limit);
-		let services = [];
-		//convert to classes
-		services.forEach((e) => new Service(e));
+	async addServices(services) {
+		let proms = services.map(async (ser) => {
+			await this.addService(ser);
+		});
+		await Promise.all(proms);
 	}
 
-	async getService(id) {
-		//look for the service
-		console.log(id);
-		let service = null;
-		//convert to class
-		return new Service(service);
+	async findServices(limit = 100) {
+		return Service.findAll(limit);
+	}
+
+	async findService(id) {
+		return Service.findById(id);
 	}
 
 	async addService(service) {
-		//add service
-		return _KongApi.addService(this.url, false, service);
+		if (!(service instanceof Service))
+			service = new Service(service);
+		return service.create();
 	}
 
-	async updateService(id, service) {
-		//update service
-		service = null;
-		//convert to class
-		return new Service(service);
+	async updateService(id, data) {
+		const service = this.findService(id);
+		if (!service)
+			throw KongError.notFound('Service');
+		return service.update(data);
 	}
 
 	async deleteService(id) {
-		console.log(id);
-		//delete service
-
+		const service = this.findService(id);
+		if (!service)
+			throw KongError.notFound('Service');
+		return Service.delete();
 	}
 }
 

@@ -1,41 +1,26 @@
 
-beforeEach(() => {
-	//create kong
-	let KongApi = require('../../index.js');
-	let config = {
-		admin_url: 'http://localhost:8001',
-		sync: true
-	};
+let KongApi = require('../../index.js');
+let config = {
+	admin_url: 'http://localhost:8001',
+};
+
+beforeEach(async () => {
 	let kong = new KongApi(config);
-	kong.init();
-	kong.clean();
+	await kong.init();
+	await kong.clean();
 });
 
-afterEach(() => {
-	//create kong
-	let KongApi = require('../../index.js');
-	let config = {
-		admin_url: 'http://localhost:8001',
-		sync: true
-	};
+afterEach(async () => {
 	let kong = new KongApi(config);
-	kong.init();
-	kong.clean();
+	await kong.init();
+	await kong.clean();
 });
 
 
-test('Init with new service', () => {
-	//create kong with service
-	let KongApi = require('../../index.js');
-	let config = {
-		admin_url: 'http://localhost:8001',
-		sync: true
-	};
+test('Init with new service', async () => {
 	let kong = new KongApi(config);
-	kong.init();
-
-	//get service
-
+	await kong.init();
+	await kong.clean();
 });
 
 test('Add Service', () => {

@@ -1,17 +1,12 @@
 const axios = require('axios');
-
-let urlPrep = url => {
-	if (url[url.length - 1] != '/') url += '/';
-	url += 'routes';
-	return url;
-};
+const helpers = require('../helpers/helpers');
 
 class Route {
 	constructor() { }
 
-	async add(url, data) {
+	async create(url, data) {
 		//[repare the url
-		url = urlPrep(url);
+		url = helpers.urlPrep(url, 'route');
 		//call for the service
 		let route = await axios.post(url, data);
 		//return the response

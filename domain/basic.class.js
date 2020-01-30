@@ -1,52 +1,57 @@
 let Plugin = require('../libs/plugin.lib');
 let Consumer = require('../libs/consumer.lib');
 
-
-
-const plugin = new Plugin();
-const consumer = new Consumer();
-
-
-
 class BasicApi {
-
-	async getConsumers(limit = 100) {
-		return await consumer.getAll(this.url, limit);
+	async addConsumers(consumers) {
+		let proms = consumers.map(async (e) => {
+			await this.addConsumer(e);
+		});
+		await Promise.all(proms);
 	}
 
-	async getConsumer(id) {
-		return await consumer.getOne(this.url, id);
+	async findConsumers(limit = 100) {
+		return await Consumer.findAll(this.url, limit);
+	}
+
+	async findConsumerById(id) {
+		return await Consumer.findById(this.url, id);
 	}
 
 	async addConsumer(consumer) {
-		return await consumer.add(this.url, consumer);
+		return await Consumer.add(this.url, consumer);
 	}
 	async updateConsumer(id, consumer) {
-		return await consumer.update(this.url, id, consumer);
+		return await Consumer.update(this.url, id, consumer);
 	}
 	async deleteConsumer(id) {
-		return await consumer.remove(this.url, id);
+		return await Consumer.remove(this.url, id);
 	}
 
-
-	async getPlugins(limit) {
-		return await plugin.getAll(this.url, limit);
+	async addPlugins(plugins) {
+		let proms = plugins.map(async (e) => {
+			await this.addPlugin(e);
+		});
+		await Promise.all(proms);
 	}
 
-	async getPlugin(id) {
-		return await plugin.getOne(this.url, id);
+	async findPlugins(limit) {
+		return await Plugin.findAll(this.url, limit);
+	}
+
+	async findPluginById(id) {
+		return await Plugin.findById(this.url, id);
 	}
 
 	async addPlugin(plugin) {
-		return await plugin.add(this.url, plugin);
+		return await Plugin.add(this.url, plugin);
 	}
 
 	async updatePlugin(id, plugin) {
-		return await plugin.update(this.url, id, plugin);
+		return await Plugin.update(this.url, id, plugin);
 	}
 
 	async deletePlugin(id) {
-		return await plugin.remove(this.url, id);
+		return await Plugin.remove(this.url, id);
 	}
 }
 
