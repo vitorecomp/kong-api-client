@@ -17,8 +17,14 @@ afterEach(async () => {
 });
 
 
-test('Init with new service', async () => {
-	let kong = new KongApi(config);
+test('Init with new service without class', async () => {
+	let lConfig = {
+		...config,
+		services: {
+
+		}
+	};
+	let kong = new KongApi(lConfig);
 	await kong.init();
 	await kong.clean();
 });
