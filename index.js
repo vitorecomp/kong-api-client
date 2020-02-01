@@ -1,4 +1,4 @@
-let kongApi = require('./src/kong-api')
+import KongApi from './src/kong-api';
 
-
-module.exports = kongApi
+export default KongApi;
+module.exports = KongApi;

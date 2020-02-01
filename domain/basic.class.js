@@ -1,7 +1,7 @@
-let Plugin = require('../libs/plugin.lib');
-let Consumer = require('../libs/consumer.lib');
+import Plugin from '../libs/plugin.lib';
+import Consumer from '../libs/consumer.lib';
 
-class BasicApi {
+export default class BasicApi {
 	async addConsumers(consumers) {
 		let proms = consumers.map(async (e) => {
 			await this.addConsumer(e);
@@ -55,4 +55,3 @@ class BasicApi {
 	}
 }
 
-module.exports = BasicApi;

@@ -21,7 +21,7 @@ test('Init with new service without class', async () => {
 	let lConfig = {
 		...config,
 		services: {
-
+			url: 'http://www.teste.com:8080'
 		}
 	};
 	let kong = new KongApi(lConfig);
