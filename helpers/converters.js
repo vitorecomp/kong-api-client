@@ -1,6 +1,4 @@
-let utils = {};
-
-utils.toArray = (inputArray) => {
+export const toArray = (inputArray) => {
 	let array = [];
 	if (inputArray) {
 		array = Array.isArray(inputArray)
@@ -10,7 +8,7 @@ utils.toArray = (inputArray) => {
 	return array;
 };
 
-utils.convertList = (list, Class) => {
+export const convertList = (list, Class) => {
 	return list.map(item =>
 		(item instanceof Class)
 			? item
@@ -19,4 +17,7 @@ utils.convertList = (list, Class) => {
 };
 
 
-module.exports = utils;
+export default {
+	toArray,
+	convertList
+};

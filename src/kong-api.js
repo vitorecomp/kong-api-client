@@ -1,13 +1,16 @@
-let BasicApi = require('../domain/basic.class');
-let KongError = require('../domain/kong.error');
-let Service = require('../libs/service.lib');
-let Plugin = require('../libs/plugin.lib');
-let Consumer = require('../libs/consumer.lib');
+import axios from 'axios';
+
+import utils from '../helpers/converters';
+
+import BasicApi from '../domain/basic.class';
+
+import Service from '../libs/service.lib';
+import Plugin from '../libs/plugin.lib';
+import Consumer from '../libs/consumer.lib';
+
+import KongError from '../domain/kong.error';
 
 
-const utils = require('../helpers/converters');
-
-const axios = require('axios');
 
 //Agregation of all the non public funcions
 let _KongApi = {
@@ -15,11 +18,11 @@ let _KongApi = {
 	service: null
 };
 
-class KongApi extends BasicApi {
+export default class KongApi extends BasicApi {
 	constructor({ admin_url, services, plugins, consumers } = {}) {
 		super();
 		if (typeof admin_url === 'undefined') {
-			throw KongError.UndefinedUrl;
+			throw KongError.undefinedUrl;
 		}
 
 		//Add / on kong url
@@ -50,7 +53,8 @@ class KongApi extends BasicApi {
 	async clean() {
 		//get all services
 		const services = await this.findServices(this.url);
-		const serviceProms = services.map(el => this.deleteService(el.id));
+		const serviceProms = services.map(el =>
+			el.delete(this.url));
 
 		//get all plugins
 		const plugins = await this.findPlugins(this.url);
@@ -82,7 +86,7 @@ class KongApi extends BasicApi {
 	async addService(service) {
 		if (!(service instanceof Service))
 			service = new Service(service);
-		return service.create();
+		return service.create(this.url);
 	}
 
 	async updateService(id, data) {
@@ -91,17 +95,8 @@ class KongApi extends BasicApi {
 			throw KongError.notFound('Service');
 		return service.update(data);
 	}
-
-	async deleteService(id) {
-		const service = this.findService(id);
-		if (!service)
-			throw KongError.notFound('Service');
-		return Service.delete();
-	}
 }
 
-
-module.exports = KongApi;
 
 
 _KongApi.addRoutes = async function (service, sync, routes) {
