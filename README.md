@@ -1,7 +1,7 @@
 # kong-api-client
 
 [![Build Status](https://travis-ci.com/vitorecomp/kong-api-client.svg?branch=master)](https://travis-ci.com/vitorecomp/kong-api-client)
-
+[![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
 This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gateway/>. The implemented endpois are:
 
 - Services
