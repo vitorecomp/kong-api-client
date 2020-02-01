@@ -32,3 +32,6 @@ script: npm test
 
 services:
   - docker
+
+after_success:
+  - codecov

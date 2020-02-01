@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-import utils from '../helpers/converters';
+import utils from './helpers/converters';
 
-import BasicApi from '../domain/basic.class';
+import BasicApi from './domain/basic.class';
 
-import Service from '../libs/service.lib';
-import Plugin from '../libs/plugin.lib';
-import Consumer from '../libs/consumer.lib';
+import Service from './libs/service.lib';
+import Plugin from './libs/plugin.lib';
+import Consumer from './libs/consumer.lib';
 
-import KongError from '../domain/kong.error';
+import KongError from './domain/kong.error';
 
 
 
