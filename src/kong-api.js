@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import utils from './helpers/converters';
 
 import BasicApi from './domain/basic.class';
@@ -9,14 +7,6 @@ import Plugin from './libs/plugin.lib';
 import Consumer from './libs/consumer.lib';
 
 import KongError from './domain/kong.error';
-
-
-
-//Agregation of all the non public funcions
-let _KongApi = {
-	sync: false,
-	service: null
-};
 
 export default class KongApi extends BasicApi {
 	constructor({ admin_url, services, plugins, consumers } = {}) {
@@ -42,37 +32,40 @@ export default class KongApi extends BasicApi {
 	}
 
 	async init() {
+		const kong = {};
 		//save all services of options
-		this.addServices(this.services);
+		kong.services = await this.addServices(this.services);
 		//save all puglins of options
-		this.addPlugins(this.plugins);
+		kong.plugins = await this.addPlugins(this.plugins);
 		//save all custumers of options
-		this.addConsumers(this.consumers);
+		kong.consumers = await this.addConsumers(this.consumers);
+
+		return kong;
 	}
 
 	async clean() {
 		//get all services
 		const services = await this.findServices(this.url);
-		const serviceProms = services.map(el =>
-			el.delete(this.url));
+		const serviceProms = services.map(async el =>
+			await el.delete(this.url));
 
+		await Promise.all(serviceProms);
 		//get all plugins
 		const plugins = await this.findPlugins(this.url);
-		const pluginProms = plugins.map(el => this.deletePlugin(el.id));
+		const pluginProms = plugins.map(async el =>
+			await this.deletePlugin(el.id));
 
+		await Promise.all(pluginProms);
 		//get all consumers
 		const consumers = await this.findConsumers(this.url);
 		const consumerProms = consumers.map(el => this.deleteConsumer(el.id));
+		await Promise.all(consumerProms);
 
-		let proms = consumerProms + pluginProms + serviceProms;
-		await Promise.all(proms);
 	}
 
 	async addServices(services) {
-		let proms = services.map(async (ser) => {
-			await this.addService(ser);
-		});
-		await Promise.all(proms);
+		let proms = services.map(async (ser) => await this.addService(ser));
+		return await Promise.all(proms);
 	}
 
 	async findServices(limit = 100) {
@@ -80,98 +73,22 @@ export default class KongApi extends BasicApi {
 	}
 
 	async findService(id) {
-		return Service.findById(id);
+		return await Service.findById(this.url, id);
 	}
 
 	async addService(service) {
 		if (!(service instanceof Service))
 			service = new Service(service);
-		return service.create(this.url);
+		return await service.create(this.url);
 	}
 
 	async updateService(id, data) {
-		const service = this.findService(id);
-		if (!service)
-			throw KongError.notFound('Service');
-		return service.update(data);
+		const service = await this.findService(id);
+		return await service.update(this.url, data);
+	}
+
+	async deleteService(id, data) {
+		const service = await this.findService(id);
+		return await service.delete(this.url);
 	}
 }
-
-
-
-_KongApi.addRoutes = async function (service, sync, routes) {
-	let proms = routes.map(async (route) => {
-		try {
-			await service.addRoute(route);
-		} catch (error) {
-			console.log(error);
-			if (!(sync && error instanceof KongError && error.code == 'R401'))
-				throw error;
-		}
-	});
-
-	await Promise.all(proms);
-};
-
-_KongApi.addPlugins = async function (service, sync, plugins) {
-	let proms = plugins.map(async (plugin) => {
-		try {
-			await service.addPlugin(plugin);
-		} catch (error) {
-			if (!(sync && error instanceof KongError && error.code == 'P401'))
-				throw error;
-		}
-	});
-	await Promise.all(proms);
-};
-
-_KongApi.addConsumers = async function (service, sync, consumers) {
-	let proms = consumers.map(async (consumer) => {
-		try {
-			await service.addConsumer(consumer);
-		} catch (error) {
-			if (!(sync && error instanceof KongError && error.code == 'C401'))
-				throw error;
-		}
-	});
-	await Promise.all(proms);
-};
-
-_KongApi.addService = async function (url_entry, sync, input) {
-	let url = url_entry + 'services';
-	let service = null;
-
-	let routes = input.routes;
-	let consumers = input.consumers;
-	let plugins = input.plugins;
-
-	input.consumers = undefined;
-	input.routes = undefined;
-	input.plugins = undefined;
-
-	try {
-		//cop
-		service = await axios.post(url, input);
-		service = new Service(service.data, url_entry);
-
-		//adding routes
-		await _KongApi.addRoutes(service, sync, routes ? routes : []);
-
-	} catch (error) {
-		if (!error.response)
-			throw error;
-		if (!(sync && error.response.status == 409))
-			throw error;
-
-		//buid the existing service here
-		service = await axios.get(url + '/' + input.name);
-		service = new Service(service.data, url_entry);
-	}
-
-	//adding plugins on service 
-	await _KongApi.addPlugins(service, sync, plugins ? plugins : []);
-
-
-	//adding consumers
-	await _KongApi.addConsumers(service, sync, consumers ? consumers : []);
-};

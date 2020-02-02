@@ -1,6 +1,6 @@
 {
 	"setupFiles": [
-		"<rootDir>/test/setup-test.js"
+		"<rootDir>/test/setup.js"
 	],
 	"collectCoverage": true
 }

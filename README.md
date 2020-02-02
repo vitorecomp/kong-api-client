@@ -84,6 +84,7 @@ kong.init()
 ## Need fix
 
 - Better error msg in case of offline kong server
+- User jest expect thorw on the tests
 
 ## Road Map
 

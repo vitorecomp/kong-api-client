@@ -6,12 +6,10 @@ import converters from '../helpers/converters';
 
 import KongError from '../domain/kong.error';
 import BasicApi from '../domain/basic.class';
-import Route from '../libs/route.lib';
-
 
 export default class Service extends BasicApi {
 
-	constructor(input) {
+	constructor(input = {}) {
 		super(input);
 		this.data = {
 			...input,
@@ -67,8 +65,7 @@ export default class Service extends BasicApi {
 		try {
 			let response = await axios.get(serviceUrl);
 			//isolando o body
-			const services = response.data.data;
-			return converters.convertList(services, Service);
+			return new Service(response.data);
 		} catch (e) {
 			throw KongError.serviceError(e);
 		}
@@ -111,26 +108,20 @@ export default class Service extends BasicApi {
 		}
 	}
 
-	async getRoute(id) {
-		return await Route.getOne(this.url, id);
+	async update(url) {
+		if (typeof url == undefined)
+			throw KongError.UndefinedUrl;
+		//[repare the url
+		const serviceUrl = helpers.urlPrep(url, `services/${this.id}`);
+		//call for the service
+		try {
+			let response = await axios.patch(serviceUrl, this.data);
+			//isolando o body
+			return new Service(response.data);
+		} catch (e) {
+			throw KongError.serviceError(e);
+		}
 	}
-
-	async addRoute(route) {
-		route.service = {
-			id: this.id
-		};
-		return await route.add(this.basic_url, route);
-	}
-
-	async updateRoute(id, route) {
-		return await route.update(this.basic_url, id, route);
-	}
-
-	async deleteRoute(id) {
-		return await Route.remove(this.basic_url, id);
-	}
-
-
 }
 
 

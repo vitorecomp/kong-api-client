@@ -1,16 +1,28 @@
 
+export class KongError {
+	constructor(err) {
+		if (typeof err == 'string') {
+			this.type = 'NE';
+			this.msg = err;
+		} else {
+			this.type = 'UN';
+			this.err = err;
+		}
+	}
+}
+
 export const undefinedUrl =
-	new Error('admin_url must be diferent of undefined');
-export const notFound = endpoint => new Error(endpoint);
+	new KongError('admin_url must be diferent of undefined');
+export const notFound = endpoint => new KongError(endpoint);
 export const serviceError = response =>
-	new Error(response);
+	new KongError(response);
 
 
 export const invalidField = field =>
-	new Error(`The field ${field} is invalid`);
+	new KongError(`The field ${field} is invalid`);
 
 export const undefinedField = field =>
-	new Error(`The field ${field} cannot be undefined`);
+	new KongError(`The field ${field} cannot be undefined`);
 
 export default {
 	undefinedUrl,
