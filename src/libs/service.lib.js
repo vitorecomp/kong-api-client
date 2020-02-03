@@ -1,9 +1,9 @@
-import validator from 'validator';
+const validator = require('validator');
 
-import KongError from '../domain/kong.error';
-import Domain from '../domain/domain.class';
+const KongError = require('../domain/kong.error');
+const Domain = require('../domain/domain.class');
 
-export default class Service extends Domain {
+module.exports = class Service extends Domain {
 	static endpoint() {
 		return 'services';
 	}
@@ -45,7 +45,7 @@ export default class Service extends Domain {
 			throw KongError.undefinedField('port');
 		}
 	}
-}
+};
 
 
 

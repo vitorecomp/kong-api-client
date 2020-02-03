@@ -1,6 +1,6 @@
-import Service from '../../src/libs/service.lib';
-import Route from '../../src/libs/route.lib';
-import { KongError } from '../../src/domain/kong.error';
+const Service = require('../../src/libs/service.lib');
+const Route = require('../../src/libs/route.lib');
+const { KongError } = require('../../src/domain/kong.error');
 
 test('Service build empty', async () => {
 	try {

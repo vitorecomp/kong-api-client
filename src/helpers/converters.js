@@ -1,4 +1,4 @@
-export const toArray = (inputArray) => {
+const toArray = (inputArray) => {
 	let array = [];
 	if (inputArray) {
 		array = Array.isArray(inputArray)
@@ -8,7 +8,7 @@ export const toArray = (inputArray) => {
 	return array;
 };
 
-export const convertList = (list, Class, inject) => {
+const convertList = (list, Class, inject) => {
 	return list.map(item =>
 		(item instanceof Class)
 			? item
@@ -20,7 +20,7 @@ export const convertList = (list, Class, inject) => {
 };
 
 
-export default {
+module.exports = {
 	toArray,
 	convertList
 };

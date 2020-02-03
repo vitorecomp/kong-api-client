@@ -1,9 +1,7 @@
-import validator from 'validator';
+const KongError = require('../domain/kong.error');
+const Domain = require('../domain/domain.class');
 
-import KongError from '../domain/kong.error';
-import Domain from '../domain/domain.class';
-
-export default class Plugin extends Domain {
+module.exports = class Plugin extends Domain {
 	static endpoint() {
 		return 'plugins';
 	}
@@ -29,6 +27,4 @@ export default class Plugin extends Domain {
 			throw KongError.undefinedField('protocols');
 		}
 	}
-}
-
-module.exports = Plugin;
+};

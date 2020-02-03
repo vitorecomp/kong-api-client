@@ -1,5 +1,5 @@
 
-export class KongError extends Error {
+class KongError extends Error {
 	constructor(err) {
 		super(err);
 		if (typeof err == 'string') {
@@ -12,24 +12,25 @@ export class KongError extends Error {
 	}
 }
 
-export const undefinedUrl =
+const undefinedUrl =
 	new KongError('admin_url must be diferent of undefined');
-export const notFound = endpoint => new KongError(endpoint);
-export const serviceError = response => response instanceof KongError
+const notFound = endpoint => new KongError(endpoint);
+const serviceError = response => response instanceof KongError
 	? response
 	: new KongError(response);
 
 
-export const invalidField = field =>
+const invalidField = field =>
 	new KongError(`The field ${field} is invalid`);
 
-export const undefinedField = field =>
+const undefinedField = field =>
 	new KongError(`The field ${field} cannot be undefined`);
 
-export const semiOptionalField = fields =>
+const semiOptionalField = fields =>
 	new KongError(`One of the files must be defined: ${fields}`);
 
-export default {
+module.exports = {
+	KongError,
 	undefinedUrl,
 	notFound,
 	serviceError,

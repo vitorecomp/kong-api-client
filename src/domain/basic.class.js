@@ -1,10 +1,9 @@
+const Service = require('../libs/service.lib');
+const Route = require('../libs/route.lib');
+const Consumer = require('../libs/consumer.lib');
+const Plugin = require('../libs/plugin.lib');
 
-import Service from '../libs/service.lib';
-import Route from '../libs/route.lib';
-import Consumer from '../libs/consumer.lib';
-import Plugin from '../libs/plugin.lib';
-
-export default class BasicApi {
+module.exports = class BasicApi {
 	//services 
 	async addServices(services) {
 		let proms = services.map(async (ser) => await this.addService(ser));
@@ -126,5 +125,5 @@ export default class BasicApi {
 		const plugin = await this.findPlugin(id);
 		return await plugin.delete(this.url);
 	}
-}
+};
 

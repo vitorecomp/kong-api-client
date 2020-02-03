@@ -1,11 +1,11 @@
-import axios from 'axios';
+const axios = require('axios');
 
-import helpers from '../helpers/helpers';
-import converters from '../helpers/converters';
+const helpers = require('../helpers/helpers');
+const converters = require('../helpers/converters');
 
-import KongError from '../domain/kong.error';
+const KongError = require('../domain/kong.error');
 
-export default class Domain {
+module.exports = class Domain {
 	static endpoint() {
 		return 'null';
 	}
@@ -104,4 +104,4 @@ export default class Domain {
 			throw KongError.serviceError(e);
 		}
 	}
-}
+};

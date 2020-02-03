@@ -1,9 +1,6 @@
-import validator from 'validator';
-
-import KongError from '../domain/kong.error';
 import Domain from '../domain/domain.class';
 
-export default class Consumer extends Domain {
+module.exports = class Consumer extends Domain {
 	static endpoint() {
 		return 'consumers';
 	}
@@ -24,6 +21,4 @@ export default class Consumer extends Domain {
 		//in case
 		this.id = input.id;
 	}
-}
-
-module.exports = Consumer;
+};

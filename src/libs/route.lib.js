@@ -1,7 +1,7 @@
-import KongError from '../domain/kong.error';
-import Domain from '../domain/domain.class';
+const KongError = require('../domain/kong.error');
+const Domain = require('../domain/domain.class');
 
-export default class Route extends Domain {
+module.exports = class Route extends Domain {
 	static endpoint() {
 		return 'routes';
 	}
@@ -34,6 +34,4 @@ export default class Route extends Domain {
 			throw KongError.semiOptionalField('methods, host, paths');
 		}
 	}
-}
-
-module.exports = Route;
+};

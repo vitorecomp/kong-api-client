@@ -1,14 +1,14 @@
-import utils from './helpers/converters';
+const utils = require('./helpers/converters');
 
-import BasicApi from './domain/basic.class';
-import KongError from './domain/kong.error';
+const BasicApi = require('./domain/basic.class');
+const KongError = require('./domain/kong.error');
 
-import Service from './libs/service.lib';
-import Route from './libs/route.lib';
-import Plugin from './libs/plugin.lib';
-import Consumer from './libs/consumer.lib';
+const Service = require('./libs/service.lib');
+const Route = require('./libs/route.lib');
+const Plugin = require('./libs/plugin.lib');
+const Consumer = require('./libs/consumer.lib');
 
-export default class KongApi extends BasicApi {
+module.exports = class KongApi extends BasicApi {
 	constructor({ admin_url, services, plugins, consumers, routes } = {}) {
 		super();
 		if (typeof admin_url === 'undefined') {
@@ -67,7 +67,7 @@ export default class KongApi extends BasicApi {
 			await el.delete(this.url));
 
 		await Promise.all(routesProms);
-		
+
 		//get all services
 		const services = await this.findServices(this.url);
 		// console.log('clean');
@@ -78,4 +78,4 @@ export default class KongApi extends BasicApi {
 		await Promise.all(serviceProms);
 
 	}
-}
+};
