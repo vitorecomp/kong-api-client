@@ -4,11 +4,11 @@ import { config, clean } from '../helpers';
 import { KongError } from '../../src/domain/kong.error';
 
 beforeEach(async (done) => {
-	await clean(done)
+	await clean(done);
 });
 
 afterEach(async (done) => {
-	await clean(done)
+	await clean(done);
 });
 
 test('Init with new service on init with url', async () => {

@@ -4,11 +4,11 @@ import { config, clean } from '../helpers';
 import { KongError } from '../../src/domain/kong.error';
 
 beforeEach(async (done) => {
-	await clean(done)
+	await clean(done);
 });
 
 afterEach(async (done) => {
-	await clean(done)
+	await clean(done);
 });
 const getService = async () => {
 	let kong = new KongApi(config);
@@ -37,16 +37,12 @@ test('Init with new route', async () => {
 		}
 	};
 	let kong = new KongApi(lConfig);
-	try {
-		const sended = await kong.init();
-		expect(sended.routes).toHaveLength(1);
-		expect(sended.routes[0].id)
-			.not.toBeUndefined();
 
-	} catch (e) {
-		console.log(e.err.response);
-		throw e;
-	}
+	const sended = await kong.init();
+	expect(sended.routes).toHaveLength(1);
+	expect(sended.routes[0].id)
+		.not.toBeUndefined();
+
 });
 
 test('Add Route without class', async () => {

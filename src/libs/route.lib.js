@@ -33,12 +33,6 @@ export default class Route extends Domain {
 			&& typeof this.data.paths === 'undefined') {
 			throw KongError.semiOptionalField('methods, host, paths');
 		}
-
-		// if (typeof this.data.snis === 'undefined'
-		// 	&& typeof this.data.sources === 'undefined'
-		// 	&& typeof this.data.destinations === 'undefined') {
-		// 	throw KongError.semiOptionalField('snis, sources, destinations');
-		// }
 	}
 }
 
