@@ -1,4 +1,5 @@
 import Service from '../../src/libs/service.lib';
+import Route from '../../src/libs/route.lib';
 import { KongError } from '../../src/domain/kong.error';
 
 test('Service build empty', async () => {
@@ -42,6 +43,51 @@ test('Service with missing parameters', async () => {
 		new Service({
 			protocol: 'http',
 			host: 'www.test.com',
+		});
+	} catch (e) {
+		expect(e).toBeInstanceOf(KongError);
+	}
+});
+
+////////////////
+//Routes
+///////////////
+
+test('Route build empty', async () => {
+	try {
+		new Route();
+	} catch (e) {
+		expect(e).toBeInstanceOf(KongError);
+	}
+});
+
+test('Route with url', async () => {
+	const route = new Route({
+		protocols: 'http',
+		methods: 'POST',
+		destinations: 'http://teste.com'
+	});
+	expect(route.data.protocols).not.toBeUndefined();
+	expect(route.data.methods).not.toBeUndefined();
+	expect(route.data.destinations).not.toBeUndefined();
+});
+
+test('Route with missing parameters destinations', async () => {
+	try {
+		new Route({
+			protocols: 'http',
+			methods: 'POST',
+		});
+	} catch (e) {
+		expect(e).toBeInstanceOf(KongError);
+	}
+});
+
+test('Route with missing parameters methods', async () => {
+	try {
+		new Route({
+			protocols: 'http',
+			destinations: 'http://teste.com'
 		});
 	} catch (e) {
 		expect(e).toBeInstanceOf(KongError);

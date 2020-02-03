@@ -1,18 +1,14 @@
 
 let KongApi = require('../../index.js');
-import { config } from '../helpers';
+import { config, clean } from '../helpers';
 import { KongError } from '../../src/domain/kong.error';
 
-beforeEach(async () => {
-	let kong = new KongApi(config);
-	await kong.init();
-	return await kong.clean();
+beforeEach(async (done) => {
+	await clean(done)
 });
 
-afterEach(async () => {
-	let kong = new KongApi(config);
-	await kong.init();
-	return await kong.clean();
+afterEach(async (done) => {
+	await clean(done)
 });
 
 test('Init with new service on init with url', async () => {
@@ -61,13 +57,14 @@ test('Add Service without class', async () => {
 
 	expect(addedService.id).toBe(service.id);
 	expect(addedService.data.url).toBe(service.data.url);
-	expect(addedService.port).toBe(service.port);
-	expect(addedService.protocol).toBe(service.protocol);
-	expect(addedService.host).toBe(service.host);
-	expect(addedService.name).toBe(service.name);
+	expect(addedService.data.port).toBe(service.data.port);
+	expect(addedService.data.protocol).toBe(service.data.protocol);
+	expect(addedService.data.host).toBe(service.data.host);
+	expect(addedService.data.name).toBe(service.data.name);
 });
 
 test('Update Service', async () => {
+	// console.log('start update');
 	//create kong
 	let kong = new KongApi(config);
 	await kong.init();
@@ -78,21 +75,24 @@ test('Update Service', async () => {
 		port: 8080,
 		name: 'teste'
 	});
+	// console.log(sended);
 
 	sended = await kong.updateService(sended.id, {
-		port: 8081,
-		name: 'teste2'
+		port: 8081
 	});
+
+	// console.log(sended);
+
 	expect(sended.id).not.toBeUndefined();
 	//get service
 	const recived = await kong.findService(sended.id);
 
 	expect(recived.id).toBe(sended.id);
 	expect(recived.data.url).toBe(sended.data.url);
-	expect(recived.port).toBe(sended.port);
-	expect(recived.protocol).toBe(sended.protocol);
-	expect(recived.host).toBe(sended.host);
-	expect(recived.name).toBe(sended.name);
+	expect(recived.data.port).toBe(sended.data.port);
+	expect(recived.data.protocol).toBe(sended.data.protocol);
+	expect(recived.data.host).toBe(sended.data.host);
+	expect(recived.data.name).toBe(sended.data.name);
 });
 
 test('Remove Service', async () => {

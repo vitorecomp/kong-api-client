@@ -1,57 +1,77 @@
-import Plugin from '../libs/plugin.lib';
-import Consumer from '../libs/consumer.lib';
+
+import Service from '../libs/service.lib';
+import Route from '../libs/route.lib';
 
 export default class BasicApi {
-	async addConsumers(consumers) {
-		let proms = consumers.map(async (e) => {
-			await this.addConsumer(e);
-		});
-		await Promise.all(proms);
+	//services 
+	async addServices(services) {
+		let proms = services.map(async (ser) => await this.addService(ser));
+		return await Promise.all(proms);
 	}
 
-	async findConsumers(limit = 100) {
-		return await Consumer.findAll(this.url, limit);
+	async findServices(limit = 100) {
+		return await Service.findAll(limit);
 	}
 
-	async findConsumerById(id) {
-		return await Consumer.findById(this.url, id);
+	async findService(id) {
+		return await Service.findById(this.url, id);
 	}
 
-	async addConsumer(consumer) {
-		return await Consumer.add(this.url, consumer);
-	}
-	async updateConsumer(id, consumer) {
-		return await Consumer.update(this.url, id, consumer);
-	}
-	async deleteConsumer(id) {
-		return await Consumer.remove(this.url, id);
+	async addService(service) {
+		if (!(service instanceof Service))
+			service = new Service(service);
+		return await service.create(this.url);
 	}
 
-	async addPlugins(plugins) {
-		let proms = plugins.map(async (e) => {
-			await this.addPlugin(e);
-		});
-		await Promise.all(proms);
+	async updateService(id, data) {
+		const service = await this.findService(id);
+		return await service.update(this.url, data);
 	}
 
-	async findPlugins(limit) {
-		return await Plugin.findAll(this.url, limit);
+	async deleteService(id) {
+		const service = await this.findService(id);
+		return await service.delete(this.url);
 	}
 
-	async findPluginById(id) {
-		return await Plugin.findById(this.url, id);
+	//consumers
+	async addPlugins() { }
+	async addConsumers() { }
+	async findConsumers() {
+		return [];
+	}
+	async findPlugins() {
+		return [];
 	}
 
-	async addPlugin(plugin) {
-		return await Plugin.add(this.url, plugin);
+
+	//route methods
+	async addRoutes(routes) {
+		let proms = routes.map(async (ser) => await this.addRoute(ser));
+		return await Promise.all(proms);
 	}
 
-	async updatePlugin(id, plugin) {
-		return await Plugin.update(this.url, id, plugin);
+	async findRoutes(limit = 100) {
+		return Route.findAll(limit);
 	}
 
-	async deletePlugin(id) {
-		return await Plugin.remove(this.url, id);
+	async findRoute(id) {
+		return await Route.findById(this.url, id);
+	}
+
+	async addRoute(route) {
+		if (!(route instanceof Route))
+			route = new Route(route);
+		return await route.create(this.url);
+	}
+
+	async updateRoute(id, data) {
+		const route = await this.findRoute(id);
+		return await route.update(this.url, data);
+	}
+
+	async deleteRoute(id) {
+		const route = await this.findRoute(id);
+		return await route.delete(this.url);
 	}
 }
 

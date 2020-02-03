@@ -1,16 +1,23 @@
 import validator from 'validator';
-import axios from 'axios';
-
-import helpers from '../helpers/helpers';
-import converters from '../helpers/converters';
 
 import KongError from '../domain/kong.error';
-import BasicApi from '../domain/basic.class';
+import Domain from '../domain/domain.class';
 
-export default class Service extends BasicApi {
+export default class Service extends Domain {
+	static endpoint() {
+		return 'services';
+	}
+	endpoint() {
+		return 'services';
+	}
+
+	static builder() {
+		return Service;
+	}
 
 	constructor(input = {}) {
-		super(input);
+		super();
+
 		this.data = {
 			...input,
 			id: undefined
@@ -36,90 +43,6 @@ export default class Service extends BasicApi {
 		}
 		if (typeof this.data.port === 'undefined') {
 			throw KongError.undefinedField('port');
-		}
-
-	}
-
-	static async findAll(url) {
-		if (typeof url == undefined)
-			throw KongError.UndefinedUrl;
-		//[repare the url
-		const serviceUrl = helpers.urlPrep(url, 'services');
-		//call for the service
-		try {
-			let response = await axios.get(serviceUrl);
-			//isolando o body
-			const services = response.data.data;
-			return converters.convertList(services, Service);
-		} catch (e) {
-			throw KongError.serviceError(e);
-		}
-	}
-
-	static async findById(url, id) {
-		if (typeof url == undefined)
-			throw KongError.UndefinedUrl;
-		//[repare the url
-		const serviceUrl = helpers.urlPrep(url, `services/${id}`);
-		//call for the service
-		try {
-			let response = await axios.get(serviceUrl);
-			//isolando o body
-			return new Service(response.data);
-		} catch (e) {
-			throw KongError.serviceError(e);
-		}
-	}
-
-	async create(url) {
-		if (typeof url == undefined)
-			throw KongError.UndefinedUrl;
-		//[repare the url
-		const serviceUrl = helpers.urlPrep(url, 'services');
-		//call for the service
-		try {
-			let response = await axios.post(serviceUrl, this.data);
-			//isolando o body
-			return new Service(response.data);
-		} catch (e) {
-			throw KongError.serviceError(e);
-		}
-	}
-
-	static async deleteService(url, id) {
-		const service = await Service.findById(url, id);
-		if (!service)
-			throw KongError.notFound('Service');
-		return await service.delete(url);
-	}
-
-	async delete(url) {
-		if (typeof url == undefined)
-			throw KongError.UndefinedUrl;
-		//[repare the url
-		const serviceUrl = helpers.urlPrep(url, `services/${this.id}`);
-		//call for the service
-		try {
-			await axios.delete(serviceUrl, this.data);
-			//isolando o body
-			return this.id;
-		} catch (e) {
-			throw KongError.serviceError(e);
-		}
-	}
-
-	async update(url) {
-		if (typeof url == undefined)
-			throw KongError.UndefinedUrl;
-		//[repare the url
-		const serviceUrl = helpers.urlPrep(url, `services/${this.id}`);
-		//call for the service
-		try {
-			let response = await axios.patch(serviceUrl, this.data);
-			//isolando o body
-			return new Service(response.data);
-		} catch (e) {
-			throw KongError.serviceError(e);
 		}
 	}
 }

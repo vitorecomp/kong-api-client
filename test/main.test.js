@@ -1,18 +1,15 @@
 let KongApi = require('../index.js');
-import { config } from './helpers';
-import { KongError } from '../src/domain/kong.error';
+import { config, clean } from './helpers';
+import { KongError } from './../src/domain/kong.error';
 
-beforeEach(async () => {
-	let kong = new KongApi(config);
-	await kong.init();
-	return await kong.clean();
+beforeEach(async (done) => {
+	await clean(done)
 });
 
-afterEach(async () => {
-	let kong = new KongApi(config);
-	await kong.init();
-	return await kong.clean();
+afterEach(async (done) => {
+	await clean(done)
 });
+
 
 test('Simple init test', async () => {
 	let kong = new KongApi(config);

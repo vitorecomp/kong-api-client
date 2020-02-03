@@ -1,16 +1,44 @@
-const axios = require('axios');
-const helpers = require('../helpers/helpers');
+import KongError from '../domain/kong.error';
+import Domain from '../domain/domain.class';
 
-class Route {
-	constructor() { }
+export default class Route extends Domain {
+	static endpoint() {
+		return 'routes';
+	}
+	endpoint() {
+		return 'routes';
+	}
 
-	async create(url, data) {
-		//[repare the url
-		url = helpers.urlPrep(url, 'route');
-		//call for the service
-		let route = await axios.post(url, data);
-		//return the response
-		return route.data;
+	static builder() {
+		return Route;
+	}
+
+	constructor(input = {}) {
+		super();
+		this.data = {
+			...input,
+			id: undefined
+		};
+		//in case
+		this.id = input.id;
+
+		//validate the fields of the service
+		if (typeof this.data.protocols === 'undefined') {
+			throw KongError.undefinedField('protocols');
+		}
+
+		//validate the fields of the route
+		if (typeof this.data.methods === 'undefined'
+			&& typeof this.data.hosts === 'undefined'
+			&& typeof this.data.paths === 'undefined') {
+			throw KongError.semiOptionalField('methods, host, paths');
+		}
+
+		// if (typeof this.data.snis === 'undefined'
+		// 	&& typeof this.data.sources === 'undefined'
+		// 	&& typeof this.data.destinations === 'undefined') {
+		// 	throw KongError.semiOptionalField('snis, sources, destinations');
+		// }
 	}
 }
 

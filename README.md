@@ -71,15 +71,16 @@ kong.init()
 
 ### Complete documentation
 
-> Init Api [contructor](./documentation/init.md)
-
-> Services Api [domains](./documentation/services.md)
-
-> Consumers Api [consumers](./documentation/consumers.md)
-
-> Route Api [routes](./documentation/routes.md)
-
-> Plugin Api [plugins](./documentation/plugins.md)
+Init Api
+> [contructor](./documentation/init.md)
+Services Api
+> [domains](./documentation/services.md)
+Route Api
+> [routes](./documentation/routes.md)
+Consumers Api
+> [consumers](./documentation/consumers.md)
+Plugin Api
+> [plugins](./documentation/plugins.md)
 
 ## Need fix
 

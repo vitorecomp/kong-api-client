@@ -1,31 +1,48 @@
-const axios = require('axios');
-const helpers = require('../helpers/helpers');
-const utils = require('../helpers/converters');
-const KongError = require('../domain/kong.error');
+import validator from 'validator';
 
-class Plugin {
-	constructor() { }
+import KongError from '../domain/kong.error';
+import Domain from '../domain/domain.class';
 
-	static async findAll(url) {
-		//[repare the url
-		const pluginUrl = helpers.urlPrep(url, 'plugins');
-		//call for the plugin
-		let response = await axios.get(pluginUrl);
-		if (response.status != 200) {
-			throw KongError.serviceError(response);
-		}
-		//isolando o body
-		const plugins = response.data.data;
-		return utils.convertList(plugins, Plugin);
+export default class Plugin extends Domain {
+	static endpoint() {
+		return 'plugins';
+	}
+	endpoint() {
+		return 'plugins';
 	}
 
-	async add(url, data) {
-		//[repare the url
-		url = helpers.urlPrep(url, 'plugins');
-		//call for the service
-		let plugin = await axios.post(url, data);
-		//return the response
-		return plugin.data;
+	static builder() {
+		return Plugin;
+	}
+
+	constructor(input) {
+		super();
+		this.data = {
+			...input,
+			id: undefined
+		};
+		//in case
+		this.id = input.id;
+
+		//validate url
+		if (typeof this.data.url !== 'undefined') {
+			if (typeof this.data.url !== 'string')
+				throw KongError.invalidField('url');
+			if (!validator.isURL(this.data.url))
+				throw KongError.invalidField('url');
+			return;
+		}
+
+		//validate the fields of the plugin
+		if (typeof this.data.protocol === 'undefined') {
+			throw KongError.undefinedField('protocol');
+		}
+		if (typeof this.data.host === 'undefined') {
+			throw KongError.undefinedField('host');
+		}
+		if (typeof this.data.port === 'undefined') {
+			throw KongError.undefinedField('port');
+		}
 	}
 }
 

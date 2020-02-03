@@ -8,11 +8,14 @@ export const toArray = (inputArray) => {
 	return array;
 };
 
-export const convertList = (list, Class) => {
+export const convertList = (list, Class, inject) => {
 	return list.map(item =>
 		(item instanceof Class)
 			? item
-			: new Class(item)
+			: new Class({
+				...item,
+				...inject
+			})
 	);
 };
 
