@@ -10,8 +10,8 @@ module.exports = class BasicApi {
 		return await Promise.all(proms);
 	}
 
-	async findServices(limit = 100) {
-		return await Service.findAll(limit);
+	async findServices() {
+		return await Service.findAll(this.url);
 	}
 
 	async findService(id) {
@@ -42,8 +42,8 @@ module.exports = class BasicApi {
 		return await Promise.all(proms);
 	}
 
-	async findRoutes(limit = 100) {
-		return Route.findAll(limit);
+	async findRoutes() {
+		return Route.findAll(this.url);
 	}
 
 	async findRoute(id) {
@@ -72,8 +72,8 @@ module.exports = class BasicApi {
 		return await Promise.all(proms);
 	}
 
-	async findConsumers(limit = 100) {
-		return Consumer.findAll(limit);
+	async findConsumers() {
+		return Consumer.findAll(this.url);
 	}
 
 	async findConsumer(id) {
@@ -102,8 +102,8 @@ module.exports = class BasicApi {
 		return await Promise.all(proms);
 	}
 
-	async findPlugins(limit = 100) {
-		return Plugin.findAll(limit);
+	async findPlugins() {
+		return Plugin.findAll(this.url);
 	}
 
 	async findPlugin(id) {

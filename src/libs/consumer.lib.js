@@ -1,4 +1,4 @@
-import Domain from '../domain/domain.class';
+const Domain = require('../domain/domain.class');
 
 module.exports = class Consumer extends Domain {
 	static endpoint() {

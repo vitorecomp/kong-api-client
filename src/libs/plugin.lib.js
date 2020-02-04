@@ -21,10 +21,5 @@ module.exports = class Plugin extends Domain {
 		};
 		//in case
 		this.id = input.id;
-
-		//validate the fields of the service
-		if (typeof this.data.protocols === 'undefined') {
-			throw KongError.undefinedField('protocols');
-		}
 	}
 };
