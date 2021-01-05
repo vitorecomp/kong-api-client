@@ -9,7 +9,7 @@
 	},
 	"bundleDependencies": [],
 	"dependencies": {
-		"axios": "^0.18.1",
+		"axios": "^0.21.1",
 		"eslint-plugin-jest": "^23.6.0",
 		"validator": "^12.2.0"
 	},
