@@ -85,29 +85,27 @@ await kong.addConsumer({
 
 ```
 
-### Complete documentation
+## Complete documentation
 
-[Builder Api](./documentation/init.md)
+### [Builder Api](./documentation/init.md)
 
 > This is the block of documentations that will define the base objects that the lib will use and/or recive from kong.
 
-[Services Api](./documentation/services.md)
+### [Services Api](./documentation/services.md)
 
 > In this block of documentations will be defined interact with the kong services using the lib.
 
-[Routes Api](./documentation/routes.md)
+### [Routes Api](./documentation/routes.md)
 
 > In this block of documentations will be defined interact with the kong routes using the lib.
 
-[Consumers Api](./documentation/consumers.md)
+### [Consumers Api](./documentation/consumers.md)
 
 > In this block of documentations will be defined interact with the kong consumers using the lib.
 
-[Plugins Api](./documentation/plugins.md)
-
+### [Plugins Api](./documentation/plugins.md)
 
 > In this block of documentations will be defined interact with the kong plugins using the lib.
-
 
 ## Need fix
 
