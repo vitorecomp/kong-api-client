@@ -2,12 +2,12 @@ let KongApi = require('../index.js');
 const { config, clean } = require('./helpers');
 const { KongError } = require('./../src/domain/kong.error');
 
-beforeEach(async (done) => {
-	await clean(done);
+beforeEach(async () => {
+	return await clean();
 });
 
-afterEach(async (done) => {
-	await clean(done);
+afterEach(async () => {
+	return await clean();
 });
 
 

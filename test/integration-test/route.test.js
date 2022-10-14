@@ -3,13 +3,15 @@ let KongApi = require('../../index.js');
 const { config, clean } = require('../helpers');
 const { KongError } = require('../../src/domain/kong.error');
 
-beforeEach(async (done) => {
-	await clean(done);
+
+beforeEach(async () => {
+	await clean();
 });
 
-afterEach(async (done) => {
-	await clean(done);
+afterEach(async () => {
+	await clean();
 });
+
 const getService = async () => {
 	let kong = new KongApi(config);
 	await kong.init();

@@ -3,23 +3,25 @@ let KongApi = require('../../index.js');
 const { config, clean } = require('../helpers');
 const { KongError } = require('../../src/domain/kong.error');
 
-beforeEach(async (done) => {
-	await clean(done);
+
+beforeEach(async () => {
+	 await clean();
 });
 
-afterEach(async (done) => {
-	await clean(done);
+afterEach(async () => {
+	 await clean();
 });
+
 
 test('Init with new service on init with url', async () => {
 
-	let lConfig = {
+	let myKongConfig = {
 		...config,
 		services: {
 			url: 'http://www.teste.com:8080'
 		}
 	};
-	let kong = new KongApi(lConfig);
+	let kong = new KongApi(myKongConfig);
 	const services = await kong.init();
 	expect(services.services).toHaveLength(1);
 	expect(services.services[0].id).not.toBeUndefined(); services.services[0];

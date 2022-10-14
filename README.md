@@ -41,9 +41,16 @@ let config = {
 let kong = new KongApi(config)
 kong.init()
 
+await kong.addService({
+    protocol: 'http',
+    host: 'www.test.com',
+    port: 8080,
+    name: 'teste'
+});
+
 ```
 
-### How update new service
+### How update a service host
 
 ```javascript
 
@@ -53,6 +60,10 @@ let config = {
 }
 let kong = new KongApi(config)
 kong.init()
+
+await kong.updateService(testHostId, {
+    host: "www.newtest.com"
+});
 
 ```
 
@@ -66,6 +77,11 @@ let config = {
 }
 let kong = new KongApi(config)
 kong.init()
+
+await kong.addConsumer({
+    username: 'my-username',
+    custom_id: 'my-custom-id',
+});
 
 ```
 
@@ -90,8 +106,15 @@ Plugin Api
 ## Road Map
 
 - add unit tests
-- add a dockerfile to up kong
+    -- builder (done)
+- add a dockerfile to up kong (Done)
 - add the plugins on the consumers (auth)
 - create the documantation
-- add the custom exception
+    -- main readme (done)
+    -- contructor
+    -- domains
+    -- routes
+    -- consumers
+    -- plugins
+- add the custom exception (done)
 - add routes capabilite to add itens (plugins, consumers)

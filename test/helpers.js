@@ -4,7 +4,7 @@ const config = {
 	admin_url: 'http://localhost:8001',
 };
 
-const clean = async (done) => {
+const clean = async () => {
 	try {
 		let kong = new KongApi(config);
 		await kong.init();
@@ -15,7 +15,6 @@ const clean = async (done) => {
 		await kong.init();
 		await kong.clean();
 	}
-	done();
 };
 
 module.exports = {
