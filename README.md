@@ -5,7 +5,7 @@
 
 ## Desciption
 
-This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gateway/>. The implemented endpois are:
+This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gateway/>. The implemented endpoints are:
 
 - Services
 - Custumers
@@ -14,8 +14,7 @@ This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gatew
 
 The version of the kong api, is 1.1.x decribed on <https://docs.konghq.com/1.1.x/getting-started/introduction>
 
-Is possible to find examples on the examples folder, and the complete reference guide to this lib on
-the documentation folder.
+Is possible to find examples on the examples folder and a complete reference guide on the documentation folder.
 
 ## How connect to the kong instance
 
@@ -27,7 +26,6 @@ let config = {
 }
 let kong = new KongApi(config)
 kong.init()
-
 ```
 
 ### How save new service
@@ -110,7 +108,7 @@ await kong.addConsumer({
 ## Need fix
 
 - Better error msg in case of offline kong server
-- User jest expect thorw on the tests
+- User jest expect throw on the tests
 
 ## Road Map
 
