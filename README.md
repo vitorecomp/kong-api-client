@@ -3,16 +3,16 @@
 [![Build Status](https://travis-ci.com/vitorecomp/kong-api-client.svg?branch=master)](https://travis-ci.com/vitorecomp/kong-api-client)
 [![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
 
-## Desciption
+## Description
 
 This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gateway/>. The implemented endpoints are:
 
 - Services
-- Custumers
+- Customers
 - Plugins
 - Routes
 
-The version of the kong api, is 1.1.x decribed on <https://docs.konghq.com/1.1.x/getting-started/introduction>
+The version of the kong api, is 1.1.x described on <https://docs.konghq.com/1.1.x/getting-started/introduction>
 
 Is possible to find examples on the examples folder and a complete reference guide on the documentation folder.
 
@@ -43,7 +43,7 @@ await kong.addService({
     protocol: 'http',
     host: 'www.test.com',
     port: 8080,
-    name: 'teste'
+    name: 'test'
 });
 
 ```
@@ -60,12 +60,12 @@ let kong = new KongApi(config)
 kong.init()
 
 await kong.updateService(testHostId, {
-    host: "www.newtest.com"
+    host: "www.new-test.com"
 });
 
 ```
 
-### Save a new custumer
+### Save a new customer
 
 ```javascript
 
@@ -87,7 +87,7 @@ await kong.addConsumer({
 
 ### [Builder Api](./documentation/init.md)
 
-> This is the block of documentations that will define the base objects that the lib will use and/or recive from kong.
+> This is the block of documentations that will define the base objects that the lib will use and/or receive from kong.
 
 ### [Services Api](./documentation/services.md)
 
@@ -116,12 +116,12 @@ await kong.addConsumer({
     -- builder (done)
 - add a dockerfile to up kong (Done)
 - add the plugins on the consumers (auth)
-- create the documantation
+- create the documentation
     -- main readme (done)
-    -- contructor
+    -- constructor
     -- domains
     -- routes
     -- consumers
     -- plugins
 - add the custom exception (done)
-- add routes capabilite to add itens (plugins, consumers)
+- add routes capable to add items (plugins, consumers)
