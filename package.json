@@ -1,6 +1,6 @@
 {
 	"author": {
-		"name": "Vitor de Araujo",
+		"name": "Vitor Vieira",
 		"email": "vitor.ecomp@gmail.com",
 		"url": "http://nobuffer.dev"
 	},
@@ -40,8 +40,8 @@
 	"scripts": {
 		"test": "jest --config=jest.config.json",
 		"test-dev": "jest --config=jest.config.json --watch",
-		"lint": "echo \"Error: no test specified\" && exit 1",
-		"lint-fix": "echo \"Error: no test specified\" && exit 1"
+		"lint": "echo \"Error: no lint specified\" && exit 1",
+		"lint-fix": "echo \"Error: no lint specified\" && exit 1"
 	},
 	"version": "2.1.4"
 }

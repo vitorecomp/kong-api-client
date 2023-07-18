@@ -107,21 +107,21 @@ await kong.addConsumer({
 
 ## Need fix
 
-- Better error msg in case of offline kong server
-- User jest expect throw on the tests
+- [ ] Better error msg in case of offline kong server
+- [ ] User jest expect throw on the tests
 
 ## Road Map
 
-- add unit tests
-    -- builder (done)
-- add a dockerfile to up kong (Done)
-- add the plugins on the consumers (auth)
-- create the documentation
-    -- main readme (done)
-    -- constructor
-    -- domains
-    -- routes
-    -- consumers
-    -- plugins
-- add the custom exception (done)
-- add routes capable to add items (plugins, consumers)
+- [ ] add unit tests
+- [x] builder
+- [x] add a dockerfile to up kong
+- [ ] add the plugins on the consumers (auth)
+- [ ] create the documentation
+- [x] main readme
+- [ ] constructor
+- [ ] domains
+- [ ] routes
+- [ ] consumers
+- [ ] plugins
+- [x] add the custom exception
+- [ ] add routes capable to add items (plugins, consumers)
