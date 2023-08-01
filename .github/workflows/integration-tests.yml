@@ -15,8 +15,7 @@ jobs:
 
     - name: Start Kong Container
       run: |
-        # Replace "docker-compose.yml" with the name of your Docker Compose file
-        docker-compose -f docker-compose.yml up -d kong
+        sh ./scripts/kong-docker.sh
 
     - name: Install dependencies
       run: npm install
