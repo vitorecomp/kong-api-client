@@ -1,6 +1,6 @@
 # kong-api-client
 
-[![Build Status](https://travis-ci.com/vitorecomp/kong-api-client.svg?branch=master)](https://travis-ci.com/vitorecomp/kong-api-client)
+[![Kong Integration Test](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml)
 [![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
 
 ## Description

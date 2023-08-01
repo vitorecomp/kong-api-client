@@ -1,24 +1,45 @@
 name: Kong Integration Test
 on: push
 
+env:
+  KONG: 'localhost:8080'
+
 jobs:
   # Label of the container job
   start_kong_container:
     runs-on: ubuntu-latest
+
+    # Service containers to run with `container-job`
+    # services:
+    #   # Label used to access the service container
+    #   kong-database:
+    #     # Docker Hub image
+    #     image: postgres:9.6
+    #     # Provide the password for postgres
+    #     env:
+    #       POSTGRES_USER: kong
+    #       POSTGRES_PASSWORD: kong
+    #     # Set health checks to wait until postgres has started
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Start Kong Container
-      run: |
-        # Replace "docker-compose.yml" with the name of your Docker Compose file
-        docker-compose -f docker-compose.yml up -d kong
+      run: sh ./scripts/kong-docker.sh
 
     - name: Install dependencies
       run: npm install
     
-    - name: Install dependencies
-      run: npm test
+    - name: Wait container
+      run: docker ps
+
+    - name: Test the code
+      run: npm run test
 
   
