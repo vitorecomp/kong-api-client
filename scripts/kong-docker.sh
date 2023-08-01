@@ -3,11 +3,12 @@
 # docker stop $(docker ps -a -q)
 # docker rm $(docker ps -a -q)
 
-docker run -d --name kong-database \
-                -p 5432:5432 \
-                -e "POSTGRES_USER=kong" \
-                -e "POSTGRES_DB=kong" \
-                postgres:9.6
+# docker run -d --name kong-database \
+#                 -p 5432:5432 \
+#                 -e "POSTGRES_USER=kong" \
+#                -e "POSTGRES_DB=kong" \
+#                -e "POSTGRES_PASSWORD=kong" \
+#                 postgres:9.6
 
 docker run --rm \
     --link kong-database:kong-database \
