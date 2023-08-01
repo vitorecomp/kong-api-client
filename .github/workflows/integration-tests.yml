@@ -18,7 +18,7 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_USER: kong
-          POSTGRES_DB: kong
+          POSTGRES_PASSWORD: kong
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
