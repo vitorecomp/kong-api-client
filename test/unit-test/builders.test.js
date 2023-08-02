@@ -93,3 +93,7 @@ test('Route with missing parameters methods', async () => {
 		expect(e).toBeInstanceOf(KongError);
 	}
 });
+
+test('Route with missing parameters methods', async () => {
+	throw "this is a error"
+});
