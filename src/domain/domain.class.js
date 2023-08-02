@@ -29,7 +29,10 @@ module.exports = class Domain {
 					kongUrl: url
 				});
 		} catch (e) {
-			throw KongError.serviceError(e);
+			if(e instanceof axios.AxiosError)
+				throw KongError.serviceError(e.cause);
+			else
+				throw KongError.serviceError(e);
 		}
 	}
 

@@ -1,7 +1,7 @@
 let KongApi = require('../index.js');
 
 const config = {
-	admin_url: 'http://localhost:8001',
+	admin_url: 'http://127.0.0.1:8001',
 };
 
 const clean = async () => {
