@@ -54,24 +54,23 @@ module.exports = class KongApi extends BasicApi {
 			await el.delete(this.url));
 
 		await Promise.all(pluginProms);
-		//get all consumers
+
+		// get all consumers
 		const consumers = await this.findConsumers(this.url);
 		const consumerProms = consumers.map(async el =>
-			await el.delete(this.url));
+		await el.delete(this.url));
 
 		await Promise.all(consumerProms);
 
-		//get all routes
+		// get all routes
 		const routes = await this.findRoutes(this.url);
 		const routesProms = routes.map(async el =>
 			await el.delete(this.url));
 
 		await Promise.all(routesProms);
 
-		//get all services
+		// get all services
 		const services = await this.findServices(this.url);
-		// console.log('clean');
-		// console.log(services);
 		const serviceProms = services.map(async el =>
 			await el.delete(this.url));
 
