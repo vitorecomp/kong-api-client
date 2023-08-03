@@ -1,0 +1,19 @@
+name: Documentation publishing
+on:
+  push:
+    branches:
+      - "master"
+
+
+jobs:
+  # Label of the container job
+  start_kong_container:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: echo "Publishing the docs on the github pages"
+    

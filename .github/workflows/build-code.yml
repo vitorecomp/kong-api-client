@@ -1,0 +1,23 @@
+name: Eslint build and validation
+on: push
+
+env:
+  KONG: 'localhost:8080'
+
+jobs:
+  # Label of the container job
+  start_kong_container:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Test the code
+      run: npm eslint ./src
+
+
+    
