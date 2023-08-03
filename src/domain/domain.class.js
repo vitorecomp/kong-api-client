@@ -15,13 +15,13 @@ module.exports = class Domain {
     if (typeof url == undefined) {
       throw KongError.undefinedUrl;
     }
-    // [repare the url
+    // repair the url
     const domainUrl = helpers.urlPrep(url, this.endpoint());
 
     // call for the domain
     try {
       const response = await axios.get(domainUrl);
-      // isolando o body
+      // get the axios data body
       const domains = response.data.data;
       // TODO add the url on the domains
       const Builder = this.builder();
@@ -41,12 +41,11 @@ module.exports = class Domain {
     if (typeof url == undefined) {
       throw KongError.undefinedUrl;
     }
-    // [repare the url
+    // repair the url
     const domainUrl = helpers.urlPrep(url, `${this.endpoint()}/${id}`);
     // call for the domain
     try {
       const response = await axios.get(domainUrl);
-      // isolando o body
       const Builder = this.builder();
       return new Builder(response.data);
     } catch (e) {
@@ -67,12 +66,11 @@ module.exports = class Domain {
     if (typeof url == undefined) {
       throw KongError.undefinedUrl;
     }
-    // [repare the url
+    // repair the url
     const domainUrl = helpers.urlPrep(url, this.endpoint());
     // call for the domain
     try {
       const response = await axios.post(domainUrl, this.data);
-      // isolando o body
       const Builder = this.constructor;
       return new Builder(response.data);
     } catch (e) {
@@ -84,12 +82,11 @@ module.exports = class Domain {
     if (typeof url == undefined) {
       throw KongError.undefinedUrl;
     }
-    // [repare the url
+    // repair the url
     const domainUrl = helpers.urlPrep(url, `${this.endpoint()}/${this.id}`);
     // call for the domain
     try {
       const response = await axios.patch(domainUrl, this.data);
-      // isolando o body
       const Builder = this.constructor;
       return new Builder(response.data);
     } catch (e) {
@@ -101,12 +98,12 @@ module.exports = class Domain {
     if (typeof url == undefined) {
       throw KongError.undefinedUrl;
     }
-    // [repare the url
+    // repair the url
     const domainUrl = helpers.urlPrep(url, `${this.endpoint()}/${this.id}`);
     // call for the domain
     try {
       await axios.delete(domainUrl);
-      // isolando o body
+      // get the id
       return this.id;
     } catch (e) {
       throw KongError.serviceError(e);

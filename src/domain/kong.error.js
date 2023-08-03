@@ -21,7 +21,7 @@ class KongError extends Error {
   }
 }
 
-const undefinedUrl = new KongError('admin_url must be diferent of undefined');
+const undefinedUrl = new KongError('adminUrl shouldn\'t be null');
 
 const notFound = (endpoint) => new KongError(endpoint);
 

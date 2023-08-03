@@ -9,18 +9,34 @@ const Plugin = require('./libs/plugin.lib');
 const Consumer = require('./libs/consumer.lib');
 
 module.exports = class KongApi extends BasicApi {
-  constructor({admin_url, services, plugins, consumers, routes} = {}) {
+  /**
+  * The constructor of the KongApi class, this will
+  * make possible to receive the base information of the Kong
+  * API instance
+  * @param {string} adminUrl the url for the kong api gateway
+  * @param {[object]} services the list of services to be added on the gateway
+  * @param {[object]} plugins the list of plugins to be added on the gateway
+  * @param {[object]} consumers the list of consumers to be added on the gateway
+  * @param {[object]} routes the list of routes to be added on the gateway
+  */
+  constructor({
+    adminUrl,
+    services,
+    plugins,
+    consumers,
+    routes,
+  } = {}) {
     super();
-    if (typeof admin_url === 'undefined') {
+    if (typeof adminUrl === 'undefined') {
       throw KongError.undefinedUrl;
     }
     // Add / on kong url
-    this.url = admin_url;
+    this.url = adminUrl;
     if (this.url[this.url.length - 1] != '/') {
       this.url += '/';
     }
 
-    // transforme services in a array
+    // transform services in a array
     this.services = utils.toArray(services);
     this.routes = utils.toArray(routes);
     this.plugins = utils.toArray(plugins);

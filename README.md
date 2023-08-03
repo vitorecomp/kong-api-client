@@ -23,7 +23,7 @@ Is possible to find examples on the examples folder and a complete reference gui
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -35,7 +35,7 @@ kong.init()
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -55,7 +55,7 @@ await kong.addService({
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -72,7 +72,7 @@ await kong.updateService(testHostId, {
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
