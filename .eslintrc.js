@@ -5,7 +5,6 @@ module.exports = {
     es2021: true,
   },
   extends: 'google',
-  plugins: ['prettier'],
   overrides: [
     {
       env: {
@@ -21,6 +20,5 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
-    'prettier/prettier': 'error',
   },
 };

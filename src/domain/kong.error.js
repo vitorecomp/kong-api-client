@@ -1,4 +1,14 @@
+/**
+   * The standard error class for the Kong API errors
+   * allow the easy treatment of the api errors
+ */
 class KongError extends Error {
+  /**
+    * The constructor of the Kong Error class, this will
+    * this will make possible to convert the errors to a standard
+    * error message, and error class
+   * @param {object} err The error message
+ */
   constructor(err) {
     super(err);
     if (typeof err == 'string') {

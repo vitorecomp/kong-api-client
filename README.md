@@ -1,5 +1,6 @@
 # kong-api-client
 
+[![Eslint build and validation](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml)
 [![Kong Integration Test](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml)
 [![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
 

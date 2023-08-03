@@ -8,8 +8,7 @@ const toArray = (inputArray) => {
 
 const convertList = (list, Class, inject) => {
   return list.map((item) =>
-    item instanceof Class ?
-      item :
+    item instanceof Class ? item :
       new Class({
         ...item,
         ...inject,

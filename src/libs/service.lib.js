@@ -4,26 +4,49 @@ const KongError = require('../domain/kong.error');
 const Domain = require('../domain/domain.class');
 
 module.exports = class Service extends Domain {
+  /**
+  * Set the base endpoint of the Service class,
+  * that will be used in the static methods
+  * that came from the Domain class
+  * @return {string} the base endpoint of the Service class
+  */
   static endpoint() {
     return 'services';
   }
+
+  /**
+  * Set the base endpoint of the Service class,
+  * that will be used in the class methods
+  * that came from the Domain class
+  * @return {string} the base endpoint of the Service instance
+  */
   endpoint() {
     return 'services';
   }
 
+  /**
+  * Implement the builder pattern for the Service class
+  * @return {Service} a instance of the Service class
+  */
   static builder() {
     return Service;
   }
 
-  constructor(input = {}) {
+  /**
+  * The constructor of the Service class, this will
+  * make possible to receive a request from the
+  * api and convert it to a Service instance
+  * @param {object} inputData the data that came from the api
+  */
+  constructor(inputData = {}) {
     super();
 
     this.data = {
-      ...input,
+      ...inputData,
       id: undefined,
     };
     // in case
-    this.id = input.id;
+    this.id = inputData.id;
 
     // validate url
     if (typeof this.data.url !== 'undefined') {
