@@ -49,21 +49,31 @@ module.exports = class KongApi extends BasicApi {
     this.consumers = utils.convertList(this.consumers, Consumer);
   }
 
+  /**
+  * This method will create all the local elements on the Kong API,
+  * if the element already exists, it will be updated, if not, it will
+  * be created.
+  */
   async init() {
     const kong = {};
 
     // save all services of options
     kong.services = await this.addServices(this.services);
-    // save all puglins of options
+    // save all plugins of options
     kong.plugins = await this.addPlugins(this.plugins);
-    // save all custumers of options
+    // save all customers of options
     kong.consumers = await this.addConsumers(this.consumers);
-    // save all custumers of options
+    // save all customers of options
     kong.routes = await this.addRoutes(this.routes);
 
     return kong;
   }
 
+  /**
+  * This method will delete all elements on a Kong API,
+  * this is useful in case of a clean install
+  * allowing for the creation of a complete new Kong API
+  */
   async clean() {
     // get all plugins
     const plugins = await this.findPlugins(this.url);

@@ -41,12 +41,12 @@ test('Add Consumer without class', async () => {
 
   expect(sended.id).not.toBeUndefined();
   // get consumer
-  const recived = await kong.findConsumer(sended.id);
+  const received = await kong.findConsumer(sended.id);
 
-  expect(recived.id).toBe(sended.id);
+  expect(received.id).toBe(sended.id);
 
-  expect(recived.data.username).toBe(sended.data.username);
-  expect(recived.data.custom_id).toBe(sended.data.custom_id);
+  expect(received.data.username).toBe(sended.data.username);
+  expect(received.data.custom_id).toBe(sended.data.custom_id);
 });
 
 test('Update Consumer', async () => {
@@ -63,13 +63,13 @@ test('Update Consumer', async () => {
     protocols: ['https'],
   });
   expect(sended.id).not.toBeUndefined();
-  const recived = await kong.findConsumer(sended.id);
+  const received = await kong.findConsumer(sended.id);
 
 
-  expect(recived.id).toBe(sended.id);
+  expect(received.id).toBe(sended.id);
 
-  expect(recived.data.username).toBe(sended.data.username);
-  expect(recived.data.custom_id).toBe(sended.data.custom_id);
+  expect(received.data.username).toBe(sended.data.username);
+  expect(received.data.custom_id).toBe(sended.data.custom_id);
 });
 
 test('Remove Consumer', async () => {
@@ -99,7 +99,7 @@ test('Remove a invalid Consumer', async () => {
 
   // get consumer
   try {
-    await kong.deleteConsumer('123jdaskd');
+    await kong.deleteConsumer('notFoundConsumer');
   } catch (e) {
     expect(e).toBeInstanceOf(KongError);
   }
@@ -112,7 +112,7 @@ test('Update a invalid Consumer', async () => {
 
   // get consumer
   try {
-    await kong.updateConsumer('123jdaskd', {});
+    await kong.updateConsumer('notFoundConsumer', {});
   } catch (e) {
     expect(e).toBeInstanceOf(KongError);
   }
