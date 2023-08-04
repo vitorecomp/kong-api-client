@@ -22,6 +22,9 @@ class KongError extends Error {
 }
 
 const undefinedUrl = new KongError('adminUrl shouldn\'t be null');
+const undefinedEndPoint = new KongError(
+    'Calling a command from abstract class',
+);
 
 const notFound = (endpoint) => new KongError(endpoint);
 
@@ -44,4 +47,5 @@ module.exports = {
   invalidField,
   undefinedField,
   semiOptionalField,
+  undefinedEndPoint,
 };
