@@ -1,5 +1,6 @@
 # kong-api-client
 
+[![Eslint build and validation](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml)
 [![Kong Integration Test](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml)
 [![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
 
@@ -22,7 +23,7 @@ Is possible to find examples on the examples folder and a complete reference gui
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -34,7 +35,7 @@ kong.init()
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -54,7 +55,7 @@ await kong.addService({
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()
@@ -71,7 +72,7 @@ await kong.updateService(testHostId, {
 
 let KongApi = require('../../index.js')
 let config = {
-    admin_url: 'http://' + process.env.KONG_IP + ':8001'
+    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
 }
 let kong = new KongApi(config)
 kong.init()

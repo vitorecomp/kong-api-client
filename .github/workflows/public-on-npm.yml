@@ -1,0 +1,21 @@
+name: Publish the code on the NPM registry
+on:
+  push:
+    branches:
+      - "master"
+
+env:
+  KONG: 'localhost:8080'
+
+jobs:
+  # Label of the container job
+  start_kong_container:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: echo "publishing the new version on the npm registry"
+    

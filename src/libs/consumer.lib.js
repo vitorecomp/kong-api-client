@@ -1,24 +1,47 @@
 const Domain = require('../domain/domain.class');
 
 module.exports = class Consumer extends Domain {
-	static endpoint() {
-		return 'consumers';
-	}
-	endpoint() {
-		return 'consumers';
-	}
+  /**
+   * Set the base endpoint of the Consumer class,
+   * that will be used in the static methods
+   * that came from the Domain class
+   * @return {string} the base endpoint of the Consumer class
+   */
+  static endpoint() {
+    return 'consumers';
+  }
 
-	static builder() {
-		return Consumer;
-	}
+  /**
+   * Set the base endpoint of the Consumer class,
+   * that will be used in the class methods
+   * that came from the Domain class
+   * @return {string} the base endpoint of the Consumer instance
+   */
+  endpoint() {
+    return 'consumers';
+  }
 
-	constructor(input) {
-		super();
-		this.data = {
-			...input,
-			id: undefined
-		};
-		//in case
-		this.id = input.id;
-	}
+  /**
+   * Implement the builder pattern for the Consumer class
+   * @return {Consumer} a instance of the Consumer class
+   */
+  static builder() {
+    return Consumer;
+  }
+
+  /**
+   * The constructor of the Consumer class, this will
+   * make possible to receive a request from the
+   * api and convert it to a Consumer instance
+   * @param {object} inputData the data that came from the api
+   */
+  constructor(inputData = {}) {
+    super();
+    this.data = {
+      ...inputData,
+      id: undefined,
+    };
+    // in case
+    this.id = inputData.id;
+  }
 };
