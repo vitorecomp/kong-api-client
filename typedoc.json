@@ -1,0 +1,55 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "tsconfig": "tsconfig.build.json",
+  "out": "docs-site",
+  "readme": "README.md",
+  "projectDocuments": ["docs/**/*.md"],
+  "alwaysCreateEntryPointModule": false,
+  "categorizeByGroup": true,
+  "navigation": {
+    "includeGroups": true,
+    "includeCategories": true
+  },
+  "groupOrder": [
+    "Guides",
+    "Plugins",
+    "Classes",
+    "Interfaces",
+    "Type Aliases",
+    "Variables",
+    "Functions",
+    "*"
+  ],
+  "categoryOrder": [
+    "Overview",
+    "AI",
+    "Analytics & Monitoring",
+    "Authentication",
+    "Logging",
+    "Security",
+    "Serverless",
+    "Traffic Control",
+    "Transformations",
+    "*"
+  ],
+  "disableGit": true,
+  "basePath": ".",
+  "sourceLinkTemplate": "https://github.com/vitorecomp/kong-api-client/blob/master/{path}#L{line}",
+  "hostedBaseUrl": "https://vitorecomp.github.io/kong-api-client/",
+  "treatWarningsAsErrors": true,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "cleanOutputDir": true,
+  "githubPages": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "searchInDocuments": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/vitorecomp/kong-api-client"
+  }
+}

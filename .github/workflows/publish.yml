@@ -1,0 +1,63 @@
+name: Publish
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify release tag matches package.json version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          pkg_version="$(node -p "require('./package.json').version")"
+          tag_version="${RELEASE_TAG#v}"
+          if [[ "${tag_version}" != "${pkg_version}" ]]; then
+            echo "Release tag '${RELEASE_TAG}' (version '${tag_version}') does not match package.json version '${pkg_version}'." >&2
+            exit 1
+          fi
+
+      - name: Run checks
+        run: npm run check
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          pkg_version="$(node -p "require('./package.json').version")"
+          args=(publish --provenance --access public)
+          if [[ "${RELEASE_PRERELEASE}" == "true" || "${pkg_version}" == *-* ]]; then
+            args+=(--tag next)
+          fi
+          if [[ -n "${NPM_TOKEN:-}" ]]; then
+            tmp_npmrc="$(mktemp)"
+            trap 'rm -f "${tmp_npmrc}"' EXIT
+            chmod 600 "${tmp_npmrc}"
+            printf '//registry.npmjs.org/:_authToken=%s\n' "${NPM_TOKEN}" > "${tmp_npmrc}"
+            NPM_CONFIG_USERCONFIG="${tmp_npmrc}" npm "${args[@]}"
+          else
+            npm "${args[@]}"
+          fi

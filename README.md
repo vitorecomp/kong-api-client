@@ -1,128 +1,69 @@
 # kong-api-client
 
-[![Eslint build and validation](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/build-code.yml)
-[![Kong Integration Test](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/vitorecomp/kong-api-client/actions/workflows/integration-tests.yml)
-[![codecov](https://codecov.io/gh/vitorecomp/kong-api-client/branch/master/graph/badge.svg)](https://codecov.io/gh/vitorecomp/kong-api-client)
+TypeScript client for the self-hosted Kong Gateway Admin API with zero runtime dependencies.
 
-## Description
+## Requirements
 
-This is a sdk, to the Kong Gateway Admin API <https://konghq.com/solutions/gateway/>. The implemented endpoints are:
+- Node.js **22.12** or later
+- ESM (`import { Kong } from 'kong-api-client'`); CommonJS `require('kong-api-client')` also works on Node 22.12+
 
-- Services
-- Customers
-- Plugins
-- Routes
+## Install
 
-The version of the kong api, is 1.1.x described on <https://docs.konghq.com/1.1.x/getting-started/introduction>
-
-Is possible to find examples on the examples folder and a complete reference guide on the documentation folder.
-
-## How connect to the kong instance
-
-```javascript
-
-let KongApi = require('../../index.js')
-let config = {
-    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
-}
-let kong = new KongApi(config)
-kong.init()
+```bash
+npm install kong-api-client
 ```
 
-### How save new service
+## Quick start
 
-```javascript
+```ts
+import { Kong } from 'kong-api-client';
 
-let KongApi = require('../../index.js')
-let config = {
-    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
-}
-let kong = new KongApi(config)
-kong.init()
-
-await kong.addService({
-    protocol: 'http',
-    host: 'www.test.com',
-    port: 8080,
-    name: 'test'
+const kong = new Kong({
+  adminUrl: 'http://localhost:8001',
 });
 
-```
-
-### How update a service host
-
-```javascript
-
-let KongApi = require('../../index.js')
-let config = {
-    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
-}
-let kong = new KongApi(config)
-kong.init()
-
-await kong.updateService(testHostId, {
-    host: "www.new-test.com"
+const service = await kong.services.upsert('billing', {
+  name: 'billing',
+  url: 'http://billing.internal:8080',
 });
 
-```
-
-### Save a new customer
-
-```javascript
-
-let KongApi = require('../../index.js')
-let config = {
-    adminUrl: 'http://' + process.env.KONG_IP + ':8001'
-}
-let kong = new KongApi(config)
-kong.init()
-
-await kong.addConsumer({
-    username: 'my-username',
-    custom_id: 'my-custom-id',
+const route = await kong.services.routes(service.id).upsert('billing-route', {
+  name: 'billing-route',
+  paths: ['/billing'],
+  protocols: ['http', 'https'],
 });
 
+console.log(service.id, route.id);
 ```
 
-## Complete documentation
+## What is covered
 
-### [Builder Api](./documentation/init.md)
+- **Admin API resources**: typed CRUD, `find`, `upsert`, pagination (`list`, `iterate`, `all`), tag filters, nested collections, and singletons across Kong's first-class resources. See the [Resources guide](./docs/resources.md).
+- **45 first-class plugins**: generated TypeScript config interfaces, plugin metadata (`PLUGINS`), typed `PluginCollection` methods, and [plugin reference pages](./docs/plugins/index.md) grouped by category.
+- **Declarative apply & AI helpers**: documented in their guides on the documentation site.
+- **Errors & escape hatch**: structured error classes ([Error Handling guide](./docs/errors.md)) and `kong.request()` for endpoints outside the first-class surface.
 
-> This is the block of documentations that will define the base objects that the lib will use and/or receive from kong.
+## Guides
 
-### [Services Api](./documentation/services.md)
+- [Getting Started](./docs/getting-started.md)
+- [Resources](./docs/resources.md)
+- [Error Handling](./docs/errors.md)
+- [Migration from 2.x](./docs/migration.md)
+- [Plugin Reference](./docs/plugins/index.md)
 
-> In this block of documentations will be defined interact with the kong services using the lib.
+## Supported Kong versions
 
-### [Routes Api](./documentation/routes.md)
+Tested live against:
 
-> In this block of documentations will be defined interact with the kong routes using the lib.
+- **Kong 3.9** (open source, `kong:3.9.5`)
+- **Kong Gateway 3.14** (`kong/kong-gateway:3.14.0.18`) running **without a license**
 
-### [Consumers Api](./documentation/consumers.md)
+Features that require an Enterprise license (workspaces, RBAC, consumer groups, licensed plugins) are out of scope.
 
-> In this block of documentations will be defined interact with the kong consumers using the lib.
+## Documentation
 
-### [Plugins Api](./documentation/plugins.md)
+Full guides, plugin reference, and API documentation: [https://vitorecomp.github.io/kong-api-client/](https://vitorecomp.github.io/kong-api-client/)
 
-> In this block of documentations will be defined interact with the kong plugins using the lib.
+## License
 
-## Need fix
-
-- [ ] Better error msg in case of offline kong server
-- [ ] User jest expect throw on the tests
-
-## Road Map
-
-- [ ] add unit tests
-- [x] builder
-- [x] add a dockerfile to up kong
-- [ ] add the plugins on the consumers (auth)
-- [ ] create the documentation
-- [x] main readme
-- [ ] constructor
-- [ ] domains
-- [ ] routes
-- [ ] consumers
-- [ ] plugins
-- [x] add the custom exception
-- [ ] add routes capable to add items (plugins, consumers)
+MIT — see [LICENSE](./LICENSE).
