@@ -3,7 +3,7 @@ import { KongError } from '../../src/errors.js';
 import type { Plugin } from '../../src/generated/entities.js';
 import type { HttpLogConfig } from '../../src/generated/plugins.js';
 import { PluginsResource } from '../../src/generated/resources.js';
-import { findPluginOnScope, PluginsApi } from '../../src/plugins.js';
+import { PluginsApi } from '../../src/plugins.js';
 import type { KongSchema } from '../../src/special/schemas.js';
 import { Transport } from '../../src/transport.js';
 import { captureHttpError } from '../support/errors.js';
@@ -557,7 +557,7 @@ describe('PluginsApi', () => {
     expect(fake.requests).toHaveLength(3);
   });
 
-  it('findPluginOnScope returns undefined when no plugin matches and normalizes omitted scope fields', async () => {
+  it('findOnScope returns matching plugin or undefined and normalizes omitted scope fields', async () => {
     const { fake, plugins } = makePluginsApi();
     fake.json({
       data: [
@@ -572,11 +572,13 @@ describe('PluginsApi', () => {
       ],
       next: null,
     });
-    const found = await findPluginOnScope(plugins, 'cors', {});
+    const controller = new AbortController();
+    const found = await plugins.findOnScope('cors', {}, { signal: controller.signal });
     expect(found?.id).toBe('p-1');
+    expect(fake.requests[0]?.signal).toBeDefined();
 
     fake.json({ data: [], next: null });
-    const missing = await findPluginOnScope(plugins, 'key-auth', { service: null });
+    const missing = await plugins.findOnScope('key-auth', { service: null });
     expect(missing).toBeUndefined();
   });
 

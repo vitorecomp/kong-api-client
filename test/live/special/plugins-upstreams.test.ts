@@ -62,7 +62,13 @@ describe('live special: plugins and upstreams special endpoints', () => {
       expect(typeof initialHealth.node_id).toBe('string');
       expect(initialHealth.data[0]?.target).toBe(targetAddress);
 
-      const balancerHealth = await kong.upstreams.health(upstreamName, { balancerHealth: true });
+      const balancerHealth = await eventually(async () => {
+        const health = await kong.upstreams.health(upstreamName, { balancerHealth: true });
+        if (health.data?.health !== 'HEALTHY') {
+          throw new Error(`Waiting for HEALTHY balancer, got ${JSON.stringify(health)}`);
+        }
+        return health;
+      });
       expect(balancerHealth.data?.health).toBe('HEALTHY');
 
       const allTargets = await kong.upstreams.allTargets(upstreamName);

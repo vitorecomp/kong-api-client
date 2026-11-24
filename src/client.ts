@@ -1,3 +1,4 @@
+import { AiApi } from './ai/index.js';
 import { KongResources } from './generated/resources.js';
 import { PluginsApi } from './plugins.js';
 import { AcmeApi } from './special/acme.js';
@@ -36,6 +37,8 @@ export class Kong extends KongResources {
   readonly acme: AcmeApi;
   /** Proxy-cache plugin inspection and purge endpoints. */
   readonly proxyCache: ProxyCacheApi;
+  /** High-level AI Gateway helpers (`llmRoute`, `proxy`, prompt & transformer plugins). */
+  readonly ai: AiApi;
 
   /** Creates a new Kong Admin API client configured with the given options. */
   constructor(options: KongOptions) {
@@ -52,6 +55,7 @@ export class Kong extends KongResources {
     this.clustering = new ClusteringApi(transport);
     this.acme = new AcmeApi(transport);
     this.proxyCache = new ProxyCacheApi(transport);
+    this.ai = new AiApi(this.services, this.routes, this.plugins);
   }
 
   /**

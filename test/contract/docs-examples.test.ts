@@ -218,6 +218,7 @@ describe('documentation TypeScript examples contract', () => {
       'docs/errors.md',
       'docs/getting-started.md',
       'docs/migration.md',
+      'docs/plugins.md',
       'docs/resources.md',
     ]);
     for (const file of markdownFiles) {

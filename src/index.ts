@@ -24,7 +24,12 @@ export type { ListParams, Page, TagFilter } from './pagination.js';
 
 export { Collection, Singleton, type Patch } from './resource.js';
 export { PluginCollection } from './plugin-collection.js';
-export { PluginsApi, type EnableOptions, type PluginScope } from './plugins.js';
+export {
+  PluginsApi,
+  type EnableOptions,
+  type PluginScope,
+  type PluginScopeIds,
+} from './plugins.js';
 export {
   UpstreamsApi,
   type BalancerHealth,
@@ -85,6 +90,16 @@ export {
 export { ProxyCacheApi, type ProxyCacheEntry } from './special/proxy-cache.js';
 export { SchemasApi, type KongSchema, type SchemaValidationResult } from './special/schemas.js';
 export { TagsApi, type TagEntry, type TagListParams } from './special/tags.js';
+
+export {
+  AiApi,
+  type AiAuth,
+  type AiProvider,
+  type AiRouteType,
+  type AiTarget,
+  type LlmRouteOptions,
+  type LlmRouteResult,
+} from './ai/index.js';
 
 export type * from './generated/entities.js';
 export * from './generated/plugins.js';

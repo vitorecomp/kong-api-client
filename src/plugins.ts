@@ -4,7 +4,7 @@ import type { ConfigOf } from './generated/plugins.js';
 import { PluginsResource } from './generated/resources.js';
 import { PluginCollection } from './plugin-collection.js';
 import type { KongSchema } from './special/schemas.js';
-import { segment, type CallOptions, type Transport } from './transport.js';
+import { segment, type CallOptions } from './transport.js';
 
 interface EnabledPluginsResponse {
   enabled_plugins: string[];
@@ -12,8 +12,6 @@ interface EnabledPluginsResponse {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ALLOWED_ASCII_INSTANCE_CHAR_RE = /^[A-Za-z0-9._~-]$/;
-
-const pluginTransports = new WeakMap<PluginsApi, Transport>();
 
 /** Scope attaching a plugin to a specific service, route, and/or consumer. */
 export interface PluginScope {
@@ -114,58 +112,50 @@ function parseScopeConflict(
   return { service, route, consumer };
 }
 
-/**
- * Finds an existing plugin matching `name` and the exact resolved scope IDs.
- * Lists the narrowest nested collection (route, else service, else consumer) or `/plugins`
- * across all pages for global plugins. Internal helper shared with `apply`.
- */
-export async function findPluginOnScope(
-  plugins: PluginsApi,
-  name: string,
-  scope: PluginScopeIds,
-  options?: CallOptions,
-): Promise<Plugin | undefined> {
-  const targetService = scope.service ?? null;
-  const targetRoute = scope.route ?? null;
-  const targetConsumer = scope.consumer ?? null;
-
-  const nestedPath =
-    targetRoute !== null
-      ? `/routes/${segment(targetRoute)}/plugins`
-      : targetService !== null
-        ? `/services/${segment(targetService)}/plugins`
-        : targetConsumer !== null
-          ? `/consumers/${segment(targetConsumer)}/plugins`
-          : undefined;
-
-  const transport = pluginTransports.get(plugins);
-  const collection =
-    nestedPath !== undefined && transport !== undefined
-      ? new PluginCollection(transport, nestedPath)
-      : plugins;
-
-  for await (const plugin of collection.iterate(undefined, options)) {
-    const pluginService = plugin.service?.id ?? null;
-    const pluginRoute = plugin.route?.id ?? null;
-    const pluginConsumer = plugin.consumer?.id ?? null;
-    if (
-      plugin.name === name &&
-      pluginService === targetService &&
-      pluginRoute === targetRoute &&
-      pluginConsumer === targetConsumer
-    ) {
-      return plugin;
-    }
-  }
-  return undefined;
-}
-
-/** Extended `/plugins` resource adding idempotent `enable()`, enabled plugin listing, and legacy schema lookup. */
+/** Extended `/plugins` resource adding idempotent `enable()`, scope lookup, enabled plugin listing, and legacy schema lookup. */
 export class PluginsApi extends PluginsResource {
-  /** Creates a {@link PluginsApi} bound to the given transport. */
-  constructor(transport: Transport) {
-    super(transport);
-    pluginTransports.set(this, transport);
+  /**
+   * Finds an existing plugin matching `name` and the exact resolved scope IDs,
+   * or returns `undefined` when no such plugin exists.
+   *
+   * Lists the narrowest nested collection (route, else service, else consumer) or
+   * `/plugins` across all pages for a global plugin.
+   */
+  async findOnScope(
+    name: string,
+    scope: PluginScopeIds,
+    options?: CallOptions,
+  ): Promise<Plugin | undefined> {
+    const targetService = scope.service ?? null;
+    const targetRoute = scope.route ?? null;
+    const targetConsumer = scope.consumer ?? null;
+
+    const nestedPath =
+      targetRoute !== null
+        ? `/routes/${segment(targetRoute)}/plugins`
+        : targetService !== null
+          ? `/services/${segment(targetService)}/plugins`
+          : targetConsumer !== null
+            ? `/consumers/${segment(targetConsumer)}/plugins`
+            : undefined;
+
+    const collection =
+      nestedPath !== undefined ? new PluginCollection(this.transport, nestedPath) : this;
+
+    for await (const plugin of collection.iterate(undefined, options)) {
+      const pluginService = plugin.service?.id ?? null;
+      const pluginRoute = plugin.route?.id ?? null;
+      const pluginConsumer = plugin.consumer?.id ?? null;
+      if (
+        plugin.name === name &&
+        pluginService === targetService &&
+        pluginRoute === targetRoute &&
+        pluginConsumer === targetConsumer
+      ) {
+        return plugin;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -220,7 +210,7 @@ export class PluginsApi extends PluginsResource {
         throw error;
       }
 
-      const existing = await findPluginOnScope(this, name, conflictScope, callOptions);
+      const existing = await this.findOnScope(name, conflictScope, callOptions);
       if (!existing) {
         throw error;
       }
