@@ -168,7 +168,11 @@ Fields or enum values specific to one target are documented in the generated JSD
 ## Next steps
 
 - [Resources](./resources.md) — collections, nested resources, singletons, pagination, and tag filters
+- [Plugins](./plugins.md) — idempotent `kong.plugins.enable()`, scopes, adoption, `findOnScope`, and `PLUGINS` metadata
 - [Admin Endpoints](./admin-endpoints.md) — node status, schemas, tags, cache, DB-less config, log levels, clustering, ACME, proxy-cache, and upstream health
+- [Declarative Apply](./apply.md) — idempotent `kong.apply()`, diff rules, `dryRun`, `prune`, `KongApplyError`, and `kong.deleteAll()`
+- [AI Gateway](./ai.md) — `kong.ai.llmRoute()` and typed helpers for Kong's six AI plugins
+- [Endpoint Coverage](./endpoints.md) — every Admin API endpoint and the call that serves it
 - [Error Handling](./errors.md) — error classes, Kong validation details, timeouts, and aborts
 - [Plugin Reference](./plugins/index.md) — configuration tables for all 45 first-class plugins
 - [Migration from 2.x](./migration.md) — call-by-call upgrade table from `kong-api-client` 2.x

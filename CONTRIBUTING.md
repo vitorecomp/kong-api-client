@@ -32,6 +32,12 @@ npm run build
 4. `npm run generate:check` — verifies committed generated files match `scripts/generate.mjs`
 5. `npm test` — Vitest `unit` and `contract` projects with coverage thresholds
 
+To verify the built npm tarball as an external consumer (packs the tarball, validates contents and manifest entrypoints, installs into an empty temporary project, and runs ESM + CommonJS runtime and `skipLibCheck=false` type-checks):
+
+```bash
+npm run test:package
+```
+
 To build and verify the documentation site locally:
 
 ```bash
@@ -48,10 +54,16 @@ npm run test:live -- oss-3.9
 npm run test:live -- ee-3.14
 ```
 
+`npm run test:live` runs two Vitest projects sequentially:
+
+1. **`live`** (`test/live/**`): non-destructive resource, special-endpoint, plugin, AI, and declarative `apply` tests (with strict coverage verification across all 308 operations when run without path filters).
+2. **`live-destructive`** (`test/live-destructive/**`): tests `kong.deleteAll({ confirm: 'delete-everything' })` and **wipes every entity on the test gateway**. `scripts/test-live.sh` always finishes `live` before starting `live-destructive` (even when paths from both directories are passed on the CLI). Never run `live-destructive` against a shared or production Kong instance.
+
 You can pass specific test files after the target:
 
 ```bash
 npm run test:live -- oss-3.9 test/live/resources/services.test.ts
+npm run test:live -- oss-3.9 test/live-destructive/delete-all.test.ts
 ```
 
 Useful environment variables:
@@ -64,7 +76,7 @@ Containers and networks created by `scripts/kong.sh` are named with the `kac-<ta
 
 ## Recording schemas and regenerating code
 
-Generated TypeScript files under `src/generated/` and plugin reference pages under `docs/plugins/` are committed and must never be edited by hand.
+Generated TypeScript files under `src/generated/`, plugin reference pages under `docs/plugins/`, `docs/endpoints.md`, and `test/support/endpoint-calls.ts` are committed and must never be edited by hand.
 
 To refresh recorded schemas from running test targets:
 
@@ -102,6 +114,6 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) with small, foc
 ## Cutting a release
 
 1. Update the version in `package.json`, `src/index.ts` (`VERSION`), and `CHANGELOG.md`.
-2. Run `npm run check`, `npm run build`, `npm run docs`, `npm run docs:check`, and `npm run test:live` against both `oss-3.9` and `ee-3.14`.
+2. Run `npm run check`, `npm run build`, `npm run test:package`, `npm run docs`, `npm run docs:check`, and `npm run test:live` against both `oss-3.9` and `ee-3.14`.
 3. Commit the release preparation, push to `master`, create an annotated tag `v<version>` matching `package.json`, and publish a GitHub Release for that tag.
 4. `.github/workflows/publish.yml` verifies that the tag matches `package.json`, runs `npm run check` and `npm run build`, and publishes to npm with `--provenance --access public` (using the `next` dist-tag for pre-release versions such as `3.0.0-rc.1`).

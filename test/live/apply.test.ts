@@ -708,6 +708,94 @@ describe('Kong.apply live tests', () => {
     }
   });
 
+  it('supports dryRun for creating new entities and pruning existing ones without any writes', async () => {
+    const { kong, resetCounts, writeCount } = createCountingKong();
+    const tag = unique('apply-dry-cp');
+    const upstreamName = `${unique('dry-up')}.example.invalid`;
+    const serviceName = unique('dry-svc');
+    const routeName = unique('dry-rt');
+    const routePath = `/${unique('dry-p')}`;
+    const consumerName = unique('dry-user');
+    const pluginName = unique('dry-plug');
+
+    const fullConfig: ApplyConfig<['correlation-id']> = {
+      upstreams: [{ name: upstreamName }],
+      targets: [{ upstream: upstreamName, target: '10.0.9.1:8080', weight: 100 }],
+      services: [{ name: serviceName, url: 'http://upstream:8080/dry' }],
+      routes: [
+        {
+          name: routeName,
+          service: { name: serviceName },
+          paths: [routePath],
+          protocols: ['http', 'https'],
+        },
+      ],
+      consumers: [{ username: consumerName }],
+      plugins: [
+        {
+          name: 'correlation-id',
+          instance_name: pluginName,
+          route: { name: routeName },
+          config: { header_name: 'X-Dry-Create' },
+        },
+      ],
+    };
+
+    try {
+      // 1. Dry run of brand-new entities: reports create for each, sends no writes, creates nothing
+      resetCounts();
+      const dryCreate = await kong.apply(fullConfig, { dryRun: true, tag });
+      expect(dryCreate.dryRun).toBe(true);
+      expect(dryCreate.summary).toEqual({ create: 6, update: 0, unchanged: 0, delete: 0 });
+      expect(dryCreate.changes).toEqual([
+        { type: 'upstreams', key: upstreamName, action: 'create' },
+        { type: 'targets', key: `${upstreamName}/10.0.9.1:8080`, action: 'create' },
+        { type: 'services', key: serviceName, action: 'create' },
+        { type: 'routes', key: routeName, action: 'create' },
+        { type: 'consumers', key: consumerName, action: 'create' },
+        { type: 'plugins', key: pluginName, action: 'create' },
+      ]);
+      expect(writeCount()).toBe(0);
+
+      await expect(kong.upstreams.find(upstreamName)).resolves.toBeUndefined();
+      await expect(kong.services.find(serviceName)).resolves.toBeUndefined();
+      await expect(kong.routes.find(routeName)).resolves.toBeUndefined();
+      await expect(kong.consumers.find(consumerName)).resolves.toBeUndefined();
+      await expect(kong.plugins.find(pluginName)).resolves.toBeUndefined();
+
+      // 2. Apply for real, then dry-run prune: reports deletes in reverse order, sends no writes, deletes nothing
+      const created = await kong.apply(fullConfig, { tag });
+      expect(created.summary).toEqual({ create: 6, update: 0, unchanged: 0, delete: 0 });
+
+      resetCounts();
+      const dryPrune = await kong.apply(
+        { upstreams: [{ name: upstreamName }] },
+        { dryRun: true, prune: true, tag },
+      );
+      expect(dryPrune.dryRun).toBe(true);
+      expect(dryPrune.summary).toEqual({ create: 0, update: 0, unchanged: 1, delete: 5 });
+      expect(dryPrune.changes).toEqual([
+        { type: 'upstreams', key: upstreamName, action: 'unchanged' },
+        { type: 'plugins', key: pluginName, action: 'delete' },
+        { type: 'consumers', key: consumerName, action: 'delete' },
+        { type: 'routes', key: routeName, action: 'delete' },
+        { type: 'services', key: serviceName, action: 'delete' },
+        { type: 'targets', key: `${upstreamName}/10.0.9.1:8080`, action: 'delete' },
+      ]);
+      expect(writeCount()).toBe(0);
+
+      expect(await kong.plugins.find(pluginName)).toBeDefined();
+      expect(await kong.consumers.find(consumerName)).toBeDefined();
+      expect(await kong.routes.find(routeName)).toBeDefined();
+      expect(await kong.services.find(serviceName)).toBeDefined();
+      expect(await kong.upstreams.find(upstreamName)).toBeDefined();
+      const targets = await kong.upstreams.targets(upstreamName).all();
+      expect(targets.some((t) => t.target === '10.0.9.1:8080')).toBe(true);
+    } finally {
+      await kong.apply({}, { prune: true, tag });
+    }
+  });
+
   it('documents the idempotency limit when Kong rewrites a deprecated plugin field alias', async () => {
     const kong = liveKong();
     const tag = unique('apply-limit');

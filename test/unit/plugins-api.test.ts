@@ -582,6 +582,77 @@ describe('PluginsApi', () => {
     expect(missing).toBeUndefined();
   });
 
+  it('findOnScope requires exact equality on all three scope refs in either listing order', async () => {
+    const svcId = '11111111-1111-4111-8111-111111111111';
+    const routeId = '22222222-2222-4222-8222-222222222222';
+    const consumerId = '33333333-3333-4333-8333-333333333333';
+
+    const serviceAndRoute = {
+      id: 'p-svc-route',
+      name: 'rate-limiting',
+      instance_name: null,
+      service: { id: svcId },
+      route: { id: routeId },
+      consumer: null,
+    };
+    const serviceAndConsumer = {
+      id: 'p-svc-consumer',
+      name: 'rate-limiting',
+      instance_name: null,
+      service: { id: svcId },
+      route: null,
+      consumer: { id: consumerId },
+    };
+    const serviceOnly = {
+      id: 'p-svc-only',
+      name: 'rate-limiting',
+      instance_name: null,
+      service: { id: svcId },
+      route: null,
+      consumer: null,
+    };
+    const routeOnly = {
+      id: 'p-route-only',
+      name: 'rate-limiting',
+      instance_name: null,
+      service: null,
+      route: { id: routeId },
+      consumer: null,
+    };
+
+    // Service-only lookup must skip service+route and service+consumer plugins in either order.
+    for (const listing of [
+      [serviceAndRoute, serviceAndConsumer, serviceOnly],
+      [serviceOnly, serviceAndRoute, serviceAndConsumer],
+    ]) {
+      const { fake, plugins } = makePluginsApi();
+      fake.json({ data: listing, next: null });
+      const found = await plugins.findOnScope('rate-limiting', { service: svcId });
+      expect(found?.id).toBe('p-svc-only');
+      expect(fake.requests[0]?.url).toBe(`http://localhost:8001/services/${svcId}/plugins`);
+    }
+
+    // Service-only lookup returns undefined when only service+route exists.
+    {
+      const { fake, plugins } = makePluginsApi();
+      fake.json({ data: [serviceAndRoute], next: null });
+      const missing = await plugins.findOnScope('rate-limiting', { service: svcId });
+      expect(missing).toBeUndefined();
+    }
+
+    // Route-only lookup must skip service+route plugin in either order.
+    for (const listing of [
+      [serviceAndRoute, routeOnly],
+      [routeOnly, serviceAndRoute],
+    ]) {
+      const { fake, plugins } = makePluginsApi();
+      fake.json({ data: listing, next: null });
+      const found = await plugins.findOnScope('rate-limiting', { route: routeId });
+      expect(found?.id).toBe('p-route-only');
+      expect(fake.requests[0]?.url).toBe(`http://localhost:8001/routes/${routeId}/plugins`);
+    }
+  });
+
   it('narrows config by plugin name and rejects unknown fields on known plugins at compile time', async () => {
     const { fake, plugins } = makePluginsApi();
     fake

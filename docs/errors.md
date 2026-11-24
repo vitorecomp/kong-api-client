@@ -9,12 +9,13 @@ Every error raised by `kong-api-client` extends `KongError` (except caller-initi
 
 ## Error hierarchy
 
-| Class                 | When it is thrown                                                                                                                                                            | Extra properties                                                 |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `KongError`           | Base class. Also thrown for invalid client configuration (missing/invalid `adminUrl`, invalid `timeoutMs`), empty path segments in `segment()`, or malformed JSON responses. | Standard `Error` (`message`, `cause`)                            |
-| `KongHttpError`       | Kong returned a non-2xx HTTP status code.                                                                                                                                    | `status`, `method`, `path`, `code`, `kongName`, `fields`, `body` |
-| `KongConnectionError` | Network, DNS, or socket failure before receiving an HTTP response.                                                                                                           | `cause` (underlying fetch error)                                 |
-| `KongTimeoutError`    | Request exceeded the configured `timeoutMs`.                                                                                                                                 | `timeoutMs`                                                      |
+| Class                 | When it is thrown                                                                                                                                                                                                | Extra properties                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `KongError`           | Base class. Also thrown for invalid client configuration (missing/invalid `adminUrl`, invalid `timeoutMs`), missing `deleteAll()` confirmation, empty path segments in `segment()`, or malformed JSON responses. | Standard `Error` (`message`, `cause`)                            |
+| `KongHttpError`       | Kong returned a non-2xx HTTP status code.                                                                                                                                                                        | `status`, `method`, `path`, `code`, `kongName`, `fields`, `body` |
+| `KongConnectionError` | Network, DNS, or socket failure before receiving an HTTP response.                                                                                                                                               | `cause` (underlying fetch error)                                 |
+| `KongTimeoutError`    | Request exceeded the configured `timeoutMs`.                                                                                                                                                                     | `timeoutMs`                                                      |
+| `KongApplyError`      | A step of `kong.apply()` failed (nothing is rolled back; see [Declarative Apply](./apply.md)).                                                                                                                   | `failed` (`{ type, key, action }`), `result`, `cause`            |
 
 ### Credential safety
 

@@ -40,6 +40,10 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Verify packed tarball
+        if: matrix.node-version == 24
+        run: npm run test:package
+
       - name: Build and check documentation site
         if: matrix.node-version == 24
         run: |

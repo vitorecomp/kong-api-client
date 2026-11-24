@@ -15,19 +15,19 @@ group: Guides
 - **Plain JSON objects**: methods accept and return Kong's own JSON shapes directly (no `Service`/`Route`/`Consumer`/`Plugin` wrapper classes, no `.data` nesting, and no mutated `kongUrl` field).
 - **No client-side validation**: Kong validates entities itself and returns structured `KongHttpError` details.
 - **Full pagination**: `.all()` and `.iterate()` follow Kong's `offset` cursor past the 100-item default page limit.
-- **Structured errors**: `KongError`, `KongHttpError`, `KongConnectionError`, and `KongTimeoutError` replace the untyped 2.x `KongError` (`{ type, msg, err }`).
+- **Structured errors**: `KongError`, `KongHttpError`, `KongConnectionError`, `KongTimeoutError`, and `KongApplyError` replace the untyped 2.x `KongError` (`{ type, msg, err }`).
 
 ## Call-by-call migration table
 
 ### Client and lifecycle
 
-| 2.x call                                                          | 3.0 equivalent                                                                                                                                         |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `const KongApi = require('kong-api-client')`                      | `import { Kong } from 'kong-api-client'` (or `const { Kong } = require('kong-api-client')`)                                                            |
-| `new KongApi({ adminUrl })`                                       | `new Kong({ adminUrl })` (also accepts `headers`, `timeoutMs`, `fetch`)                                                                                |
-| `new KongApi({ adminUrl, services, routes, consumers, plugins })` | `new Kong({ adminUrl })`; pass entities to resource methods instead of the constructor                                                                 |
-| `kong.init()`                                                     | No direct constructor-array initializer; use idempotent `upsert()` calls on each resource collection                                                   |
-| `kong.clean()`                                                    | No direct method on this API surface; fetch with `.all()` and `.delete(id)` in reverse dependency order (`plugins`, `routes`, `consumers`, `services`) |
+| 2.x call                                                          | 3.0 equivalent                                                                                                                                    |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `const KongApi = require('kong-api-client')`                      | `import { Kong } from 'kong-api-client'` (or `const { Kong } = require('kong-api-client')`)                                                       |
+| `new KongApi({ adminUrl })`                                       | `new Kong({ adminUrl })` (also accepts `headers`, `timeoutMs`, `fetch`)                                                                           |
+| `new KongApi({ adminUrl, services, routes, consumers, plugins })` | `new Kong({ adminUrl })`; pass the declarative config to `kong.apply(config)` instead of the constructor                                          |
+| `kong.init()`                                                     | `kong.apply(config)` — idempotent declarative reconcile with `dryRun` and `prune` (see [Declarative Apply](./apply.md))                           |
+| `kong.clean()`                                                    | `kong.deleteAll({ confirm: 'delete-everything' })` (wipes all 20 first-class resources); for scoped cleanup use `kong.apply({}, { prune: true })` |
 
 ### Services
 
@@ -155,3 +155,4 @@ try {
 5. **Listing mutated entities with `kongUrl`**: returned entities match Kong's JSON responses verbatim.
 6. **Static `Entity.delete()` always threw**: `kong.<resource>.delete(key)` removes the entity cleanly.
 7. **Missing `adminUrl` threw `TypeError` in edge cases**: `new Kong(...)` validates `adminUrl` and throws `KongError`.
+8. **`init()` failed with 409 on a second run**: `kong.apply(config)` compares declared fields against Kong and reports matching entities as `unchanged` with zero write requests instead of failing with `409 Conflict`.

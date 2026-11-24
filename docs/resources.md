@@ -32,7 +32,7 @@ group: Guides
 | `kong.sessions`       | `/sessions`        | `session_id`                                           |
 | `kong.acmeStorage`    | `/acme_storage`    | `id` only                                              |
 
-Kong serves `targets` only underneath an upstream, so targets are accessed exclusively via `kong.upstreams.targets(upstream)` rather than a top-level property.
+Kong serves `targets` only underneath an upstream, so targets are accessed exclusively via `kong.upstreams.targets(upstream)` rather than a top-level property. For the complete endpoint-by-endpoint matrix, see [Endpoint Coverage](./endpoints.md).
 
 ## Collection operations
 
@@ -80,6 +80,52 @@ const replaced = await kong.services.upsert('catalog', {
   port: 8080,
 });
 console.log(replaced.retries, replaced.path); // 5, null
+```
+
+### Nested merge rules in `update` (`Patch<T>`)
+
+`update()` accepts `Patch<I>` (exported from `kong-api-client`), matching how Kong merges `PATCH` payloads:
+
+- **Records** (objects with fixed schema fields, such as `upstream.healthchecks.active` or `ai-proxy`'s `config.model.options`) merge **field by field at any depth** — pass only the nested fields you want to change and sibling fields keep their values.
+- **Arrays** (such as `tags`, `paths`, or `request-transformer`'s `config.add.headers`) are **replaced as a whole** when included, while sibling fields on the surrounding record keep their values.
+- **Maps** (`Record<string, ...>` key-value fields, such as `routes.headers` or `http-log`'s `config.headers`) are **replaced as a whole** when included — omitted keys in that map are removed, while sibling fields outside the map keep their values.
+
+```ts
+import { Kong } from 'kong-api-client';
+
+const kong = new Kong({ adminUrl: 'http://localhost:8001' });
+
+// Deep record merge: changes `concurrency`, preserves `http_path` and `timeout`
+await kong.upstreams.update('backend-pool', {
+  healthchecks: {
+    active: { concurrency: 12 },
+  },
+});
+
+// Deep record merge on a typed plugin: changes `temperature`, preserves `provider`, `name`, and `max_tokens`
+await kong.plugins.update<'ai-proxy'>('ai-proxy-plugin-id', {
+  config: {
+    model: {
+      options: { temperature: 0.9 },
+    },
+  },
+});
+
+// Map replacement: replaces the entire `headers` map (previous keys are dropped), preserves `http_endpoint`
+await kong.plugins.update<'http-log'>('http-log-plugin-id', {
+  config: {
+    headers: { 'x-c': '3' },
+  },
+});
+
+// Array replacement: replaces the entire `headers` array, preserves sibling `querystring`
+await kong.plugins.update<'request-transformer'>('req-tx-plugin-id', {
+  config: {
+    add: {
+      headers: ['x-c:3'],
+    },
+  },
+});
 ```
 
 ### Resource-specific Kong behaviours
@@ -207,4 +253,4 @@ const custom = await kong.plugins.create({
 console.log(custom.id);
 ```
 
-See the [Plugin Reference](./plugins/index.md) for all 45 first-class plugins and their config fields.
+See the [Plugins guide](./plugins.md) for `enable()`, scopes, and `PLUGINS` metadata, or the [Plugin Reference](./plugins/index.md) for all 45 first-class plugins and their config fields.

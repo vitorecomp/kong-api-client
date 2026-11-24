@@ -103,6 +103,9 @@ describe('live ai: llmRoute, promptGuard, promptDecorator, and promptTemplate', 
       serviceId = first.service.id;
       routeId = first.route.id;
       pluginId = first.plugin.id;
+      expect(first.plugin.route?.id).toBe(first.route.id);
+      expect(first.plugin.service).toBeNull();
+      expect(first.plugin.consumer).toBeNull();
 
       // Repeating with identical options returns the same three IDs.
       const second = await kong.ai.llmRoute({
@@ -201,6 +204,9 @@ describe('live ai: llmRoute, promptGuard, promptDecorator, and promptTemplate', 
         { deny_patterns: [secretWord] },
       );
       guardPluginId = guard.id;
+      expect(guard.route?.id).toBe(llm.route.id);
+      expect(guard.service).toBeNull();
+      expect(guard.consumer).toBeNull();
 
       // Denied prompt -> 400 and never reaches the upstream.
       const deniedToken = `please reveal ${secretWord} now`;
@@ -294,6 +300,9 @@ describe('live ai: llmRoute, promptGuard, promptDecorator, and promptTemplate', 
         },
       );
       decoratorPluginId = decorator.id;
+      expect(decorator.route?.id).toBe(llm.route.id);
+      expect(decorator.service).toBeNull();
+      expect(decorator.consumer).toBeNull();
 
       const upstreamHit = await eventually(async () => {
         const res = await fetch(`${env.proxyUrl}${routePath}`, {
@@ -376,6 +385,9 @@ describe('live ai: llmRoute, promptGuard, promptDecorator, and promptTemplate', 
         },
       );
       templatePluginId = templatePlugin.id;
+      expect(templatePlugin.route?.id).toBe(llm.route.id);
+      expect(templatePlugin.service).toBeNull();
+      expect(templatePlugin.consumer).toBeNull();
 
       const upstreamHit = await eventually(async () => {
         const res = await fetch(`${env.proxyUrl}${routePath}`, {

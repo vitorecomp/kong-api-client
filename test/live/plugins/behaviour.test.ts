@@ -249,6 +249,63 @@ describe('live plugins: enable() and proxy behaviour', () => {
     }
   });
 
+  it('adopts the service-only plugin when a service+route plugin of the same name also exists', async () => {
+    const echo = await createEchoRoute('adopt-svc-route');
+    const createdPluginIds: string[] = [];
+
+    try {
+      // Create service+route first so it precedes the service-only plugin in /services/{id}/plugins.
+      const svcAndRoute = await kong.plugins.create({
+        name: 'rate-limiting',
+        service: { id: echo.serviceId },
+        route: { id: echo.routeId },
+        config: { minute: 10, policy: 'local' },
+      });
+      createdPluginIds.push(svcAndRoute.id);
+      expect(svcAndRoute.instance_name).toBeNull();
+      expect(svcAndRoute.service?.id).toBe(echo.serviceId);
+      expect(svcAndRoute.route?.id).toBe(echo.routeId);
+
+      const svcOnly = await kong.services.plugins(echo.serviceId).create({
+        name: 'rate-limiting',
+        config: { minute: 30, policy: 'local' },
+      });
+      createdPluginIds.push(svcOnly.id);
+      expect(svcOnly.instance_name).toBeNull();
+      expect(svcOnly.service?.id).toBe(echo.serviceId);
+      expect(svcOnly.route).toBeNull();
+
+      // Direct findOnScope distinguishes service-only from service+route.
+      const lookedUp = await kong.plugins.findOnScope('rate-limiting', {
+        service: echo.serviceId,
+      });
+      expect(lookedUp?.id).toBe(svcOnly.id);
+
+      // enable() on service S alone adopts svcOnly and leaves svcAndRoute untouched.
+      const adopted = await kong.plugins.enable('rate-limiting', {
+        on: { service: echo.serviceName },
+        config: { minute: 60, policy: 'local' },
+      });
+      expect(adopted.id).toBe(svcOnly.id);
+      expect(adopted.instance_name).toBe(`rate-limiting.service.${echo.serviceName}`);
+      expect(adopted.service?.id).toBe(echo.serviceId);
+      expect(adopted.route).toBeNull();
+      expect(adopted.consumer).toBeNull();
+      expect(adopted.config.minute).toBe(60);
+
+      const svcAndRouteAfter = await kong.plugins.get(svcAndRoute.id);
+      expect(svcAndRouteAfter.instance_name).toBeNull();
+      expect(svcAndRouteAfter.service?.id).toBe(echo.serviceId);
+      expect(svcAndRouteAfter.route?.id).toBe(echo.routeId);
+      expect(svcAndRouteAfter.config).toMatchObject({ minute: 10 });
+    } finally {
+      for (const id of createdPluginIds.reverse()) {
+        await deleteIgnoringNotFound(() => kong.plugins.delete(id));
+      }
+      await echo.cleanup();
+    }
+  });
+
   it('pins instance_name character rules and sanitizes rejected ASCII chars in derived names', async () => {
     const consumerUsername = `${unique('user')}+ops@example.com`;
     const allowedInstanceName = `${unique('inst')}.a_b-c~café`;

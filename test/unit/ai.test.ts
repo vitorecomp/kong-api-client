@@ -244,9 +244,9 @@ describe('AiApi', () => {
     });
   });
 
-  it('forwards all six single-plugin AI helpers cleanly to plugins.enable', async () => {
+  it('forwards all six single-plugin AI helpers with their scope (and global when undefined) to plugins.enable', async () => {
     const { fake, kong } = makeKong();
-    for (let i = 0; i < 6; i += 1) {
+    for (let i = 0; i < 7; i += 1) {
       fake.json({ id: `p-${i}`, config: {} });
     }
     const controller = new AbortController();
@@ -262,7 +262,7 @@ describe('AiApi', () => {
       { signal: controller.signal },
     );
     const p3 = await kong.ai.promptDecorator(
-      undefined,
+      { route: 'chat' },
       { prompts: { prepend: [{ role: 'system', content: 'Be brief.' }] } },
       { signal: controller.signal },
     );
@@ -287,6 +287,11 @@ describe('AiApi', () => {
       },
       { signal: controller.signal },
     );
+    const p7 = await kong.ai.promptDecorator(
+      undefined,
+      { prompts: { prepend: [{ role: 'system', content: 'Global rule.' }] } },
+      { signal: controller.signal },
+    );
 
     expectTypeOf(p1).toEqualTypeOf<Plugin<'ai-proxy'>>();
     expectTypeOf(p2).toEqualTypeOf<Plugin<'ai-prompt-guard'>>();
@@ -294,15 +299,52 @@ describe('AiApi', () => {
     expectTypeOf(p4).toEqualTypeOf<Plugin<'ai-prompt-template'>>();
     expectTypeOf(p5).toEqualTypeOf<Plugin<'ai-request-transformer'>>();
     expectTypeOf(p6).toEqualTypeOf<Plugin<'ai-response-transformer'>>();
+    expectTypeOf(p7).toEqualTypeOf<Plugin<'ai-prompt-decorator'>>();
 
     expect(fake.requests.map((r) => `${r.method} ${r.url}`)).toEqual([
       'PUT http://localhost:8001/plugins/ai-proxy.route.chat',
       'PUT http://localhost:8001/plugins/ai-prompt-guard.route.chat',
-      'PUT http://localhost:8001/plugins/ai-prompt-decorator',
+      'PUT http://localhost:8001/plugins/ai-prompt-decorator.route.chat',
       'PUT http://localhost:8001/plugins/ai-prompt-template.service.llm',
       'PUT http://localhost:8001/plugins/ai-request-transformer.route.api',
       'PUT http://localhost:8001/plugins/ai-response-transformer.route.api',
+      'PUT http://localhost:8001/plugins/ai-prompt-decorator',
     ]);
+    expect(fake.requests[0]?.json).toMatchObject({
+      name: 'ai-proxy',
+      instance_name: 'ai-proxy.route.chat',
+      route: { name: 'chat' },
+    });
+    expect(fake.requests[1]?.json).toMatchObject({
+      name: 'ai-prompt-guard',
+      instance_name: 'ai-prompt-guard.route.chat',
+      route: { name: 'chat' },
+    });
+    expect(fake.requests[2]?.json).toMatchObject({
+      name: 'ai-prompt-decorator',
+      instance_name: 'ai-prompt-decorator.route.chat',
+      route: { name: 'chat' },
+    });
+    expect(fake.requests[3]?.json).toMatchObject({
+      name: 'ai-prompt-template',
+      instance_name: 'ai-prompt-template.service.llm',
+      service: { name: 'llm' },
+    });
+    expect(fake.requests[4]?.json).toMatchObject({
+      name: 'ai-request-transformer',
+      instance_name: 'ai-request-transformer.route.api',
+      route: { name: 'api' },
+    });
+    expect(fake.requests[5]?.json).toMatchObject({
+      name: 'ai-response-transformer',
+      instance_name: 'ai-response-transformer.route.api',
+      route: { name: 'api' },
+    });
+    expect(fake.requests[6]?.json).toEqual({
+      name: 'ai-prompt-decorator',
+      instance_name: 'ai-prompt-decorator',
+      config: { prompts: { prepend: [{ role: 'system', content: 'Global rule.' }] } },
+    });
     for (const req of fake.requests) {
       expect(req.signal).toBeDefined();
     }

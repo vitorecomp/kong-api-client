@@ -102,6 +102,9 @@ describe('live ai: requestTransformer and responseTransformer', () => {
         },
       );
       pluginId = plugin.id;
+      expect(plugin.route?.id).toBe(route.id);
+      expect(plugin.service).toBeNull();
+      expect(plugin.consumer).toBeNull();
 
       // With ai-request-transformer active, the fake model's 'pong' replaces the request body.
       const after = await eventually(async () => {
@@ -190,6 +193,9 @@ describe('live ai: requestTransformer and responseTransformer', () => {
         },
       );
       pluginId = plugin.id;
+      expect(plugin.route?.id).toBe(route.id);
+      expect(plugin.service).toBeNull();
+      expect(plugin.consumer).toBeNull();
 
       // With ai-response-transformer active, the fake model's 'pong' replaces the response body.
       const transformedBody = await eventually(async () => {

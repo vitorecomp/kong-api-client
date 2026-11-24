@@ -1,12 +1,17 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { PLUGINS } from '../../src/index.js';
 
 const TEST_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(TEST_DIR, '../..');
 const ENTRY_FILE = resolve(REPO_ROOT, 'src/index.ts');
+
+// Generated reference index/table pages that intentionally contain no fenced TypeScript snippets.
+// docs/endpoints.md calls are type-checked separately via test/support/endpoint-calls.ts.
+const EXCLUDED_DOC_FILES = new Set(['docs/endpoints.md', 'docs/plugins/index.md']);
 
 interface ExtractedBlock {
   sourceFile: string;
@@ -16,19 +21,25 @@ interface ExtractedBlock {
   skipped: boolean;
 }
 
+function walkMarkdown(dir: string, acc: string[]): void {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = resolve(dir, entry.name);
+    if (entry.isDirectory()) {
+      walkMarkdown(fullPath, acc);
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      const rel = relative(REPO_ROOT, fullPath).replace(/\\/g, '/');
+      if (!EXCLUDED_DOC_FILES.has(rel)) {
+        acc.push(rel);
+      }
+    }
+  }
+}
+
 function collectMarkdownFiles(): string[] {
-  const docsDir = resolve(REPO_ROOT, 'docs');
-  const guideFiles = readdirSync(docsDir, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        entry.name.endsWith('.md') &&
-        // docs/endpoints.md is generated and its calls are type-checked via test/support/endpoint-calls.ts.
-        entry.name !== 'endpoints.md',
-    )
-    .map((entry) => `docs/${entry.name}`)
-    .sort();
-  return ['README.md', ...guideFiles];
+  const docsFiles: string[] = [];
+  walkMarkdown(resolve(REPO_ROOT, 'docs'), docsFiles);
+  docsFiles.sort();
+  return ['README.md', ...docsFiles];
 }
 
 function extractTypeScriptBlocks(relativePath: string): ExtractedBlock[] {
@@ -211,16 +222,33 @@ describe('documentation TypeScript examples contract', () => {
   const checkedBlocks = allBlocks.filter((block) => !block.skipped);
   const skippedBlocks = allBlocks.filter((block) => block.skipped);
 
-  it('finds TypeScript examples in README.md and every guide under docs/*.md', () => {
-    expect(markdownFiles).toEqual([
-      'README.md',
-      'docs/admin-endpoints.md',
-      'docs/errors.md',
-      'docs/getting-started.md',
-      'docs/migration.md',
-      'docs/plugins.md',
-      'docs/resources.md',
-    ]);
+  it('finds TypeScript examples in README.md, every guide, and all 45 plugin pages', () => {
+    expect(markdownFiles).toEqual(
+      expect.arrayContaining([
+        'README.md',
+        'docs/admin-endpoints.md',
+        'docs/ai.md',
+        'docs/apply.md',
+        'docs/errors.md',
+        'docs/getting-started.md',
+        'docs/migration.md',
+        'docs/plugins.md',
+        'docs/resources.md',
+      ]),
+    );
+
+    const pluginFiles = markdownFiles.filter((file) => file.startsWith('docs/plugins/'));
+    const pluginNamesFromDocs = pluginFiles
+      .map((file) => file.split('/').at(-1)?.replace(/\.md$/, ''))
+      .sort();
+    expect(pluginNamesFromDocs).toEqual(Object.keys(PLUGINS).sort());
+
+    for (const excluded of EXCLUDED_DOC_FILES) {
+      expect(
+        extractTypeScriptBlocks(excluded),
+        `expected no fenced ts blocks in excluded page ${excluded}`,
+      ).toHaveLength(0);
+    }
     for (const file of markdownFiles) {
       const fileBlocks = checkedBlocks.filter((block) => block.sourceFile === file);
       expect(

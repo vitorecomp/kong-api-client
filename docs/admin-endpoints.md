@@ -17,7 +17,7 @@ Several of these endpoints depend on how the gateway is configured (database mod
 | `kong.node.dnsStatus()`                  | `/status/dns`                                                          | New DNS client enabled (`KONG_NEW_DNS_CLIENT=on`); returns `501` on legacy DNS                                  |
 | `kong.schemas`                           | `/schemas/{name}`, `/schemas/plugins/*`, `/schemas/vaults/*`           | Any running Kong node                                                                                           |
 | `kong.tags`                              | `/tags`, `/tags/{tag}`                                                 | Any running Kong node (read-only)                                                                               |
-| `kong.cache`                             | `/cache`, `/cache/{key}`                                               | Database-backed Kong node                                                                                       |
+| `kong.cache`                             | `/cache`, `/cache/{key}`                                               | Any running Kong node                                                                                           |
 | `kong.config`                            | `/config` (`GET`, `POST`)                                              | **DB-less mode only** (`KONG_DATABASE=off`); returns `400` on database-backed nodes                             |
 | `kong.debug`                             | `/debug/node/log-level*`, `/debug/cluster/log-level/*`                 | Any running Kong node                                                                                           |
 | `kong.clustering`                        | `/clustering/data-planes`, `/clustering/status`                        | **Hybrid Control Plane only** (`KONG_ROLE=control_plane`); returns `400` otherwise                              |
@@ -116,7 +116,7 @@ console.log(allTags.data.length, prodEntities.data.length);
 
 ## Node cache (`kong.cache`)
 
-Inspect or invalidate Kong's node-level database cache. Kong's `/cache/{key}` endpoint looks up keys without URL-decoding colons, so `kong.cache.get()` and `kong.cache.delete()` preserve literal `:` separators (such as `router:version`). Reading a key that is not currently cached on that node throws `KongHttpError` with status `404`:
+Inspect or invalidate Kong's node-level entity cache (works on any running Kong node, including DB-less nodes). Kong's `/cache/{key}` endpoint looks up keys without URL-decoding colons, so `kong.cache.get()` and `kong.cache.delete()` preserve literal `:` separators (such as `router:version`). Reading a key that is not currently cached on that node throws `KongHttpError` with status `404`:
 
 ```ts
 import { Kong } from 'kong-api-client';
