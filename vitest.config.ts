@@ -39,6 +39,20 @@ export default defineConfig({
           hookTimeout: 30_000,
         },
       },
+      {
+        test: {
+          name: 'live-destructive',
+          include: ['test/live-destructive/**/*.test.ts'],
+          pool: 'forks',
+          poolOptions: {
+            forks: {
+              singleFork: true,
+            },
+          },
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
+        },
+      },
     ],
   },
 });

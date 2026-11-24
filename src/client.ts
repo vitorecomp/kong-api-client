@@ -1,4 +1,6 @@
 import { AiApi } from './ai/index.js';
+import { runApply, type ApplyConfig, type ApplyOptions, type ApplyResult } from './apply/apply.js';
+import { runDeleteAll, type DeleteAllOptions, type DeleteAllResult } from './apply/delete-all.js';
 import { KongResources } from './generated/resources.js';
 import { PluginsApi } from './plugins.js';
 import { AcmeApi } from './special/acme.js';
@@ -64,5 +66,21 @@ export class Kong extends KongResources {
    */
   request<T = unknown>(options: RequestOptions): Promise<T> {
     return this.transport.request<T>(options);
+  }
+
+  /** Applies a declarative configuration to Kong idempotently in dependency order. */
+  apply<const P extends readonly string[] = string[]>(
+    config: ApplyConfig<P>,
+    options?: ApplyOptions,
+  ): Promise<ApplyResult> {
+    return runApply(this, config, options);
+  }
+
+  /**
+   * Deletes every entity across all first-class Kong resources in reverse
+   * dependency order. Requires `{ confirm: 'delete-everything' }`.
+   */
+  deleteAll(options: DeleteAllOptions): Promise<DeleteAllResult> {
+    return runDeleteAll(this, options);
   }
 }

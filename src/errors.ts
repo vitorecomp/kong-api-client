@@ -1,3 +1,4 @@
+import type { ApplyChange, ApplyConfig, ApplyResult } from './apply/apply.js';
 import type { HttpMethod } from './transport.js';
 
 /** Base error class for all errors thrown by `kong-api-client`. */
@@ -90,5 +91,32 @@ export class KongTimeoutError extends KongError {
     super(`Request timed out after ${timeoutMs}ms${target}`, options);
     this.name = 'KongTimeoutError';
     this.timeoutMs = timeoutMs;
+  }
+}
+
+/** Error thrown when a step of {@link Kong.apply} fails. Nothing is rolled back. */
+export class KongApplyError extends KongError {
+  /** Details of the step that failed. */
+  readonly failed: {
+    /** Resource collection being applied. */
+    type: keyof ApplyConfig;
+    /** Entity key (`<upstream>/<target>` for targets). */
+    key: string;
+    /** Action attempted when the error occurred. */
+    action: ApplyChange['action'];
+  };
+  /** Changes completed before the failure. */
+  readonly result: ApplyResult;
+
+  constructor(
+    failed: { type: keyof ApplyConfig; key: string; action: ApplyChange['action'] },
+    result: ApplyResult,
+    cause: unknown,
+  ) {
+    const detail = cause instanceof Error && cause.message ? `: ${cause.message}` : '';
+    super(`Failed to ${failed.action} ${failed.type} "${failed.key}"${detail}`, { cause });
+    this.name = 'KongApplyError';
+    this.failed = failed;
+    this.result = result;
   }
 }

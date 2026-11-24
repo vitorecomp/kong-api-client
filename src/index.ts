@@ -4,12 +4,16 @@ export const VERSION = '3.0.0-rc.1';
 export { Kong } from './client.js';
 
 export {
+  KongApplyError,
   KongConnectionError,
   KongError,
   KongHttpError,
   KongTimeoutError,
   type KongHttpErrorOptions,
 } from './errors.js';
+
+export type { ApplyChange, ApplyConfig, ApplyOptions, ApplyResult } from './apply/apply.js';
+export type { DeleteAllOptions, DeleteAllResult } from './apply/delete-all.js';
 
 export {
   Transport,

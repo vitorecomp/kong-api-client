@@ -29,7 +29,30 @@ mkdir -p "${REPO_ROOT}/coverage"
 eval "$("${SCRIPT_DIR}/kong.sh" env "${TARGET}")"
 
 cd "${REPO_ROOT}"
-npx vitest run --project live "$@"
+if [[ $# -eq 0 ]]; then
+  npx vitest run --project live
+  npx vitest run --project live-destructive
+else
+  live_args=()
+  destructive_args=()
+  shared_flags=()
+  for arg in "$@"; do
+    case "${arg}" in
+      -*) shared_flags+=("${arg}") ;;
+      *live-destructive*) destructive_args+=("${arg}") ;;
+      *) live_args+=("${arg}") ;;
+    esac
+  done
+  if [[ ${#live_args[@]} -gt 0 ]]; then
+    npx vitest run --project live "${shared_flags[@]}" "${live_args[@]}"
+  fi
+  if [[ ${#destructive_args[@]} -gt 0 ]]; then
+    npx vitest run --project live-destructive "${shared_flags[@]}" "${destructive_args[@]}"
+  fi
+  if [[ ${#live_args[@]} -eq 0 && ${#destructive_args[@]} -eq 0 ]]; then
+    npx vitest run --project live "${shared_flags[@]}"
+  fi
+fi
 
 if [[ -n "${LIVE_COVERAGE:-}" ]]; then
   COVERAGE_MODE="${LIVE_COVERAGE}"
