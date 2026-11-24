@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "method": "GET",
+    "template": "/clustering/data-planes",
+    "status": 400,
+    "reason": "Only available when Kong runs as a hybrid-mode Control Plane; the test gateway runs in traditional database mode."
+  },
+  {
+    "method": "GET",
+    "template": "/clustering/status",
+    "status": 400,
+    "reason": "Only available when Kong runs as a hybrid-mode Control Plane; the test gateway runs in traditional database mode."
+  },
+  {
+    "method": "POST",
+    "template": "/acme",
+    "status": 400,
+    "reason": "Requires an external ACME CA and a publicly reachable HTTP-01 challenge listener on port 80; the test gateway has neither."
+  }
+]
