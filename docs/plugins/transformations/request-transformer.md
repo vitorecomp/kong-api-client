@@ -1,5 +1,7 @@
 ---
 title: Request Transformer
+group: Plugins
+category: Transformations
 ---
 
 # Request Transformer (`request-transformer`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('request-transformer', {
   on: { route: 'my-route' },
-  config: { add: { headers: ['X-Test:1'] } },
+  config: { add: { headers: ['X-Gateway:kong'] }, remove: { headers: ['X-Internal-Debug'] } },
 });
 ```
 

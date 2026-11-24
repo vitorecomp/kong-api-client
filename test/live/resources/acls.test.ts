@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { deleteIgnoringNotFound } from '../../support/crud.js';
 import {
-  captureHttpError,
   exerciseCollectionWithTagReset,
   exerciseConsumerSingleton,
 } from '../../support/crud-credentials.js';
+import { captureHttpError } from '../../support/errors.js';
 import { liveKong, unique } from '../../support/live.js';
 
 describe('acls and acl consumer singleton', () => {

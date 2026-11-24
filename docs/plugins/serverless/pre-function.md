@@ -1,5 +1,7 @@
 ---
 title: Pre-Function
+group: Plugins
+category: Serverless
 ---
 
 # Pre-Function (`pre-function`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('pre-function', {
   on: { route: 'my-route' },
-  config: { access: ['return'] },
+  config: { access: ["kong.service.request.set_header('X-Gateway-Checked', 'true')"] },
 });
 ```
 

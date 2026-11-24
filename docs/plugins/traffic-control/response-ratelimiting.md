@@ -1,5 +1,7 @@
 ---
 title: Response Rate Limiting
+group: Plugins
+category: Traffic Control
 ---
 
 # Response Rate Limiting (`response-ratelimiting`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('response-ratelimiting', {
   on: { route: 'my-route' },
-  config: { limits: { video: { minute: 10 } } },
+  config: { limits: { requests: { minute: 100 } }, header_name: 'X-Kong-Limit', policy: 'local' },
 });
 ```
 

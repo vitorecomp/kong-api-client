@@ -1,5 +1,7 @@
 ---
 title: TCP Log
+group: Plugins
+category: Logging
 ---
 
 # TCP Log (`tcp-log`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('tcp-log', {
   on: { route: 'my-route' },
-  config: { host: '127.0.0.1', port: 9999 },
+  config: { host: '192.0.2.10', port: 5140, tls: true },
 });
 ```
 

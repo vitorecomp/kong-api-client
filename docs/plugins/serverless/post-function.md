@@ -1,5 +1,7 @@
 ---
 title: Post-Function
+group: Plugins
+category: Serverless
 ---
 
 # Post-Function (`post-function`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('post-function', {
   on: { route: 'my-route' },
-  config: { access: ['return'] },
+  config: { log: ["kong.log.info('request completed')"] },
 });
 ```
 

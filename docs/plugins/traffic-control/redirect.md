@@ -1,5 +1,7 @@
 ---
 title: Redirect
+group: Plugins
+category: Traffic Control
 ---
 
 # Redirect (`redirect`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('redirect', {
   on: { route: 'my-route' },
-  config: { location: 'https://example.com' },
+  config: { location: 'https://api.example.com/v2', status_code: 301, keep_incoming_path: true },
 });
 ```
 

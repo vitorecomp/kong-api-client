@@ -1,5 +1,7 @@
 ---
 title: Standard Webhooks
+group: Plugins
+category: Traffic Control
 ---
 
 # Standard Webhooks (`standard-webhooks`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('standard-webhooks', {
   on: { route: 'my-route' },
-  config: { secret_v1: 'dGVzdC1zZWNyZXQ=' },
+  config: { secret_v1: 'd2hzZWNfZXhhbXBsZV9zZWNyZXQ=', tolerance_second: 300 },
 });
 ```
 

@@ -1,5 +1,7 @@
 ---
 title: Request Size Limiting
+group: Plugins
+category: Traffic Control
 ---
 
 # Request Size Limiting (`request-size-limiting`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('request-size-limiting', {
   on: { route: 'my-route' },
-  config: {},
+  config: { allowed_payload_size: 16, size_unit: 'megabytes', require_content_length: true },
 });
 ```
 

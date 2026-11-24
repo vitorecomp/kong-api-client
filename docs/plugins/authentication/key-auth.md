@@ -1,5 +1,7 @@
 ---
 title: Key Auth
+group: Plugins
+category: Authentication
 ---
 
 # Key Auth (`key-auth`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('key-auth', {
   on: { route: 'my-route' },
-  config: {},
+  config: { key_names: ['X-API-Key'], hide_credentials: true },
 });
 ```
 

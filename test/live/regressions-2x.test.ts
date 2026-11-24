@@ -1,18 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { KongHttpError } from '../../src/index.js';
 import { deleteIgnoringNotFound } from '../support/crud.js';
+import { captureHttpError } from '../support/errors.js';
 import { liveKong, unique } from '../support/live.js';
-
-async function captureHttpError(promise: Promise<unknown>): Promise<KongHttpError> {
-  let captured: unknown;
-  await expect(
-    promise.catch((error: unknown) => {
-      captured = error;
-      throw error;
-    }),
-  ).rejects.toBeInstanceOf(KongHttpError);
-  return captured as KongHttpError;
-}
 
 describe('2.x regression tests (live)', () => {
   const kong = liveKong();
@@ -86,11 +75,15 @@ describe('2.x regression tests (live)', () => {
       serviceId = service.id;
       expect(service.host).toBe('upstream');
 
+      const expectedHeaders = { 'x-regression-4': [unique('hdr')] };
       const route = await kong.routes.create({
-        headers: { 'x-regression-4': [unique('hdr')] },
+        headers: expectedHeaders,
       });
       routeId = route.id;
-      expect(route.headers).toBeTruthy();
+      expect(route.headers).toEqual(expectedHeaders);
+
+      const fetchedRoute = await kong.routes.get(route.id);
+      expect(fetchedRoute.headers).toEqual(expectedHeaders);
     } finally {
       if (routeId) {
         const id = routeId;

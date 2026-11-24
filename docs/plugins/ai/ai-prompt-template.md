@@ -1,5 +1,7 @@
 ---
 title: AI Prompt Template
+group: Plugins
+category: AI
 ---
 
 # AI Prompt Template (`ai-prompt-template`)
@@ -21,8 +23,12 @@ await kong.plugins.enable('ai-prompt-template', {
   on: { route: 'my-route' },
   config: {
     templates: [
-      { name: 'greet', template: '{"messages":[{"role":"user","content":"Hello {{name}}"}]}' },
+      {
+        name: 'summarize',
+        template: '{"messages":[{"role":"user","content":"Summarize: {{text}}"}]}',
+      },
     ],
+    allow_untemplated_requests: false,
   },
 });
 ```

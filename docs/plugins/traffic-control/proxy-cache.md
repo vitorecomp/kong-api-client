@@ -1,5 +1,7 @@
 ---
 title: Proxy Cache
+group: Plugins
+category: Traffic Control
 ---
 
 # Proxy Cache (`proxy-cache`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('proxy-cache', {
   on: { route: 'my-route' },
-  config: { strategy: 'memory' },
+  config: { strategy: 'memory', cache_ttl: 300, content_type: ['application/json'] },
 });
 ```
 

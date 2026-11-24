@@ -1,5 +1,7 @@
 ---
 title: AI Prompt Decorator
+group: Plugins
+category: AI
 ---
 
 # AI Prompt Decorator (`ai-prompt-decorator`)
@@ -19,7 +21,9 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('ai-prompt-decorator', {
   on: { route: 'my-route' },
-  config: { prompts: { prepend: [{ role: 'system', content: 'Answer concisely.' }] } },
+  config: {
+    prompts: { prepend: [{ role: 'system', content: 'Answer concisely and cite sources.' }] },
+  },
 });
 ```
 

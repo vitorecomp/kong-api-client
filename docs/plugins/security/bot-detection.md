@@ -1,5 +1,7 @@
 ---
 title: Bot Detection
+group: Plugins
+category: Security
 ---
 
 # Bot Detection (`bot-detection`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('bot-detection', {
   on: { route: 'my-route' },
-  config: { deny: ['badbot'] },
+  config: { deny: ['BadBot/1\\.0'], allow: ['MonitoringBot/1\\.0'] },
 });
 ```
 

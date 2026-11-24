@@ -1,5 +1,7 @@
 ---
 title: AWS Lambda
+group: Plugins
+category: Serverless
 ---
 
 # AWS Lambda (`aws-lambda`)
@@ -19,7 +21,11 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('aws-lambda', {
   on: { route: 'my-route' },
-  config: { aws_region: 'us-east-1', function_name: 'hello' },
+  config: {
+    aws_region: 'us-east-1',
+    function_name: 'orders-handler',
+    invocation_type: 'RequestResponse',
+  },
 });
 ```
 

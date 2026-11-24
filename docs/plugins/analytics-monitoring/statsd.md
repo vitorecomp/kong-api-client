@@ -1,5 +1,7 @@
 ---
 title: StatsD
+group: Plugins
+category: Analytics & Monitoring
 ---
 
 # StatsD (`statsd`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('statsd', {
   on: { route: 'my-route' },
-  config: {},
+  config: { host: '10.0.0.20', port: 8125, prefix: 'kong' },
 });
 ```
 

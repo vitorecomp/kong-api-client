@@ -175,7 +175,9 @@ describe('generated plugin reference pages contract', () => {
 
   it('links every plugin page from docs/plugins/index.md', () => {
     const indexMd = readFileSync(new URL('index.md', docsPluginsDir), 'utf8');
-    expect(indexMd.startsWith('---\ntitle: Plugins\n---\n')).toBe(true);
+    expect(
+      indexMd.startsWith('---\ntitle: All Plugins\ngroup: Plugins\ncategory: Overview\n---\n'),
+    ).toBe(true);
 
     for (const name of recordedPlugins) {
       const meta = categoriesFile.plugins[name]!;
@@ -194,9 +196,11 @@ describe('generated plugin reference pages contract', () => {
       const relPath = `${slugifyCategory(meta.category)}/${name}.md`;
       const md = readFileSync(new URL(relPath, docsPluginsDir), 'utf8');
 
-      // Front matter with title
+      // Front matter with title, group, and category
       expect(md.startsWith('---\n')).toBe(true);
       expect(md).toContain(`title: ${meta.title}\n`);
+      expect(md).toContain('group: Plugins\n');
+      expect(md).toContain(`category: ${meta.category}\n`);
 
       // Required page metadata
       expect(md).toContain(`**Category:** ${meta.category}`);
@@ -224,5 +228,44 @@ describe('generated plugin reference pages contract', () => {
         expect(parsed.options.on).toEqual({ route: 'my-route' });
       }
     }
+  });
+
+  it('contains no markdown links targeting # fragments in generated pages or generated JSDoc', () => {
+    const hashLinkRe = /\]\(#[^)]*\)/;
+
+    for (const relPath of actualMarkdownFiles) {
+      const md = readFileSync(new URL(relPath, docsPluginsDir), 'utf8');
+      expect(md, `docs/plugins/${relPath} must not contain # fragment links`).not.toMatch(
+        hashLinkRe,
+      );
+    }
+
+    const generatedDir = new URL('../../src/generated/', import.meta.url);
+    const generatedTsFiles = readdirSync(generatedDir)
+      .filter((file) => file.endsWith('.ts'))
+      .sort();
+    expect(generatedTsFiles.length).toBeGreaterThan(0);
+
+    for (const file of generatedTsFiles) {
+      const source = readFileSync(new URL(file, generatedDir), 'utf8');
+      const jsdocBlocks = source.match(/\/\*\*[\s\S]*?\*\//g) ?? [];
+      for (const block of jsdocBlocks) {
+        expect(block, `src/generated/${file} JSDoc must not contain # fragment links`).not.toMatch(
+          hashLinkRe,
+        );
+      }
+    }
+
+    const correlationIdDoc = readFileSync(
+      new URL('transformations/correlation-id.md', docsPluginsDir),
+      'utf8',
+    );
+    expect(correlationIdDoc).toContain(
+      '[Generators](https://developer.konghq.com/plugins/correlation-id/)',
+    );
+    const pluginsTs = readFileSync(new URL('plugins.ts', generatedDir), 'utf8');
+    expect(pluginsTs).toContain(
+      '[Generators](https://developer.konghq.com/plugins/correlation-id/)',
+    );
   });
 });

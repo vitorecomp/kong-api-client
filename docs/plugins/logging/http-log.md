@@ -1,5 +1,7 @@
 ---
 title: HTTP Log
+group: Plugins
+category: Logging
 ---
 
 # HTTP Log (`http-log`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('http-log', {
   on: { route: 'my-route' },
-  config: { http_endpoint: 'http://upstream:8080/collect' },
+  config: { http_endpoint: 'https://logs.example.com/ingest', method: 'POST', timeout: 10000 },
 });
 ```
 

@@ -1,5 +1,7 @@
 ---
 title: Session
+group: Plugins
+category: Authentication
 ---
 
 # Session (`session`)
@@ -19,7 +21,12 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('session', {
   on: { route: 'my-route' },
-  config: {},
+  config: {
+    storage: 'cookie',
+    cookie_name: 'app_session',
+    cookie_same_site: 'Lax',
+    idling_timeout: 900,
+  },
 });
 ```
 

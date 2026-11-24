@@ -1,5 +1,7 @@
 ---
 title: gRPC-Web
+group: Plugins
+category: Transformations
 ---
 
 # gRPC-Web (`grpc-web`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('grpc-web', {
   on: { route: 'my-route' },
-  config: {},
+  config: { allow_origin_header: 'https://app.example.com' },
 });
 ```
 

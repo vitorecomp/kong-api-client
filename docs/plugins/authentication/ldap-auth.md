@@ -1,5 +1,7 @@
 ---
 title: LDAP Authentication
+group: Plugins
+category: Authentication
 ---
 
 # LDAP Authentication (`ldap-auth`)
@@ -19,7 +21,12 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('ldap-auth', {
   on: { route: 'my-route' },
-  config: { ldap_host: 'ldap.example.com', base_dn: 'dc=example,dc=com', attribute: 'cn' },
+  config: {
+    ldap_host: 'ldap.example.com',
+    ldap_port: 389,
+    base_dn: 'dc=example,dc=com',
+    attribute: 'cn',
+  },
 });
 ```
 

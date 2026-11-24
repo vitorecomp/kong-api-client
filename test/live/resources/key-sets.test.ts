@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { deleteIgnoringNotFound, exerciseCollection } from '../../support/crud.js';
+import { captureHttpError } from '../../support/errors.js';
 import { TLS_FIXTURES } from '../../support/fixtures/tls/index.js';
 import { liveKong, unique } from '../../support/live.js';
 
@@ -89,6 +90,57 @@ describe('key-sets and nested keys', () => {
       });
     } finally {
       await deleteIgnoringNotFound(() => kong.keySets.delete(parentKeySet.id));
+    }
+  });
+
+  it('pins Kong behaviour: PUT /key-sets/{name} returns 500 for existing and new names', async () => {
+    const existingName = unique('ks-put-existing');
+    const newName = unique('ks-put-new');
+    const initialTag = unique('ks-put-tag');
+    const patchedTag = unique('ks-put-patched');
+
+    const existing = await kong.keySets.create({
+      name: existingName,
+      tags: [initialTag],
+    });
+
+    try {
+      const existingError = await captureHttpError(
+        kong.keySets.upsert(existingName, {
+          name: existingName,
+        }),
+      );
+      expect(existingError.status).toBe(500);
+      expect(existingError.method).toBe('PUT');
+      expect(existingError.path).toBe(`/key-sets/${existingName}`);
+      expect(existingError.message).toContain('An unexpected error occurred');
+
+      const afterExistingAttempt = await kong.keySets.get(existingName);
+      expect(afterExistingAttempt.id).toBe(existing.id);
+      expect(afterExistingAttempt.name).toBe(existingName);
+      expect(afterExistingAttempt.tags).toEqual([initialTag]);
+
+      const newError = await captureHttpError(
+        kong.keySets.upsert(newName, {
+          name: newName,
+        }),
+      );
+      expect(newError.status).toBe(500);
+      expect(newError.method).toBe('PUT');
+      expect(newError.path).toBe(`/key-sets/${newName}`);
+      expect(newError.message).toContain('An unexpected error occurred');
+      await expect(kong.keySets.find(newName)).resolves.toBeUndefined();
+
+      const patched = await kong.keySets.update(existingName, { tags: [patchedTag] });
+      expect(patched.id).toBe(existing.id);
+      expect(patched.tags).toEqual([patchedTag]);
+
+      await kong.keySets.delete(existingName);
+      await expect(kong.keySets.find(existingName)).resolves.toBeUndefined();
+      await expect(kong.keySets.find(existing.id)).resolves.toBeUndefined();
+    } finally {
+      await deleteIgnoringNotFound(() => kong.keySets.delete(existing.id));
+      await deleteIgnoringNotFound(() => kong.keySets.delete(newName));
     }
   });
 });

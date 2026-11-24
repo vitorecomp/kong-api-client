@@ -1,5 +1,7 @@
 ---
 title: Basic Auth
+group: Plugins
+category: Authentication
 ---
 
 # Basic Auth (`basic-auth`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('basic-auth', {
   on: { route: 'my-route' },
-  config: {},
+  config: { hide_credentials: true, realm: 'api' },
 });
 ```
 

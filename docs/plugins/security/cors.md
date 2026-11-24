@@ -1,5 +1,7 @@
 ---
 title: CORS
+group: Plugins
+category: Security
 ---
 
 # CORS (`cors`)
@@ -19,7 +21,12 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('cors', {
   on: { route: 'my-route' },
-  config: {},
+  config: {
+    origins: ['https://app.example.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    max_age: 3600,
+  },
 });
 ```
 

@@ -1,5 +1,7 @@
 ---
 title: Zipkin
+group: Plugins
+category: Analytics & Monitoring
 ---
 
 # Zipkin (`zipkin`)
@@ -19,7 +21,11 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('zipkin', {
   on: { route: 'my-route' },
-  config: {},
+  config: {
+    http_endpoint: 'https://zipkin.example.com/api/v2/spans',
+    sample_ratio: 0.1,
+    local_service_name: 'api-gateway',
+  },
 });
 ```
 

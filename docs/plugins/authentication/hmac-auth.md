@@ -1,5 +1,7 @@
 ---
 title: HMAC Auth
+group: Plugins
+category: Authentication
 ---
 
 # HMAC Auth (`hmac-auth`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('hmac-auth', {
   on: { route: 'my-route' },
-  config: {},
+  config: { clock_skew: 300, hide_credentials: true, enforce_headers: ['date', 'request-line'] },
 });
 ```
 

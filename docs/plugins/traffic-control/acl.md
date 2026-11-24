@@ -1,5 +1,7 @@
 ---
 title: ACL
+group: Plugins
+category: Traffic Control
 ---
 
 # ACL (`acl`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('acl', {
   on: { route: 'my-route' },
-  config: { allow: ['admins'] },
+  config: { allow: ['admin', 'support'], hide_groups_header: true },
 });
 ```
 

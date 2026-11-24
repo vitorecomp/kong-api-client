@@ -100,7 +100,18 @@ describe('PluginCollection', () => {
     const untyped = await plugins.update('p-4', { enabled: false });
     expectTypeOf(untyped).toEqualTypeOf<Plugin<string>>();
 
-    expect(fake.requests).toHaveLength(2);
+    fake.json({
+      id: 'p-4',
+      name: 'http-log',
+      config: { http_endpoint: 'https://y', timeout: 5000 },
+    });
+    const partialConfig = await plugins.update<'http-log'>('p-4', {
+      config: { timeout: 5000 },
+    });
+    expectTypeOf(partialConfig).toEqualTypeOf<Plugin<'http-log'>>();
+    expectTypeOf(partialConfig.config).toEqualTypeOf<HttpLogConfig>();
+
+    expect(fake.requests).toHaveLength(3);
     expect(fake.requests[0]).toMatchObject({
       method: 'PATCH',
       url: 'http://localhost:8001/plugins/team%2Flog-1',
@@ -111,6 +122,11 @@ describe('PluginCollection', () => {
       method: 'PATCH',
       url: 'http://localhost:8001/plugins/p-4',
       json: { enabled: false },
+    });
+    expect(fake.requests[2]).toMatchObject({
+      method: 'PATCH',
+      url: 'http://localhost:8001/plugins/p-4',
+      json: { config: { timeout: 5000 } },
     });
   });
 

@@ -1,5 +1,7 @@
 ---
 title: AI Response Transformer
+group: Plugins
+category: AI
 ---
 
 # AI Response Transformer (`ai-response-transformer`)
@@ -20,11 +22,11 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 await kong.plugins.enable('ai-response-transformer', {
   on: { route: 'my-route' },
   config: {
-    prompt: 'Summarize the upstream response.',
+    prompt: 'Summarize the upstream JSON response in one sentence.',
     llm: {
       route_type: 'llm/v1/chat',
       model: { provider: 'openai', name: 'gpt-4o-mini' },
-      auth: { header_name: 'Authorization', header_value: 'Bearer test-key' },
+      auth: { header_name: 'Authorization', header_value: 'Bearer <your-api-key>' },
     },
   },
 });

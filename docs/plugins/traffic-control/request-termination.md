@@ -1,5 +1,7 @@
 ---
 title: Request Termination
+group: Plugins
+category: Traffic Control
 ---
 
 # Request Termination (`request-termination`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('request-termination', {
   on: { route: 'my-route' },
-  config: { status_code: 503 },
+  config: { status_code: 503, message: 'Service temporarily unavailable' },
 });
 ```
 

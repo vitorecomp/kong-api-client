@@ -1,5 +1,7 @@
 ---
 title: Datadog
+group: Plugins
+category: Analytics & Monitoring
 ---
 
 # Datadog (`datadog`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('datadog', {
   on: { route: 'my-route' },
-  config: {},
+  config: { host: '10.0.0.10', port: 8125, prefix: 'kong' },
 });
 ```
 

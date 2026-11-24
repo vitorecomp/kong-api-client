@@ -1,5 +1,7 @@
 ---
 title: OpenTelemetry
+group: Plugins
+category: Analytics & Monitoring
 ---
 
 # OpenTelemetry (`opentelemetry`)
@@ -19,7 +21,10 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('opentelemetry', {
   on: { route: 'my-route' },
-  config: { traces_endpoint: 'http://upstream:8080/collect' },
+  config: {
+    traces_endpoint: 'https://otel.example.com/v1/traces',
+    resource_attributes: { 'service.name': 'api-gateway' },
+  },
 });
 ```
 

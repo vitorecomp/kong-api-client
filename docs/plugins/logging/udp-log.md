@@ -1,5 +1,7 @@
 ---
 title: UDP Log
+group: Plugins
+category: Logging
 ---
 
 # UDP Log (`udp-log`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('udp-log', {
   on: { route: 'my-route' },
-  config: { host: '127.0.0.1', port: 9999 },
+  config: { host: '192.0.2.11', port: 5140, timeout: 10000 },
 });
 ```
 

@@ -1,5 +1,7 @@
 ---
 title: AI Prompt Guard
+group: Plugins
+category: AI
 ---
 
 # AI Prompt Guard (`ai-prompt-guard`)
@@ -19,7 +21,10 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('ai-prompt-guard', {
   on: { route: 'my-route' },
-  config: { deny_patterns: ['ignore previous instructions'] },
+  config: {
+    deny_patterns: ['ignore previous instructions'],
+    allow_all_conversation_history: false,
+  },
 });
 ```
 

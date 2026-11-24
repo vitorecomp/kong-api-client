@@ -1,5 +1,7 @@
 ---
 title: Rate Limiting
+group: Plugins
+category: Traffic Control
 ---
 
 # Rate Limiting (`rate-limiting`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('rate-limiting', {
   on: { route: 'my-route' },
-  config: { minute: 100 },
+  config: { minute: 60, policy: 'local', hide_client_headers: false },
 });
 ```
 

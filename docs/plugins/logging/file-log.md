@@ -1,5 +1,7 @@
 ---
 title: File Log
+group: Plugins
+category: Logging
 ---
 
 # File Log (`file-log`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('file-log', {
   on: { route: 'my-route' },
-  config: { path: '/tmp/kong-file-log.log' },
+  config: { path: '/tmp/kong-access.log', reopen: true },
 });
 ```
 

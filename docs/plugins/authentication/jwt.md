@@ -1,5 +1,7 @@
 ---
 title: JWT
+group: Plugins
+category: Authentication
 ---
 
 # JWT (`jwt`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('jwt', {
   on: { route: 'my-route' },
-  config: {},
+  config: { claims_to_verify: ['exp'], key_claim_name: 'iss' },
 });
 ```
 

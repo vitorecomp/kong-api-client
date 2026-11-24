@@ -1,5 +1,7 @@
 ---
 title: Loggly
+group: Plugins
+category: Logging
 ---
 
 # Loggly (`loggly`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('loggly', {
   on: { route: 'my-route' },
-  config: { key: '00000000-0000-0000-0000-000000000000' },
+  config: { key: '<your-loggly-token>', host: 'logs-01.example.com', log_level: 'info' },
 });
 ```
 

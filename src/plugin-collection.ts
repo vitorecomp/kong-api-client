@@ -1,4 +1,5 @@
 import type { Plugin, PluginInput } from './generated/entities.js';
+import type { ConfigOf } from './generated/plugins.js';
 import { Collection } from './resource.js';
 import { segment, type CallOptions } from './transport.js';
 
@@ -35,7 +36,7 @@ export class PluginCollection extends Collection<Plugin, PluginInput> {
   /** Partially updates an existing plugin by key (`PATCH`). */
   override async update<const N extends string = string>(
     key: string,
-    patch: Partial<PluginInput<N>>,
+    patch: Omit<Partial<PluginInput<N>>, 'config'> & { config?: Partial<ConfigOf<N>> | null },
     options?: CallOptions,
   ): Promise<Plugin<N>> {
     const encoded = segment(key);

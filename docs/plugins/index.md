@@ -1,5 +1,7 @@
 ---
-title: Plugins
+title: All Plugins
+group: Plugins
+category: Overview
 ---
 
 # Plugins

@@ -1,5 +1,7 @@
 ---
 title: Syslog
+group: Plugins
+category: Logging
 ---
 
 # Syslog (`syslog`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('syslog', {
   on: { route: 'my-route' },
-  config: {},
+  config: { log_level: 'info', facility: 'user', server_errors_severity: 'err' },
 });
 ```
 

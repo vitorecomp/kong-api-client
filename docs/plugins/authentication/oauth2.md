@@ -1,5 +1,7 @@
 ---
 title: OAuth 2.0 Authentication
+group: Plugins
+category: Authentication
 ---
 
 # OAuth 2.0 Authentication (`oauth2`)
@@ -19,7 +21,12 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('oauth2', {
   on: { route: 'my-route' },
-  config: { enable_client_credentials: true },
+  config: {
+    scopes: ['read', 'write'],
+    mandatory_scope: true,
+    enable_client_credentials: true,
+    token_expiration: 7200,
+  },
 });
 ```
 

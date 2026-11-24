@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseCollection } from '../../support/crud.js';
-import { captureHttpError } from '../../support/crud-credentials.js';
+import { captureHttpError } from '../../support/errors.js';
 import { liveKong, unique } from '../../support/live.js';
 
 describe('acme_storage', () => {

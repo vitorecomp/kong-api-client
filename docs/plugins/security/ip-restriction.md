@@ -1,5 +1,7 @@
 ---
 title: IP Restriction
+group: Plugins
+category: Security
 ---
 
 # IP Restriction (`ip-restriction`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('ip-restriction', {
   on: { route: 'my-route' },
-  config: { allow: ['127.0.0.1'] },
+  config: { allow: ['192.0.2.0/24', '10.0.0.0/8'], status: 403 },
 });
 ```
 

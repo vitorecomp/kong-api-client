@@ -66,6 +66,13 @@ function escapeJsDoc(text) {
   return String(text).replaceAll('*/', '*\\/').replaceAll('\r\n', '\n').trim();
 }
 
+function resolvePluginRelativeLinks(text, pluginName) {
+  if (!pluginName || typeof text !== 'string') {
+    return text;
+  }
+  return text.replace(/\]\(#[^)]*\)/g, `](https://developer.konghq.com/plugins/${pluginName}/)`);
+}
+
 function formatPropName(name) {
   return IDENTIFIER_RE.test(name) ? name : JSON.stringify(name);
 }
@@ -266,11 +273,11 @@ function collectNestedOneOfNotes(def39, def314, notes) {
 }
 
 function buildFieldJsDocLines(def39, def314, options = {}) {
-  const { isShorthand = false, suppressTargetNote = false } = options;
+  const { isShorthand = false, suppressTargetNote = false, pluginName = undefined } = options;
   const lines = [];
 
   if (def39?.description) {
-    lines.push(def39.description);
+    lines.push(resolvePluginRelativeLinks(def39.description, pluginName));
   }
 
   if (!suppressTargetNote) {
@@ -316,7 +323,7 @@ function buildFieldJsDocLines(def39, def314, options = {}) {
   if (def39?.deprecation) {
     const dep = def39.deprecation;
     if (isPlainObject(dep) && typeof dep.message === 'string' && dep.message.trim()) {
-      lines.push(`@deprecated ${dep.message.trim()}`);
+      lines.push(`@deprecated ${resolvePluginRelativeLinks(dep.message.trim(), pluginName)}`);
     } else {
       lines.push('@deprecated');
     }
@@ -337,7 +344,7 @@ function renderForeignAcceptedType(reference, entityContext) {
   return variants.join(' | ');
 }
 
-function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext) {
+function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext, pluginName) {
   const sole = def39 ?? def314;
   const kongType = sole.type;
 
@@ -366,7 +373,14 @@ function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext
       if (!elem39 && !elem314) {
         return 'Array<unknown>';
       }
-      const elemType = renderType(elem39, elem314, mode, insideSingleTarget, entityContext);
+      const elemType = renderType(
+        elem39,
+        elem314,
+        mode,
+        insideSingleTarget,
+        entityContext,
+        pluginName,
+      );
       return `Array<${elemType}>`;
     }
     case 'map': {
@@ -375,7 +389,14 @@ function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext
       if (!val39 && !val314) {
         return 'Record<string, unknown>';
       }
-      const valType = renderType(val39, val314, mode, insideSingleTarget, entityContext);
+      const valType = renderType(
+        val39,
+        val314,
+        mode,
+        insideSingleTarget,
+        entityContext,
+        pluginName,
+      );
       return `Record<string, ${valType}>`;
     }
     case 'foreign': {
@@ -391,7 +412,9 @@ function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext
       if (isAbstractOrEmptyRecord(def39) && isAbstractOrEmptyRecord(def314)) {
         return 'Record<string, unknown>';
       }
-      const body = renderRecordMembers(def39, def314, mode, insideSingleTarget, entityContext);
+      const body = renderRecordMembers(def39, def314, mode, insideSingleTarget, entityContext, {
+        pluginName,
+      });
       return `{\n${body}}`;
     }
     default:
@@ -399,15 +422,15 @@ function renderSingleType(def39, def314, mode, insideSingleTarget, entityContext
   }
 }
 
-function renderType(def39, def314, mode, insideSingleTarget, entityContext) {
+function renderType(def39, def314, mode, insideSingleTarget, entityContext, pluginName) {
   const type39 = def39?.type;
   const type314 = def314?.type;
   if (type39 && type314 && type39 !== type314) {
-    const t39 = renderSingleType(def39, undefined, mode, true, entityContext);
-    const t314 = renderSingleType(undefined, def314, mode, true, entityContext);
+    const t39 = renderSingleType(def39, undefined, mode, true, entityContext, pluginName);
+    const t314 = renderSingleType(undefined, def314, mode, true, entityContext, pluginName);
     return t39 === t314 ? t39 : `${t39} | ${t314}`;
   }
-  return renderSingleType(def39, def314, mode, insideSingleTarget, entityContext);
+  return renderSingleType(def39, def314, mode, insideSingleTarget, entityContext, pluginName);
 }
 
 function withNullable(tsType) {
@@ -418,7 +441,7 @@ function withNullable(tsType) {
 }
 
 function renderRecordMembers(rec39, rec314, mode, insideSingleTarget, entityContext, options = {}) {
-  const { entityName = undefined, isTopLevelEntity = false } = options;
+  const { entityName = undefined, isTopLevelEntity = false, pluginName = undefined } = options;
   const overrides =
     isTopLevelEntity && mode === 'accepted' ? ENTITY_INPUT_OVERRIDES[entityName] : undefined;
   const parentSingleTarget = insideSingleTarget || rec39 === undefined || rec314 === undefined;
@@ -439,6 +462,7 @@ function renderRecordMembers(rec39, rec314, mode, insideSingleTarget, entityCont
     const fieldSingleTarget = parentSingleTarget || def39 === undefined || def314 === undefined;
     const jsdocLines = buildFieldJsDocLines(def39, def314, {
       suppressTargetNote: parentSingleTarget,
+      pluginName,
     });
     const jsdoc = formatJsDoc(jsdocLines);
 
@@ -456,7 +480,7 @@ function renderRecordMembers(rec39, rec314, mode, insideSingleTarget, entityCont
       continue;
     }
 
-    const tsType = renderType(def39, def314, mode, fieldSingleTarget, entityContext);
+    const tsType = renderType(def39, def314, mode, fieldSingleTarget, entityContext, pluginName);
 
     if (mode === 'returned') {
       const onlyInOneTarget = !parentSingleTarget && (def39 === undefined || def314 === undefined);
@@ -494,9 +518,10 @@ function renderRecordMembers(rec39, rec314, mode, insideSingleTarget, entityCont
     const jsdocLines = buildFieldJsDocLines(def39, def314, {
       isShorthand: true,
       suppressTargetNote: parentSingleTarget,
+      pluginName,
     });
     const jsdoc = formatJsDoc(jsdocLines);
-    const tsType = renderType(def39, def314, mode, fieldSingleTarget, entityContext);
+    const tsType = renderType(def39, def314, mode, fieldSingleTarget, entityContext, pluginName);
     lines.push(`${jsdoc}${formatPropName(name)}?: ${withNullable(tsType)};`);
   }
 
@@ -678,6 +703,7 @@ function generatePluginsSource(pluginRecords, entityContext) {
       'accepted',
       false,
       entityContext,
+      { pluginName: plugin.name },
     );
     const ifaceDoc = formatJsDoc([
       `Configuration for the \`${plugin.name}\` (${plugin.title}) plugin.`,
@@ -960,6 +986,68 @@ function generateResourcesSource(resourcesJson, entityContext) {
   return chunks.join('\n');
 }
 
+function collectSetPaths(node, currentPath, paths) {
+  if (!isPlainObject(node)) {
+    return;
+  }
+  if (node.type === 'set' && currentPath) {
+    paths.add(currentPath);
+  }
+  if (Array.isArray(node.fields)) {
+    for (const entry of node.fields) {
+      if (!isPlainObject(entry)) {
+        continue;
+      }
+      for (const [fieldName, fieldDef] of Object.entries(entry)) {
+        const nextPath = currentPath ? `${currentPath}.${fieldName}` : fieldName;
+        collectSetPaths(fieldDef, nextPath, paths);
+      }
+    }
+  }
+  if ((node.type === 'array' || node.type === 'set') && isPlainObject(node.elements)) {
+    const nextPath = currentPath ? `${currentPath}[]` : '[]';
+    collectSetPaths(node.elements, nextPath, paths);
+  }
+  if (node.type === 'map' && isPlainObject(node.values)) {
+    const nextPath = currentPath ? `${currentPath}.*` : '*';
+    collectSetPaths(node.values, nextPath, paths);
+  }
+}
+
+function generateMetaSource(resourcesJson, entityContext, pluginRecords) {
+  const entityNames = [
+    ...new Set(Object.values(resourcesJson.resources).map((resource) => resource.entity)),
+  ].sort();
+
+  const entries = [];
+
+  for (const entity of entityNames) {
+    const paths = new Set();
+    collectSetPaths(entityContext.schemas39.get(entity), '', paths);
+    collectSetPaths(entityContext.schemas314.get(entity), '', paths);
+    const sorted = [...paths].sort();
+    entries.push(`${formatPropName(entity)}: [${sorted.map(formatLiteral).join(', ')}],`);
+  }
+
+  for (const plugin of pluginRecords) {
+    const paths = new Set();
+    collectSetPaths(plugin.config39, 'config', paths);
+    collectSetPaths(plugin.config314, 'config', paths);
+    const sorted = [...paths].sort();
+    entries.push(
+      `${formatPropName(`plugin:${plugin.name}`)}: [${sorted.map(formatLiteral).join(', ')}],`,
+    );
+  }
+
+  return (
+    GENERATED_BANNER +
+    formatJsDoc([
+      'Paths of schema fields typed as `set` in Kong 3.9 or Kong Gateway 3.14, keyed by entity name and `plugin:<name>`.',
+    ]) +
+    `export const SET_FIELDS: Readonly<Record<string, readonly string[]>> = {\n${entries.join('\n')}\n};\n`
+  );
+}
+
 function renderTsValue(value) {
   if (value === null) {
     return 'null';
@@ -1167,7 +1255,12 @@ function formatDocType(def39, def314, entityContext) {
 }
 
 function buildDocDescriptionCell(def39, def314, options = {}) {
-  const { isShorthand = false, only39Parent = false, only314Parent = false } = options;
+  const {
+    isShorthand = false,
+    only39Parent = false,
+    only314Parent = false,
+    pluginName = undefined,
+  } = options;
 
   // Fields that exist only on 3.14 must have no description, only the target notice.
   if (only314Parent || (!def39 && def314)) {
@@ -1176,7 +1269,7 @@ function buildDocDescriptionCell(def39, def314, options = {}) {
 
   const parts = [];
   if (def39?.description) {
-    parts.push(escapeMarkdownCell(def39.description));
+    parts.push(escapeMarkdownCell(resolvePluginRelativeLinks(def39.description, pluginName)));
   }
 
   if (only39Parent || (def39 && !def314)) {
@@ -1192,7 +1285,9 @@ function buildDocDescriptionCell(def39, def314, options = {}) {
   if (def39?.deprecation) {
     const dep = def39.deprecation;
     if (isPlainObject(dep) && typeof dep.message === 'string' && dep.message.trim()) {
-      parts.push(`Deprecated: ${escapeMarkdownCell(dep.message)}`);
+      parts.push(
+        `Deprecated: ${escapeMarkdownCell(resolvePluginRelativeLinks(dep.message, pluginName))}`,
+      );
     } else {
       parts.push('Deprecated.');
     }
@@ -1213,7 +1308,7 @@ function collectDocFieldRows(
   prefix,
   rows,
   entityContext,
-  parentState = { only39: false, only314: false, insideSingleTarget: false },
+  parentState = { only39: false, only314: false, insideSingleTarget: false, pluginName: undefined },
 ) {
   const regularFields = mergeFieldMaps(rec39?.fields, rec314?.fields);
   const regularNames = new Set(regularFields.map((f) => f.name));
@@ -1230,6 +1325,7 @@ function collectDocFieldRows(
     const descriptionText = buildDocDescriptionCell(def39, def314, {
       only39Parent: parentState.only39,
       only314Parent: parentState.only314,
+      pluginName: parentState.pluginName,
     });
 
     rows.push({
@@ -1249,6 +1345,7 @@ function collectDocFieldRows(
         only39,
         only314,
         insideSingleTarget,
+        pluginName: parentState.pluginName,
       });
     } else if (soleType === 'array' || soleType === 'set') {
       const elem39 = def39?.elements;
@@ -1262,6 +1359,7 @@ function collectDocFieldRows(
           only39,
           only314,
           insideSingleTarget,
+          pluginName: parentState.pluginName,
         });
       }
     } else if (soleType === 'map') {
@@ -1276,6 +1374,7 @@ function collectDocFieldRows(
           only39,
           only314,
           insideSingleTarget,
+          pluginName: parentState.pluginName,
         });
       }
     }
@@ -1299,6 +1398,7 @@ function collectDocFieldRows(
         isShorthand: true,
         only39Parent: parentState.only39 || only39,
         only314Parent: parentState.only314 || only314,
+        pluginName: parentState.pluginName,
       }),
     });
   }
@@ -1325,7 +1425,12 @@ async function generatePluginPageSource(plugin, example, entityContext, prettier
   ).trimEnd();
 
   const rows = [];
-  collectDocFieldRows(plugin.config39, plugin.config314, '', rows, entityContext);
+  collectDocFieldRows(plugin.config39, plugin.config314, '', rows, entityContext, {
+    only39: false,
+    only314: false,
+    insideSingleTarget: false,
+    pluginName: plugin.name,
+  });
 
   const tableLines = [
     '| Field | Type | Required | Default | Description |',
@@ -1342,7 +1447,7 @@ async function generatePluginPageSource(plugin, example, entityContext, prettier
     : plugin.title;
 
   return (
-    `---\ntitle: ${frontMatterTitle}\n---\n\n` +
+    `---\ntitle: ${frontMatterTitle}\ngroup: Plugins\ncategory: ${plugin.category}\n---\n\n` +
     `# ${plugin.title} (\`${plugin.name}\`)\n\n` +
     `- **Category:** ${plugin.category}\n` +
     `- **Kong documentation:** [${kongUrl}](${kongUrl})\n` +
@@ -1386,7 +1491,7 @@ function generatePluginsIndexSource(pluginRecords) {
   }
 
   return (
-    '---\ntitle: Plugins\n---\n\n' +
+    '---\ntitle: All Plugins\ngroup: Plugins\ncategory: Overview\n---\n\n' +
     '# Plugins\n\n' +
     `Reference pages for all ${pluginRecords.length} first-class Kong Gateway plugins supported by \`kong-api-client\`, grouped by category.\n\n` +
     `${sections.join('\n\n')}\n`
@@ -1419,6 +1524,10 @@ async function main() {
     {
       relPath: 'src/generated/resources.ts',
       raw: generateResourcesSource(resourcesJson, entityContext),
+    },
+    {
+      relPath: 'src/generated/meta.ts',
+      raw: generateMetaSource(resourcesJson, entityContext, pluginRecords),
     },
     {
       relPath: 'test/support/plugin-examples.ts',

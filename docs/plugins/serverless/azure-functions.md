@@ -1,5 +1,7 @@
 ---
 title: Azure Functions
+group: Plugins
+category: Serverless
 ---
 
 # Azure Functions (`azure-functions`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('azure-functions', {
   on: { route: 'my-route' },
-  config: { appname: 'example-app', functionname: 'hello' },
+  config: { appname: 'orders-func-app', functionname: 'process-order', https: true },
 });
 ```
 

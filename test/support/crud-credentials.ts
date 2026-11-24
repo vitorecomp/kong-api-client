@@ -1,11 +1,5 @@
 import { expect } from 'vitest';
-import {
-  KongHttpError,
-  type Collection,
-  type Consumer,
-  type ConsumerInput,
-  type Singleton,
-} from '../../src/index.js';
+import type { Collection, Consumer, ConsumerInput, Singleton } from '../../src/index.js';
 import { deleteIgnoringNotFound, exerciseSingleton } from './crud.js';
 import { unique } from './live.js';
 
@@ -41,18 +35,6 @@ export interface CollectionTagResetOptions<
     getKey?: (current: E) => string;
     assertUpserted: (upserted: E, before: E) => void;
   };
-}
-
-/** Captures a rejected {@link KongHttpError} without swallowing non-throwing promises. */
-export async function captureHttpError(promise: Promise<unknown>): Promise<KongHttpError> {
-  let captured: unknown;
-  await expect(
-    promise.catch((error: unknown) => {
-      captured = error;
-      throw error;
-    }),
-  ).rejects.toBeInstanceOf(KongHttpError);
-  return captured as KongHttpError;
 }
 
 /**

@@ -1,5 +1,7 @@
 ---
 title: gRPC-Gateway
+group: Plugins
+category: Transformations
 ---
 
 # gRPC-Gateway (`grpc-gateway`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('grpc-gateway', {
   on: { route: 'my-route' },
-  config: {},
+  config: { proto: '/etc/kong/protos/service.proto' },
 });
 ```
 

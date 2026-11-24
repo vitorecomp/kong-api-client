@@ -1,5 +1,7 @@
 ---
 title: AI Proxy
+group: Plugins
+category: AI
 ---
 
 # AI Proxy (`ai-proxy`)
@@ -22,7 +24,7 @@ await kong.plugins.enable('ai-proxy', {
   config: {
     route_type: 'llm/v1/chat',
     model: { provider: 'openai', name: 'gpt-4o-mini' },
-    auth: { header_name: 'Authorization', header_value: 'Bearer test-key' },
+    auth: { header_name: 'Authorization', header_value: 'Bearer <your-api-key>' },
   },
 });
 ```

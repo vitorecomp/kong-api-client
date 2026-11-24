@@ -1,23 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { KongHttpError } from '../../../src/index.js';
 import {
   deleteIgnoringNotFound,
   exerciseCollection,
   exerciseSingleton,
 } from '../../support/crud.js';
+import { captureHttpError } from '../../support/errors.js';
 import { TLS_FIXTURES } from '../../support/fixtures/tls/index.js';
 import { liveKong, unique } from '../../support/live.js';
-
-async function captureHttpError(promise: Promise<unknown>): Promise<KongHttpError> {
-  let captured: unknown;
-  await expect(
-    promise.catch((error: unknown) => {
-      captured = error;
-      throw error;
-    }),
-  ).rejects.toBeInstanceOf(KongHttpError);
-  return captured as KongHttpError;
-}
 
 describe('services, nested routes, and route service singleton', () => {
   const kong = liveKong();

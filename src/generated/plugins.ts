@@ -1333,7 +1333,7 @@ export interface CorrelationIdConfig {
    */
   echo_downstream?: boolean | null;
   /**
-   * The generator to use for the correlation ID. Accepted values are `uuid`, `uuid#counter`, and `tracker`. See [Generators](#generators).
+   * The generator to use for the correlation ID. Accepted values are `uuid`, `uuid#counter`, and `tracker`. See [Generators](https://developer.konghq.com/plugins/correlation-id/).
    * @default 'uuid#counter'
    */
   generator?: 'tracker' | 'uuid' | 'uuid#counter' | null;

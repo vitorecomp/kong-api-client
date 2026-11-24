@@ -1,5 +1,7 @@
 ---
 title: Response Transformer
+group: Plugins
+category: Transformations
 ---
 
 # Response Transformer (`response-transformer`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('response-transformer', {
   on: { route: 'my-route' },
-  config: { add: { headers: ['X-Test:1'] } },
+  config: { add: { headers: ['X-Content-Type-Options:nosniff'] } },
 });
 ```
 

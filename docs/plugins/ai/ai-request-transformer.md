@@ -1,5 +1,7 @@
 ---
 title: AI Request Transformer
+group: Plugins
+category: AI
 ---
 
 # AI Request Transformer (`ai-request-transformer`)
@@ -20,11 +22,11 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 await kong.plugins.enable('ai-request-transformer', {
   on: { route: 'my-route' },
   config: {
-    prompt: 'Normalize the incoming request payload.',
+    prompt: 'Rewrite the incoming JSON body to camelCase.',
     llm: {
       route_type: 'llm/v1/chat',
       model: { provider: 'openai', name: 'gpt-4o-mini' },
-      auth: { header_name: 'Authorization', header_value: 'Bearer test-key' },
+      auth: { header_name: 'Authorization', header_value: 'Bearer <your-api-key>' },
     },
   },
 });

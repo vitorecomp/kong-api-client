@@ -4,6 +4,7 @@ import {
   exerciseCollection,
   exerciseSingleton,
 } from '../../support/crud.js';
+import { captureHttpError } from '../../support/errors.js';
 import { TLS_FIXTURES } from '../../support/fixtures/tls/index.js';
 import { liveKong, unique } from '../../support/live.js';
 
@@ -82,6 +83,53 @@ describe('upstreams, nested targets, and upstream client_certificate', () => {
           },
         },
       });
+    } finally {
+      await deleteIgnoringNotFound(() => kong.upstreams.delete(parentUpstream.id));
+    }
+  });
+
+  it('pins Kong behaviour: PUT /upstreams/{upstream}/targets/{key} merges omitted fields and returns 404 for a missing target', async () => {
+    const parentUpstream = await kong.upstreams.create({
+      name: `${unique('up-targets-put')}.example.invalid`,
+    });
+    const targets = kong.upstreams.targets(parentUpstream.id);
+    const initialTag = unique('target-put-tag');
+    const missingAddress = '10.0.1.99:8080';
+
+    try {
+      const created = await targets.create({
+        target: '10.0.1.10:8080',
+        weight: 50,
+        tags: [initialTag],
+      });
+
+      const afterPutById = await targets.upsert(created.id, { target: created.target });
+      expect(afterPutById.id).toBe(created.id);
+      expect(afterPutById.weight).toBe(50);
+      expect(afterPutById.tags).toEqual([initialTag]);
+
+      const fetchedAfterPutById = await targets.get(created.id);
+      expect(fetchedAfterPutById.weight).toBe(50);
+      expect(fetchedAfterPutById.tags).toEqual([initialTag]);
+
+      const afterPutByAddress = await targets.upsert(created.target, { target: created.target });
+      expect(afterPutByAddress.id).toBe(created.id);
+      expect(afterPutByAddress.weight).toBe(50);
+      expect(afterPutByAddress.tags).toEqual([initialTag]);
+
+      const fetchedAfterPutByAddress = await targets.get(created.id);
+      expect(fetchedAfterPutByAddress.weight).toBe(50);
+      expect(fetchedAfterPutByAddress.tags).toEqual([initialTag]);
+
+      const notFound = await captureHttpError(
+        targets.upsert(missingAddress, { target: missingAddress }),
+      );
+      expect(notFound.status).toBe(404);
+      expect(notFound.method).toBe('PUT');
+      expect(notFound.path).toBe(
+        `/upstreams/${parentUpstream.id}/targets/${encodeURIComponent(missingAddress)}`,
+      );
+      await expect(targets.find(missingAddress)).resolves.toBeUndefined();
     } finally {
       await deleteIgnoringNotFound(() => kong.upstreams.delete(parentUpstream.id));
     }

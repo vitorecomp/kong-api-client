@@ -1,5 +1,7 @@
 ---
 title: ACME
+group: Plugins
+category: Security
 ---
 
 # ACME (`acme`)
@@ -18,7 +20,12 @@ import { Kong } from 'kong-api-client';
 const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('acme', {
-  config: { account_email: 'admin@example.com', tos_accepted: true },
+  config: {
+    account_email: 'ops@example.com',
+    domains: ['api.example.com'],
+    storage: 'shm',
+    tos_accepted: true,
+  },
 });
 ```
 

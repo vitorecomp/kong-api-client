@@ -1,5 +1,7 @@
 ---
 title: Prometheus
+group: Plugins
+category: Analytics & Monitoring
 ---
 
 # Prometheus (`prometheus`)
@@ -19,7 +21,7 @@ const kong = new Kong({ adminUrl: 'http://localhost:8001' });
 
 await kong.plugins.enable('prometheus', {
   on: { route: 'my-route' },
-  config: {},
+  config: { latency_metrics: true, status_code_metrics: true, per_consumer: false },
 });
 ```
 
