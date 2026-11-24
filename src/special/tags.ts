@@ -20,11 +20,6 @@ export interface TagListParams {
   offset?: string;
 }
 
-function encodeTagSegment(tag: string): string {
-  // Colons are valid unencoded path characters (RFC 3986 pchar) and are common in Kong tags.
-  return segment(tag).replace(/%3A/gi, ':');
-}
-
 function buildTagQuery(
   params?: TagListParams,
 ): Record<string, string | number | boolean | undefined> | undefined {
@@ -62,7 +57,7 @@ export class TagsApi {
     params?: TagListParams,
     options?: CallOptions,
   ): Promise<Page<TagEntry>> {
-    const encoded = encodeTagSegment(tag);
+    const encoded = segment(tag);
     return this.transport.request<Page<TagEntry>>({
       method: 'GET',
       path: `/tags/${encoded}`,

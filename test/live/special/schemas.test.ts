@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { KongHttpError } from '../../../src/index.js';
+import { captureHttpError } from '../../support/errors.js';
 import { liveKong, unique } from '../../support/live.js';
 
 function fieldNames(fields: Array<Record<string, unknown>>): string[] {
@@ -22,18 +22,12 @@ describe('live special: schema inspection and validation endpoints', () => {
     });
     expect(valid.message).toBe('schema validation successful');
 
-    await expect(kong.schemas.validateEntity('services', { port: -1 })).rejects.toSatisfy(
-      (error: unknown) => {
-        expect(error).toBeInstanceOf(KongHttpError);
-        const httpError = error as KongHttpError;
-        expect(httpError.status).toBe(400);
-        expect(httpError.kongName).toBe('schema violation');
-        expect(typeof httpError.code).toBe('number');
-        expect(httpError.fields).toBeDefined();
-        expect(httpError.fields?.port).toBeDefined();
-        return true;
-      },
-    );
+    const error = await captureHttpError(kong.schemas.validateEntity('services', { port: -1 }));
+    expect(error.status).toBe(400);
+    expect(error.kongName).toBe('schema violation');
+    expect(typeof error.code).toBe('number');
+    expect(error.fields).toBeDefined();
+    expect(error.fields?.port).toBeDefined();
   });
 
   it('fetches and validates plugin schemas via /schemas/plugins/{name} and /schemas/plugins/validate', async () => {
@@ -43,15 +37,11 @@ describe('live special: schema inspection and validation endpoints', () => {
     const valid = await kong.schemas.validatePlugin({ name: 'key-auth', config: {} });
     expect(valid.message).toBe('schema validation successful');
 
-    await expect(
+    const error = await captureHttpError(
       kong.schemas.validatePlugin({ name: 'key-auth', config: { unknown_field: true } }),
-    ).rejects.toSatisfy((error: unknown) => {
-      expect(error).toBeInstanceOf(KongHttpError);
-      const httpError = error as KongHttpError;
-      expect(httpError.status).toBe(400);
-      expect(httpError.kongName).toBe('schema violation');
-      return true;
-    });
+    );
+    expect(error.status).toBe(400);
+    expect(error.kongName).toBe('schema violation');
   });
 
   it('fetches and validates vault schemas via /schemas/vaults/{name} and /schemas/vaults/validate', async () => {
@@ -65,14 +55,10 @@ describe('live special: schema inspection and validation endpoints', () => {
     });
     expect(valid.message).toBe('schema validation successful');
 
-    await expect(
+    const error = await captureHttpError(
       kong.schemas.validateVault({ name: 'env', config: { unknown_field: true } }),
-    ).rejects.toSatisfy((error: unknown) => {
-      expect(error).toBeInstanceOf(KongHttpError);
-      const httpError = error as KongHttpError;
-      expect(httpError.status).toBe(400);
-      expect(httpError.kongName).toBe('schema violation');
-      return true;
-    });
+    );
+    expect(error.status).toBe(400);
+    expect(error.kongName).toBe('schema violation');
   });
 });

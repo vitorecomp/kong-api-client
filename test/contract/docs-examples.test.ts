@@ -19,7 +19,13 @@ interface ExtractedBlock {
 function collectMarkdownFiles(): string[] {
   const docsDir = resolve(REPO_ROOT, 'docs');
   const guideFiles = readdirSync(docsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .filter(
+      (entry) =>
+        entry.isFile() &&
+        entry.name.endsWith('.md') &&
+        // docs/endpoints.md is generated and its calls are type-checked via test/support/endpoint-calls.ts.
+        entry.name !== 'endpoints.md',
+    )
     .map((entry) => `docs/${entry.name}`)
     .sort();
   return ['README.md', ...guideFiles];

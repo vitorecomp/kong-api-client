@@ -1511,6 +1511,460 @@ function generatePluginsIndexSource(pluginRecords) {
   );
 }
 
+function normalizeEndpointTemplate(endpoint) {
+  return endpoint.replace(/\{[^/}]+\}/g, '{}');
+}
+
+function splitTopLevelCalls(callStr) {
+  const parts = [];
+  let current = '';
+  let depth = 0;
+  let quote = null;
+
+  for (let i = 0; i < callStr.length; i += 1) {
+    const ch = callStr[i];
+    if (quote !== null) {
+      current += ch;
+      if (ch === '\\' && i + 1 < callStr.length) {
+        current += callStr[i + 1];
+        i += 1;
+      } else if (ch === quote) {
+        quote = null;
+      }
+      continue;
+    }
+
+    if (ch === "'" || ch === '"') {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if (ch === '(') {
+      depth += 1;
+      current += ch;
+      continue;
+    }
+    if (ch === ')') {
+      depth -= 1;
+      current += ch;
+      continue;
+    }
+    if (ch === ',' && depth === 0) {
+      const trimmed = current.trim();
+      if (!trimmed) {
+        throw new Error(`Empty call segment in "${callStr}"`);
+      }
+      parts.push(trimmed);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+
+  const tail = current.trim();
+  if (tail) {
+    parts.push(tail);
+  }
+  return parts;
+}
+
+function buildEndpointCoverageData(
+  resourcesJson,
+  endpointsJson,
+  endpointNotesJson,
+  endpoints39,
+  endpoints314,
+) {
+  const recorded39ByNorm = new Map();
+  for (const endpoint of endpoints39) {
+    recorded39ByNorm.set(normalizeEndpointTemplate(endpoint), endpoint);
+  }
+  const recorded314NormSet = new Set(endpoints314.map(normalizeEndpointTemplate));
+
+  const notesEntries = endpointNotesJson.notes ?? {};
+  const usedNoteKeys = new Set();
+  const getNote = (method, normalized) => {
+    const opKey = `${method} ${normalized}`;
+    if (Object.prototype.hasOwnProperty.call(notesEntries, opKey)) {
+      usedNoteKeys.add(opKey);
+      return notesEntries[opKey];
+    }
+    return undefined;
+  };
+
+  const resources = resourcesJson.resources;
+  const resourceSections = [];
+  const regularEndpoints = new Set();
+  let regularOpCount = 0;
+
+  for (const [resourceKey, def] of Object.entries(resources)) {
+    if (def.topLevel === false) {
+      continue;
+    }
+
+    const paramName = lowerCamel(def.type);
+    const groups = [];
+
+    const topCollectionPath = `/${def.path}`;
+    const topItemDisplay = `/${def.path}/{${paramName}}`;
+    const topItemNorm = `/${def.path}/{}`;
+    const topReceiver = `kong.${resourceKey}`;
+    const topRows = [
+      {
+        endpoint: topCollectionPath,
+        normalized: topCollectionPath,
+        method: 'GET',
+        call: `${topReceiver}.list()`,
+        note: getNote('GET', topCollectionPath),
+      },
+      {
+        endpoint: topCollectionPath,
+        normalized: topCollectionPath,
+        method: 'POST',
+        call: `${topReceiver}.create(input)`,
+        note: getNote('POST', topCollectionPath),
+      },
+      {
+        endpoint: topItemDisplay,
+        normalized: topItemNorm,
+        method: 'GET',
+        call: `${topReceiver}.get(key)`,
+        note: getNote('GET', topItemNorm),
+      },
+      {
+        endpoint: topItemDisplay,
+        normalized: topItemNorm,
+        method: 'PATCH',
+        call: `${topReceiver}.update(key, patch)`,
+        note: getNote('PATCH', topItemNorm),
+      },
+      {
+        endpoint: topItemDisplay,
+        normalized: topItemNorm,
+        method: 'PUT',
+        call: `${topReceiver}.upsert(key, input)`,
+        note: getNote('PUT', topItemNorm),
+      },
+      {
+        endpoint: topItemDisplay,
+        normalized: topItemNorm,
+        method: 'DELETE',
+        call: `${topReceiver}.delete(key)`,
+        note: getNote('DELETE', topItemNorm),
+      },
+    ];
+    groups.push({
+      kind: 'collection',
+      type: def.type,
+      parentParam: null,
+      rows: topRows,
+    });
+
+    for (const [methodName, nested] of Object.entries(def.nested ?? {})) {
+      const child = resources[nested.resource];
+      if (!child) {
+        throw new Error(`Unknown nested resource "${nested.resource}" on "${resourceKey}"`);
+      }
+      const childParam = lowerCamel(child.type);
+      const colDisplay = `/${def.path}/{${paramName}}/${nested.path}`;
+      const colNorm = `/${def.path}/{}/${nested.path}`;
+      const itemDisplay = `${colDisplay}/{${childParam}}`;
+      const itemNorm = `${colNorm}/{}`;
+      const receiver = `kong.${resourceKey}.${methodName}(${paramName})`;
+
+      groups.push({
+        kind: 'collection',
+        type: child.type,
+        parentParam: paramName,
+        rows: [
+          {
+            endpoint: colDisplay,
+            normalized: colNorm,
+            method: 'GET',
+            call: `${receiver}.list()`,
+            note: getNote('GET', colNorm),
+          },
+          {
+            endpoint: colDisplay,
+            normalized: colNorm,
+            method: 'POST',
+            call: `${receiver}.create(input)`,
+            note: getNote('POST', colNorm),
+          },
+          {
+            endpoint: itemDisplay,
+            normalized: itemNorm,
+            method: 'GET',
+            call: `${receiver}.get(key)`,
+            note: getNote('GET', itemNorm),
+          },
+          {
+            endpoint: itemDisplay,
+            normalized: itemNorm,
+            method: 'PATCH',
+            call: `${receiver}.update(key, patch)`,
+            note: getNote('PATCH', itemNorm),
+          },
+          {
+            endpoint: itemDisplay,
+            normalized: itemNorm,
+            method: 'PUT',
+            call: `${receiver}.upsert(key, input)`,
+            note: getNote('PUT', itemNorm),
+          },
+          {
+            endpoint: itemDisplay,
+            normalized: itemNorm,
+            method: 'DELETE',
+            call: `${receiver}.delete(key)`,
+            note: getNote('DELETE', itemNorm),
+          },
+        ],
+      });
+    }
+
+    for (const [methodName, single] of Object.entries(def.single ?? {})) {
+      const target = resources[single.resource];
+      if (!target) {
+        throw new Error(`Unknown single resource "${single.resource}" on "${resourceKey}"`);
+      }
+      const singleDisplay = `/${def.path}/{${paramName}}/${single.path}`;
+      const singleNorm = `/${def.path}/{}/${single.path}`;
+      const receiver = `kong.${resourceKey}.${methodName}(${paramName})`;
+
+      groups.push({
+        kind: 'singleton',
+        type: target.type,
+        parentParam: paramName,
+        rows: [
+          {
+            endpoint: singleDisplay,
+            normalized: singleNorm,
+            method: 'GET',
+            call: `${receiver}.get()`,
+            note: getNote('GET', singleNorm),
+          },
+          {
+            endpoint: singleDisplay,
+            normalized: singleNorm,
+            method: 'PATCH',
+            call: `${receiver}.update(patch)`,
+            note: getNote('PATCH', singleNorm),
+          },
+          {
+            endpoint: singleDisplay,
+            normalized: singleNorm,
+            method: 'PUT',
+            call: `${receiver}.upsert(input)`,
+            note: getNote('PUT', singleNorm),
+          },
+        ],
+      });
+    }
+
+    const sectionRows = groups.flatMap((group) => group.rows);
+    for (const row of sectionRows) {
+      regularEndpoints.add(row.normalized);
+    }
+    regularOpCount += sectionRows.length;
+
+    resourceSections.push({
+      resourceKey,
+      path: def.path,
+      groups,
+      rows: sectionRows,
+    });
+  }
+
+  const specialRows = [];
+  const specialEndpoints = new Set();
+  for (const [normTemplate, spec] of Object.entries(endpointsJson.special)) {
+    const displayPath = recorded39ByNorm.get(normTemplate) ?? normTemplate;
+    const calls = splitTopLevelCalls(spec.call);
+    if (calls.length !== spec.methods.length) {
+      throw new Error(
+        `Special endpoint "${normTemplate}" has ${spec.methods.length} methods but ${calls.length} calls in schemas/endpoints.json`,
+      );
+    }
+    specialEndpoints.add(normTemplate);
+    for (let i = 0; i < spec.methods.length; i += 1) {
+      const method = spec.methods[i];
+      specialRows.push({
+        endpoint: displayPath,
+        normalized: normTemplate,
+        method,
+        call: calls[i],
+        note: getNote(method, normTemplate),
+      });
+    }
+  }
+
+  const excludedRows = [];
+  for (const [normTemplate, reason] of Object.entries(endpointsJson.excluded)) {
+    const displayPath = recorded39ByNorm.get(normTemplate) ?? normTemplate;
+    excludedRows.push({
+      endpoint: displayPath,
+      normalized: normTemplate,
+      reason,
+    });
+  }
+
+  const unusedNotes = Object.keys(notesEntries).filter((k) => !usedNoteKeys.has(k));
+  if (unusedNotes.length > 0) {
+    throw new Error(
+      `Unused operation notes in schemas/endpoint-notes.json: ${unusedNotes.join(', ')}`,
+    );
+  }
+
+  const servedEndpoints = new Set([...regularEndpoints, ...specialEndpoints]);
+  const servedOn314Count = [...servedEndpoints].filter((ep) => recorded314NormSet.has(ep)).length;
+
+  return {
+    resourceSections,
+    specialRows,
+    excludedRows,
+    counts: {
+      recorded39Count: endpoints39.length,
+      regularEndpointCount: regularEndpoints.size,
+      specialEndpointCount: specialEndpoints.size,
+      servedEndpointCount: servedEndpoints.size,
+      servedOn314Count,
+      regularOpCount,
+      specialOpCount: specialRows.length,
+      totalOpCount: regularOpCount + specialRows.length,
+      excludedEndpointCount: excludedRows.length,
+    },
+  };
+}
+
+function renderOperationTable(rows) {
+  const lines = [
+    '| Endpoint | Method | Call | Notes |',
+    '| --- | --- | --- | --- |',
+    ...rows.map((row) => {
+      const noteCell = row.note ? escapeMarkdownCell(row.note) : '—';
+      return `| ${formatMarkdownCode(row.endpoint)} | ${formatMarkdownCode(row.method)} | ${formatMarkdownCode(row.call)} | ${noteCell} |`;
+    }),
+  ];
+  return lines.join('\n');
+}
+
+function generateEndpointsPageSource(coverageData) {
+  const { counts, resourceSections, specialRows, excludedRows } = coverageData;
+
+  const resourceBlocks = resourceSections.map(
+    (section) =>
+      `### \`kong.${section.resourceKey}\` (\`/${section.path}\`)\n\n${renderOperationTable(section.rows)}`,
+  );
+
+  const excludedLines = [
+    '| Endpoint | Reason |',
+    '| --- | --- |',
+    ...excludedRows.map(
+      (row) => `| ${formatMarkdownCode(row.endpoint)} | ${escapeMarkdownCell(row.reason)} |`,
+    ),
+  ];
+
+  return (
+    '---\ntitle: Endpoint Coverage\ngroup: Guides\n---\n\n' +
+    '# Endpoint Coverage\n\n' +
+    `\`kong-api-client\` accounts for all **${counts.recorded39Count}** Admin API endpoints recorded on Kong 3.9: ` +
+    `**${counts.servedEndpointCount}** are served through **${counts.totalOpCount}** typed operations ` +
+    `(**${counts.regularOpCount}** across **${counts.regularEndpointCount}** regular resource endpoints and ` +
+    `**${counts.specialOpCount}** across **${counts.specialEndpointCount}** special endpoints — ` +
+    `all **${counts.servedOn314Count}** also present on Kong Gateway 3.14), ` +
+    `and **${counts.excludedEndpointCount}** are excluded.\n\n` +
+    '## Resources\n\n' +
+    `${resourceBlocks.join('\n\n')}\n\n` +
+    '## Special endpoints\n\n' +
+    `${renderOperationTable(specialRows)}\n\n` +
+    '## Excluded endpoints\n\n' +
+    `${excludedLines.join('\n')}\n`
+  );
+}
+
+const SPECIAL_CALL_PLACEHOLDERS = [
+  ['tag', 'const tag = placeholder;'],
+  ['key', 'const key = placeholder;'],
+  ['config', 'const config: Record<string, unknown> = {};'],
+  ['level', "const level: LogLevel = 'info';"],
+  ['name', 'const name = placeholder;'],
+  ['body', 'const body: unknown = {};'],
+  ['upstream', 'const upstream = placeholder;'],
+  ['target', 'const target = placeholder;'],
+  ['address', 'const address = placeholder;'],
+  ['host', 'const host = placeholder;'],
+  ['cacheKey', 'const cacheKey = placeholder;'],
+  ['pluginId', 'const pluginId = placeholder;'],
+];
+
+function generateEndpointCallsSource(coverageData) {
+  const inputTypes = new Set();
+  for (const section of coverageData.resourceSections) {
+    for (const group of section.groups) {
+      inputTypes.add(group.type);
+    }
+  }
+  const sortedTypes = [...inputTypes].sort();
+
+  const specialSource = coverageData.specialRows.map((row) => row.call).join('\n');
+  const activeSpecialPlaceholders = SPECIAL_CALL_PLACEHOLDERS.filter(([ident]) =>
+    new RegExp(`\\b${ident}\\b`).test(specialSource),
+  );
+  const usesLogLevel = activeSpecialPlaceholders.some(([ident]) => ident === 'level');
+
+  const typeImports = [
+    'Kong',
+    ...(usesLogLevel ? ['LogLevel'] : []),
+    'Patch',
+    ...sortedTypes.map((typeName) => `${typeName}Input`),
+  ];
+
+  const inputInterfaceFields = sortedTypes.flatMap((typeName) => [
+    `${typeName}: ${typeName}Input;`,
+    `${typeName}Patch: Patch<${typeName}Input>;`,
+  ]);
+
+  const bodyBlocks = [];
+  for (const section of coverageData.resourceSections) {
+    for (const group of section.groups) {
+      const decls = [];
+      if (group.parentParam) {
+        decls.push(`const ${group.parentParam} = placeholder;`);
+      }
+      if (group.kind === 'collection' && group.parentParam !== 'key') {
+        decls.push('const key = placeholder;');
+      }
+      decls.push(`const input = inputs.${group.type};`);
+      decls.push(`const patch = inputs.${group.type}Patch;`);
+      const statements = group.rows.map((row) => `await ${row.call};`);
+      bodyBlocks.push(`{\n${decls.join('\n')}\n${statements.join('\n')}\n}`);
+    }
+  }
+
+  const specialDecls = activeSpecialPlaceholders.map(([, decl]) => decl);
+  const specialStatements = coverageData.specialRows.map((row) => `await ${row.call};`);
+  bodyBlocks.push(`{\n${specialDecls.join('\n')}\n${specialStatements.join('\n')}\n}`);
+
+  return (
+    GENERATED_BANNER +
+    `import type {\n${typeImports.join(',\n')},\n} from '../../src/index.js';\n\n` +
+    '/** Typed placeholder inputs used to compile every endpoint call documented in `docs/endpoints.md`. */\n' +
+    `export interface EndpointCallInputs {\n${inputInterfaceFields.join('\n')}\n}\n\n` +
+    '/**\n' +
+    ' * Compile-time verification of every call expression listed in `docs/endpoints.md`.\n' +
+    ' * Not invoked at run time.\n' +
+    ' */\n' +
+    'export async function verifyEndpointCalls(\n' +
+    '  kong: Kong,\n' +
+    '  placeholder: string,\n' +
+    '  inputs: EndpointCallInputs,\n' +
+    '): Promise<void> {\n' +
+    `${bodyBlocks.join('\n\n')}\n` +
+    '}\n'
+  );
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const checkOnly = args.includes('--check');
@@ -1521,9 +1975,22 @@ async function main() {
 
   const prettierConfig = await readJson(path.join(REPO_ROOT, '.prettierrc.json'));
   const resourcesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'resources.json'));
+  const endpointsJson = await readJson(path.join(REPO_ROOT, 'schemas', 'endpoints.json'));
+  const endpointNotesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'endpoint-notes.json'));
+  const endpoints39 = await readJson(path.join(REPO_ROOT, 'schemas', TARGET_39, 'endpoints.json'));
+  const endpoints314 = await readJson(
+    path.join(REPO_ROOT, 'schemas', TARGET_314, 'endpoints.json'),
+  );
   const examplesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'plugin-examples.json'));
   const entityContext = await loadEntityContext(resourcesJson);
   const pluginRecords = await loadPluginRecords();
+  const endpointCoverage = buildEndpointCoverageData(
+    resourcesJson,
+    endpointsJson,
+    endpointNotesJson,
+    endpoints39,
+    endpoints314,
+  );
 
   const outputs = [
     {
@@ -1545,6 +2012,14 @@ async function main() {
     {
       relPath: 'test/support/plugin-examples.ts',
       raw: generatePluginExamplesSource(examplesJson, pluginRecords),
+    },
+    {
+      relPath: 'test/support/endpoint-calls.ts',
+      raw: generateEndpointCallsSource(endpointCoverage),
+    },
+    {
+      relPath: 'docs/endpoints.md',
+      raw: generateEndpointsPageSource(endpointCoverage),
     },
     {
       relPath: 'docs/plugins/index.md',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { KongHttpError } from '../../../src/index.js';
 import { deleteIgnoringNotFound } from '../../support/crud.js';
+import { captureHttpError } from '../../support/errors.js';
 import { eventually, getLiveEnv, liveKong, unique } from '../../support/live.js';
 
 describe('live special: proxy-cache endpoints', () => {
@@ -68,11 +68,8 @@ describe('live special: proxy-cache endpoints', () => {
 
       // DELETE /proxy-cache/{pluginId}/caches/{cacheKey}
       await expect(kong.proxyCache.delete(cacheKey, plugin.id)).resolves.toBeUndefined();
-      await expect(kong.proxyCache.get(cacheKey, plugin.id)).rejects.toSatisfy((error: unknown) => {
-        expect(error).toBeInstanceOf(KongHttpError);
-        expect((error as KongHttpError).status).toBe(404);
-        return true;
-      });
+      const scopedDeletedError = await captureHttpError(kong.proxyCache.get(cacheKey, plugin.id));
+      expect(scopedDeletedError.status).toBe(404);
 
       // Repopulate cache and test DELETE /proxy-cache/{cacheKey}
       const secondKey = await fetchCacheKey();
@@ -80,11 +77,8 @@ describe('live special: proxy-cache endpoints', () => {
       expect(repopulated.status).toBe(200);
 
       await expect(kong.proxyCache.delete(secondKey)).resolves.toBeUndefined();
-      await expect(kong.proxyCache.get(secondKey)).rejects.toSatisfy((error: unknown) => {
-        expect(error).toBeInstanceOf(KongHttpError);
-        expect((error as KongHttpError).status).toBe(404);
-        return true;
-      });
+      const globalDeletedError = await captureHttpError(kong.proxyCache.get(secondKey));
+      expect(globalDeletedError.status).toBe(404);
 
       // DELETE /proxy-cache
       await expect(kong.proxyCache.purge()).resolves.toBeUndefined();

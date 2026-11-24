@@ -56,12 +56,23 @@ describe('live special: tags, cache, and declarative config endpoints', () => {
     // Trigger a proxy lookup so Kong ensures `router:version` is present in its shared cache,
     // regardless of what other tests invalidated earlier. Reading `router:version` also proves
     // that colons in cache keys are preserved unencoded in the request path.
-    const cached = await eventually(async () => {
+    const cachedMessage = await eventually(async () => {
       await fetch(`${env.proxyUrl}/__cache-warmup`);
-      return (await kong.cache.get('router:version')) as { message?: string };
+      const entry = await kong.cache.get('router:version');
+      if (
+        typeof entry !== 'object' ||
+        entry === null ||
+        !('message' in entry) ||
+        typeof entry.message !== 'string' ||
+        entry.message.length === 0
+      ) {
+        throw new Error(
+          `Expected cache entry with non-empty message, got ${JSON.stringify(entry)}`,
+        );
+      }
+      return entry.message;
     });
-    expect(typeof cached.message).toBe('string');
-    expect(cached.message!.length).toBeGreaterThan(0);
+    expect(cachedMessage.length).toBeGreaterThan(0);
 
     await expect(kong.cache.delete(`special:${unique('cache-key')}`)).resolves.toBeUndefined();
     await expect(kong.cache.purge()).resolves.toBeUndefined();

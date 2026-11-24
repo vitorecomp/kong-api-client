@@ -48,7 +48,7 @@ describe('TagsApi', () => {
     expect(fake.requests[1]?.signal).toBeDefined();
   });
 
-  it('lists entities for a tag, preserving colons and encoding other reserved characters', async () => {
+  it('lists entities for a tag, percent-encoding reserved characters in the tag segment', async () => {
     const { fake, transport } = makeTransport();
     const tags = new TagsApi(transport);
     const page: Page<TagEntry> = {
@@ -65,10 +65,10 @@ describe('TagsApi', () => {
 
     expect(fake.requests[0]).toMatchObject({
       method: 'GET',
-      url: 'http://localhost:8001/tags/managed-by:kong-api-client',
+      url: 'http://localhost:8001/tags/managed-by%3Akong-api-client',
     });
     const url = new URL(fake.requests[1]!.url);
-    expect(url.pathname).toBe('/tags/team%2Fa:b');
+    expect(url.pathname).toBe('/tags/team%2Fa%3Ab');
     expect(url.searchParams.get('size')).toBe('5');
     expect(url.searchParams.get('offset')).toBe('p2');
     expect(fake.requests[1]?.signal).toBeDefined();

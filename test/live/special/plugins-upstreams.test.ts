@@ -12,11 +12,9 @@ describe('live special: plugins and upstreams special endpoints', () => {
     expect(enabled).toContain('proxy-cache');
     expect(enabled).toContain('rate-limiting');
 
-    const schema = (await kong.plugins.schema('key-auth')) as {
-      fields?: Array<Record<string, unknown>>;
-    };
+    const schema = await kong.plugins.schema('key-auth');
     expect(Array.isArray(schema.fields)).toBe(true);
-    const names = schema.fields!.flatMap((entry) => Object.keys(entry));
+    const names = schema.fields.flatMap((entry) => Object.keys(entry));
     expect(names).toContain('key_names');
   });
 

@@ -1,6 +1,7 @@
 import type { Target } from './generated/entities.js';
 import { UpstreamsResource } from './generated/resources.js';
 import { toListQuery, type ListParams, type Page } from './pagination.js';
+import { colonSegment } from './special/colon-segment.js';
 import { segment, type CallOptions } from './transport.js';
 
 /** Target health state accepted by {@link UpstreamsApi.setTargetHealth}. */
@@ -105,12 +106,6 @@ export interface UpstreamHealthOptions extends CallOptions {
   offset?: string;
 }
 
-function encodeAddressSegment(address: string): string {
-  // Kong's /upstreams/:upstreams/targets/:targets/:address/(un)healthy handler passes :address
-  // without unescaping, so literal colons (valid RFC 3986 pchar) are required for ip:port values.
-  return segment(address).replace(/%3A/gi, ':');
-}
-
 /** Extended `/upstreams` resource adding health inspection, full target history, and manual health overrides. */
 export class UpstreamsApi extends UpstreamsResource {
   /** Retrieves aggregate balancer health (`GET /upstreams/{upstream}/health?balancer_health=1`). */
@@ -191,7 +186,7 @@ export class UpstreamsApi extends UpstreamsResource {
     const encodedTarget = segment(target);
     const path =
       address !== undefined
-        ? `/upstreams/${encodedUpstream}/targets/${encodedTarget}/${encodeAddressSegment(address)}/${health}`
+        ? `/upstreams/${encodedUpstream}/targets/${encodedTarget}/${colonSegment(address)}/${health}`
         : `/upstreams/${encodedUpstream}/targets/${encodedTarget}/${health}`;
 
     await this.transport.request<unknown>({

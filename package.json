@@ -31,6 +31,7 @@
     "test:contract": "vitest run --project contract",
     "test": "vitest run --project unit --project contract --coverage",
     "test:live": "scripts/test-live.sh",
+    "test:package": "node scripts/check-package.mjs",
     "generate": "node scripts/generate.mjs",
     "generate:check": "node scripts/generate.mjs --check",
     "record": "node scripts/record-schemas.mjs",

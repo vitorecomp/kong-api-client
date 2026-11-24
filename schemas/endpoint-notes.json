@@ -1,0 +1,18 @@
+{
+  "$comment": "Known Kong Admin API limits and prerequisites pinned by live tests, keyed by '<METHOD> <normalized-template>' and rendered in docs/endpoints.md.",
+  "notes": {
+    "PUT /upstreams/{}/targets/{}": "Kong does not create missing targets (answers 404) and merges omitted fields like PATCH.",
+    "PUT /keys/{}": "Kong answers 500 when called by name; works by id.",
+    "PUT /key-sets/{}": "Kong answers 500 when called by name; works by id.",
+    "PUT /key-sets/{}/keys/{}": "Kong answers 500 when called by key name; works by key id.",
+    "GET /status/dns": "Answers 501 when Kong uses the legacy DNS client.",
+    "GET /config": "DB-less mode only (answers 400 in database mode).",
+    "POST /config": "DB-less mode only (answers 400 in database mode).",
+    "GET /clustering/data-planes": "Hybrid-mode Control Plane only (answers 400 in traditional mode).",
+    "GET /clustering/status": "Hybrid-mode Control Plane only (answers 400 in traditional mode).",
+    "POST /acme": "Requires the `acme` plugin configured and a reachable HTTP-01 challenge domain.",
+    "PATCH /acme": "Requires the `acme` plugin configured.",
+    "GET /acme/certificates": "Requires the `acme` plugin configured (answers 404 otherwise).",
+    "GET /acme/certificates/{}": "Requires the `acme` plugin configured."
+  }
+}

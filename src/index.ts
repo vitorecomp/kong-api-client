@@ -24,7 +24,7 @@ export type { ListParams, Page, TagFilter } from './pagination.js';
 
 export { Collection, Singleton, type Patch } from './resource.js';
 export { PluginCollection } from './plugin-collection.js';
-export { PluginsApi } from './plugins.js';
+export { PluginsApi, type EnableOptions, type PluginScope } from './plugins.js';
 export {
   UpstreamsApi,
   type BalancerHealth,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { KongHttpError } from '../../../src/index.js';
+import { captureHttpError } from '../../support/errors.js';
 import { liveKong } from '../../support/live.js';
 
 describe('live special: debug and clustering endpoints', () => {
@@ -29,20 +29,12 @@ describe('live special: debug and clustering endpoints', () => {
   });
 
   it('returns 400 on /clustering/data-planes and /clustering/status on a standalone node', async () => {
-    await expect(kong.clustering.dataPlanes()).rejects.toSatisfy((error: unknown) => {
-      expect(error).toBeInstanceOf(KongHttpError);
-      const httpError = error as KongHttpError;
-      expect(httpError.status).toBe(400);
-      expect(httpError.message).toMatch(/control plane/i);
-      return true;
-    });
+    const dataPlanesError = await captureHttpError(kong.clustering.dataPlanes());
+    expect(dataPlanesError.status).toBe(400);
+    expect(dataPlanesError.message).toMatch(/control plane/i);
 
-    await expect(kong.clustering.status()).rejects.toSatisfy((error: unknown) => {
-      expect(error).toBeInstanceOf(KongHttpError);
-      const httpError = error as KongHttpError;
-      expect(httpError.status).toBe(400);
-      expect(httpError.message).toMatch(/control plane/i);
-      return true;
-    });
+    const statusError = await captureHttpError(kong.clustering.status());
+    expect(statusError.status).toBe(400);
+    expect(statusError.message).toMatch(/control plane/i);
   });
 });
