@@ -5,6 +5,7 @@ import {
   exerciseCollection,
   exerciseSingleton,
 } from '../../support/crud.js';
+import { TLS_FIXTURES } from '../../support/fixtures/tls/index.js';
 import { liveKong, unique } from '../../support/live.js';
 
 async function captureHttpError(promise: Promise<unknown>): Promise<KongHttpError> {
@@ -155,6 +156,112 @@ describe('services, nested routes, and route service singleton', () => {
     } finally {
       await deleteIgnoringNotFound(() => kong.routes.delete(route.id));
       await deleteIgnoringNotFound(() => kong.services.delete(service.id));
+    }
+  });
+
+  it('exercises full CRUD and pagination on /services/{service}/plugins', async () => {
+    const parentService = await kong.services.create({
+      name: unique('svc-plug-parent'),
+      host: 'upstream',
+      port: 8080,
+    });
+    const pluginNames = ['correlation-id', 'cors', 'request-termination'] as const;
+    let index = 0;
+
+    try {
+      await exerciseCollection(kong.services.plugins(parentService.id))({
+        makeCreateInput: (tag) => {
+          const name = pluginNames[index]!;
+          index += 1;
+          return {
+            name,
+            instance_name: unique(`svc-${name}`),
+            enabled: false,
+            protocols: ['http'],
+            tags: tag ? [tag] : undefined,
+          };
+        },
+        getKey: (plugin) => {
+          expect(plugin.instance_name).toBeTruthy();
+          return plugin.instance_name!;
+        },
+        update: {
+          patch: { protocols: ['http', 'https'] },
+          assertUpdated: (updated) => {
+            expect(updated.protocols).toEqual(expect.arrayContaining(['http', 'https']));
+            expect(updated.protocols).toHaveLength(2);
+            expect(updated.enabled).toBe(false);
+          },
+        },
+        upsert: {
+          makeInput: (current) => ({
+            name: current.name,
+            instance_name: current.instance_name,
+          }),
+          assertUpserted: (upserted) => {
+            expect(upserted.enabled).toBe(true);
+            expect(upserted.tags).toBeNull();
+            expect(upserted.protocols).toEqual(
+              expect.arrayContaining(['grpc', 'grpcs', 'http', 'https']),
+            );
+          },
+        },
+      });
+    } finally {
+      await deleteIgnoringNotFound(() => kong.services.delete(parentService.id));
+    }
+  });
+
+  it('exercises get, update, and upsert on /services/{service}/client_certificate', async () => {
+    const initialTag = unique('svc-cert-init');
+    const patchedTag = unique('svc-cert-patch');
+    const cert = await kong.certificates.create({
+      cert: TLS_FIXTURES.rsaCert,
+      key: TLS_FIXTURES.rsaKey,
+      cert_alt: TLS_FIXTURES.ecdsaCert,
+      key_alt: TLS_FIXTURES.ecdsaKey,
+      tags: [initialTag],
+    });
+    const service = await kong.services.create({
+      name: unique('svc-client-cert'),
+      protocol: 'https',
+      host: 'upstream',
+      port: 8443,
+      client_certificate: { id: cert.id },
+    });
+
+    try {
+      await exerciseSingleton(kong.services.clientCertificate(service.id))({
+        assertInitial: (fetched) => {
+          expect(fetched.id).toBe(cert.id);
+          expect(fetched.cert_alt).toBe(TLS_FIXTURES.ecdsaCert);
+          expect(fetched.tags).toEqual([initialTag]);
+        },
+        update: {
+          patch: { tags: [patchedTag] },
+          assertUpdated: (updated) => {
+            expect(updated.id).toBe(cert.id);
+            expect(updated.tags).toEqual([patchedTag]);
+            expect(updated.cert_alt).toBe(TLS_FIXTURES.ecdsaCert);
+          },
+        },
+        upsert: {
+          makeInput: () => ({
+            cert: TLS_FIXTURES.rsa2Cert,
+            key: TLS_FIXTURES.rsa2Key,
+          }),
+          assertUpserted: (upserted) => {
+            expect(upserted.id).toBe(cert.id);
+            expect(upserted.cert).toBe(TLS_FIXTURES.rsa2Cert);
+            expect(upserted.cert_alt).toBeNull();
+            expect(upserted.key_alt).toBeNull();
+            expect(upserted.tags).toBeNull();
+          },
+        },
+      });
+    } finally {
+      await deleteIgnoringNotFound(() => kong.services.delete(service.id));
+      await deleteIgnoringNotFound(() => kong.certificates.delete(cert.id));
     }
   });
 

@@ -26,7 +26,7 @@ export interface CollectionCrudOptions<E extends { id: string }, I> {
    * the changed field and that an untouched field retained its previous value.
    */
   update: {
-    patch: Partial<I>;
+    patch: Partial<I> | ((current: E, tag?: string) => Partial<I>);
     assertUpdated: (updated: E, before: E) => void;
   };
   /**
@@ -58,7 +58,7 @@ export interface SingletonCrudOptions<E, I> {
    * the changed field and that an untouched field retained its previous value.
    */
   update: {
-    patch: Partial<I>;
+    patch: Partial<I> | ((current: E) => Partial<I>);
     assertUpdated: (updated: E, before: E) => void;
   };
   /**
@@ -123,34 +123,22 @@ export function exerciseCollection<E extends { id: string }, I>(
       }
 
       // 3. Partial update (PATCH) — verify changed field and preserved field
-      const updated = await collection.update(created.id, update.patch);
+      const patchBody =
+        typeof update.patch === 'function' ? update.patch(created, tag) : update.patch;
+      const updated = await collection.update(created.id, patchBody);
       expect(updated.id).toBe(created.id);
       update.assertUpdated(updated, created);
 
       const afterUpdate = await collection.get(created.id);
       update.assertUpdated(afterUpdate, created);
 
-      // 4. Replace / upsert (PUT) — verify omitted field resets to default
-      const upsertKey = upsert.getKey
-        ? upsert.getKey(afterUpdate)
-        : getKey
-          ? getKey(afterUpdate)
-          : afterUpdate.id;
-      const upserted = await collection.upsert(upsertKey, upsert.makeInput(afterUpdate, tag));
-      expect(typeof upserted.id).toBe('string');
-      createdIds.add(upserted.id);
-      upsert.assertUpserted(upserted, afterUpdate);
-
-      const afterUpsert = await collection.get(upserted.id);
-      upsert.assertUpserted(afterUpsert, afterUpdate);
-
-      // 5. Real-page pagination across 3 entities sharing one unique tag
+      // 4. Real-page pagination across 3 entities sharing one unique tag
       const second = await collection.create(makeCreateInput(tag));
       createdIds.add(second.id);
       const third = await collection.create(makeCreateInput(tag));
       createdIds.add(third.id);
 
-      const expectedIds = [afterUpsert.id, second.id, third.id];
+      const paginatedIds = [afterUpdate.id, second.id, third.id];
       const listParams: Omit<ListParams, 'offset'> = tag ? { size: 1, tags: [tag] } : { size: 1 };
 
       const firstPage = await collection.list(listParams);
@@ -164,7 +152,7 @@ export function exerciseCollection<E extends { id: string }, I>(
       for await (const item of collection.iterate(listParams)) {
         iteratedIds.push(item.id);
       }
-      for (const id of expectedIds) {
+      for (const id of paginatedIds) {
         expect(iteratedIds).toContain(id);
       }
       if (supportsTags) {
@@ -173,18 +161,36 @@ export function exerciseCollection<E extends { id: string }, I>(
 
       const allItems = await collection.all(listParams);
       const allIds = allItems.map((item) => item.id);
-      for (const id of expectedIds) {
+      for (const id of paginatedIds) {
         expect(allIds).toContain(id);
       }
       if (supportsTags) {
         expect(allIds).toHaveLength(3);
       }
 
-      // 6. Delete and confirm find() returns undefined afterwards
-      for (const id of expectedIds) {
+      // Remove the two extra pagination entities before testing replacement (PUT)
+      for (const id of [second.id, third.id]) {
         await collection.delete(id);
         createdIds.delete(id);
       }
+
+      // 5. Replace / upsert (PUT) — verify omitted field resets to default
+      const upsertKey = upsert.getKey
+        ? upsert.getKey(afterUpdate)
+        : getKey
+          ? getKey(afterUpdate)
+          : afterUpdate.id;
+      const upserted = await collection.upsert(upsertKey, upsert.makeInput(afterUpdate, tag));
+      expect(typeof upserted.id).toBe('string');
+      createdIds.add(upserted.id);
+      upsert.assertUpserted(upserted, afterUpdate);
+
+      const afterUpsert = await collection.get(upserted.id);
+      upsert.assertUpserted(afterUpsert, afterUpdate);
+
+      // 6. Delete and confirm find() returns undefined afterwards
+      await collection.delete(afterUpsert.id);
+      createdIds.delete(afterUpsert.id);
       await expect(collection.find(afterUpsert.id)).resolves.toBeUndefined();
     } finally {
       for (const id of [...createdIds].reverse()) {
@@ -213,7 +219,8 @@ export function exerciseSingleton<E, I>(
     const found = await singleton.find();
     expect(found).toBeDefined();
 
-    const updated = await singleton.update(update.patch);
+    const patchBody = typeof update.patch === 'function' ? update.patch(initial) : update.patch;
+    const updated = await singleton.update(patchBody);
     update.assertUpdated(updated, initial);
 
     const afterUpdate = await singleton.get();
