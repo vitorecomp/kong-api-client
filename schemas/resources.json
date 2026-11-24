@@ -1,0 +1,104 @@
+{
+  "$comment": "Declaration of the regular Admin API resources. Source of truth for the generated resource classes and for the coverage test. 'entity' is the schema name served by GET /schemas/<entity>. 'nested' are collections below one item; 'single' are the one-entity references below one item.",
+  "resources": {
+    "services": {
+      "path": "services", "entity": "services", "type": "Service",
+      "nested": {
+        "routes": { "path": "routes", "resource": "routes" },
+        "plugins": { "path": "plugins", "resource": "plugins" },
+        "oauth2Tokens": { "path": "oauth2_tokens", "resource": "oauth2Tokens" }
+      },
+      "single": { "clientCertificate": { "path": "client_certificate", "resource": "certificates" } }
+    },
+    "routes": {
+      "path": "routes", "entity": "routes", "type": "Route",
+      "nested": { "plugins": { "path": "plugins", "resource": "plugins" } },
+      "single": { "service": { "path": "service", "resource": "services" } }
+    },
+    "consumers": {
+      "path": "consumers", "entity": "consumers", "type": "Consumer",
+      "nested": {
+        "acls": { "path": "acls", "resource": "acls" },
+        "basicAuth": { "path": "basic-auth", "resource": "basicAuths" },
+        "hmacAuth": { "path": "hmac-auth", "resource": "hmacAuths" },
+        "jwt": { "path": "jwt", "resource": "jwts" },
+        "keyAuth": { "path": "key-auth", "resource": "keyAuths" },
+        "oauth2": { "path": "oauth2", "resource": "oauth2" },
+        "plugins": { "path": "plugins", "resource": "plugins" }
+      }
+    },
+    "plugins": {
+      "path": "plugins", "entity": "plugins", "type": "Plugin",
+      "single": {
+        "consumer": { "path": "consumer", "resource": "consumers" },
+        "route": { "path": "route", "resource": "routes" },
+        "service": { "path": "service", "resource": "services" }
+      }
+    },
+    "upstreams": {
+      "path": "upstreams", "entity": "upstreams", "type": "Upstream",
+      "nested": { "targets": { "path": "targets", "resource": "targets" } },
+      "single": { "clientCertificate": { "path": "client_certificate", "resource": "certificates" } }
+    },
+    "targets": {
+      "path": "targets", "entity": "targets", "type": "Target",
+      "single": { "upstream": { "path": "upstream", "resource": "upstreams" } }
+    },
+    "certificates": {
+      "path": "certificates", "entity": "certificates", "type": "Certificate",
+      "nested": {
+        "services": { "path": "services", "resource": "services" },
+        "snis": { "path": "snis", "resource": "snis" },
+        "upstreams": { "path": "upstreams", "resource": "upstreams" }
+      }
+    },
+    "snis": {
+      "path": "snis", "entity": "snis", "type": "Sni",
+      "single": { "certificate": { "path": "certificate", "resource": "certificates" } }
+    },
+    "caCertificates": { "path": "ca_certificates", "entity": "ca_certificates", "type": "CaCertificate" },
+    "vaults": { "path": "vaults", "entity": "vaults", "type": "Vault" },
+    "keys": {
+      "path": "keys", "entity": "keys", "type": "Key",
+      "single": { "set": { "path": "set", "resource": "keySets" } }
+    },
+    "keySets": {
+      "path": "key-sets", "entity": "key_sets", "type": "KeySet",
+      "nested": { "keys": { "path": "keys", "resource": "keys" } }
+    },
+    "acls": {
+      "path": "acls", "entity": "acls", "type": "Acl",
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "basicAuths": {
+      "path": "basic-auths", "entity": "basicauth_credentials", "type": "BasicAuthCredential",
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "hmacAuths": {
+      "path": "hmac-auths", "entity": "hmacauth_credentials", "type": "HmacAuthCredential",
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "jwts": {
+      "path": "jwts", "entity": "jwt_secrets", "type": "JwtSecret",
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "keyAuths": {
+      "path": "key-auths", "entity": "keyauth_credentials", "type": "KeyAuthCredential",
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "oauth2": {
+      "path": "oauth2", "entity": "oauth2_credentials", "type": "OAuth2Credential",
+      "nested": { "oauth2Tokens": { "path": "oauth2_tokens", "resource": "oauth2Tokens" } },
+      "single": { "consumer": { "path": "consumer", "resource": "consumers" } }
+    },
+    "oauth2Tokens": {
+      "path": "oauth2_tokens", "entity": "oauth2_tokens", "type": "OAuth2Token",
+      "single": {
+        "credential": { "path": "credential", "resource": "oauth2" },
+        "service": { "path": "service", "resource": "services" }
+      }
+    },
+    "sessions": { "path": "sessions", "entity": "sessions", "type": "Session" },
+    "acmeStorage": { "path": "acme_storage", "entity": "acme_storage", "type": "AcmeStorage" }
+  }
+}

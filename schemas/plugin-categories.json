@@ -1,0 +1,185 @@
+{
+  "$comment": "Category and title of each supported plugin, as on Kong's plugin hub (https://developer.konghq.com/plugins/).",
+  "plugins": {
+    "acl": {
+      "category": "Traffic Control",
+      "title": "ACL"
+    },
+    "acme": {
+      "category": "Security",
+      "title": "ACME"
+    },
+    "ai-prompt-decorator": {
+      "category": "AI",
+      "title": "AI Prompt Decorator"
+    },
+    "ai-prompt-guard": {
+      "category": "AI",
+      "title": "AI Prompt Guard"
+    },
+    "ai-prompt-template": {
+      "category": "AI",
+      "title": "AI Prompt Template"
+    },
+    "ai-proxy": {
+      "category": "AI",
+      "title": "AI Proxy"
+    },
+    "ai-request-transformer": {
+      "category": "AI",
+      "title": "AI Request Transformer"
+    },
+    "ai-response-transformer": {
+      "category": "AI",
+      "title": "AI Response Transformer"
+    },
+    "aws-lambda": {
+      "category": "Serverless",
+      "title": "AWS Lambda"
+    },
+    "azure-functions": {
+      "category": "Serverless",
+      "title": "Azure Functions"
+    },
+    "basic-auth": {
+      "category": "Authentication",
+      "title": "Basic Auth"
+    },
+    "bot-detection": {
+      "category": "Security",
+      "title": "Bot Detection"
+    },
+    "correlation-id": {
+      "category": "Transformations",
+      "title": "Correlation ID"
+    },
+    "cors": {
+      "category": "Security",
+      "title": "CORS"
+    },
+    "datadog": {
+      "category": "Analytics & Monitoring",
+      "title": "Datadog"
+    },
+    "file-log": {
+      "category": "Logging",
+      "title": "File Log"
+    },
+    "grpc-gateway": {
+      "category": "Transformations",
+      "title": "gRPC-Gateway"
+    },
+    "grpc-web": {
+      "category": "Transformations",
+      "title": "gRPC-Web"
+    },
+    "hmac-auth": {
+      "category": "Authentication",
+      "title": "HMAC Auth"
+    },
+    "http-log": {
+      "category": "Logging",
+      "title": "HTTP Log"
+    },
+    "ip-restriction": {
+      "category": "Security",
+      "title": "IP Restriction"
+    },
+    "jwt": {
+      "category": "Authentication",
+      "title": "JWT"
+    },
+    "key-auth": {
+      "category": "Authentication",
+      "title": "Key Auth"
+    },
+    "ldap-auth": {
+      "category": "Authentication",
+      "title": "LDAP Authentication"
+    },
+    "loggly": {
+      "category": "Logging",
+      "title": "Loggly"
+    },
+    "oauth2": {
+      "category": "Authentication",
+      "title": "OAuth 2.0 Authentication"
+    },
+    "opentelemetry": {
+      "category": "Analytics & Monitoring",
+      "title": "OpenTelemetry"
+    },
+    "post-function": {
+      "category": "Serverless",
+      "title": "Post-Function"
+    },
+    "pre-function": {
+      "category": "Serverless",
+      "title": "Pre-Function"
+    },
+    "prometheus": {
+      "category": "Analytics & Monitoring",
+      "title": "Prometheus"
+    },
+    "proxy-cache": {
+      "category": "Traffic Control",
+      "title": "Proxy Cache"
+    },
+    "rate-limiting": {
+      "category": "Traffic Control",
+      "title": "Rate Limiting"
+    },
+    "redirect": {
+      "category": "Traffic Control",
+      "title": "Redirect"
+    },
+    "request-size-limiting": {
+      "category": "Traffic Control",
+      "title": "Request Size Limiting"
+    },
+    "request-termination": {
+      "category": "Traffic Control",
+      "title": "Request Termination"
+    },
+    "request-transformer": {
+      "category": "Transformations",
+      "title": "Request Transformer"
+    },
+    "response-ratelimiting": {
+      "category": "Traffic Control",
+      "title": "Response Rate Limiting"
+    },
+    "response-transformer": {
+      "category": "Transformations",
+      "title": "Response Transformer"
+    },
+    "session": {
+      "category": "Authentication",
+      "title": "Session"
+    },
+    "standard-webhooks": {
+      "category": "Traffic Control",
+      "title": "Standard Webhooks"
+    },
+    "statsd": {
+      "category": "Analytics & Monitoring",
+      "title": "StatsD"
+    },
+    "syslog": {
+      "category": "Logging",
+      "title": "Syslog"
+    },
+    "tcp-log": {
+      "category": "Logging",
+      "title": "TCP Log"
+    },
+    "udp-log": {
+      "category": "Logging",
+      "title": "UDP Log"
+    },
+    "zipkin": {
+      "category": "Analytics & Monitoring",
+      "title": "Zipkin"
+    }
+  }
+}
