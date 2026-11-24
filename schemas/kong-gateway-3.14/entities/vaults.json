@@ -1,0 +1,54 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "prefix": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "name": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "description": {
+        "type": "string"
+      }
+    },
+    {
+      "config": {
+        "abstract": true,
+        "type": "record"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "client_errors_severity": {
+              "default": "info",
+              "one_of": [
+                "alert",
+                "crit",
+                "debug",
+                "emerg",
+                "err",
+                "info",
+                "notice",
+                "warning"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "custom_fields_by_lua": {
+              "keys": {
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "facility": {
+              "default": "user",
+              "one_of": [
+                "auth",
+                "authpriv",
+                "cron",
+                "daemon",
+                "ftp",
+                "kern",
+                "local0",
+                "local1",
+                "local2",
+                "local3",
+                "local4",
+                "local5",
+                "local6",
+                "local7",
+                "lpr",
+                "mail",
+                "news",
+                "syslog",
+                "user",
+                "uucp"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "log_level": {
+              "default": "info",
+              "one_of": [
+                "alert",
+                "crit",
+                "debug",
+                "emerg",
+                "err",
+                "info",
+                "notice",
+                "warning"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "server_errors_severity": {
+              "default": "info",
+              "one_of": [
+                "alert",
+                "crit",
+                "debug",
+                "emerg",
+                "err",
+                "info",
+                "notice",
+                "warning"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "successful_severity": {
+              "default": "info",
+              "one_of": [
+                "alert",
+                "crit",
+                "debug",
+                "emerg",
+                "err",
+                "info",
+                "notice",
+                "warning"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

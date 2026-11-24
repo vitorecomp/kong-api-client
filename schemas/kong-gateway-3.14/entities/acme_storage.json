@@ -1,0 +1,35 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "key": {
+        "auto": true,
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "value": {
+        "auto": true,
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "ttl": {
+        "type": "number"
+      }
+    }
+  ]
+}

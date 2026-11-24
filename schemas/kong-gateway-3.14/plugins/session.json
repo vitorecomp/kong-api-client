@@ -1,0 +1,295 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "absolute_timeout": {
+              "default": 86400,
+              "type": "number"
+            }
+          },
+          {
+            "audience": {
+              "default": "default",
+              "type": "string"
+            }
+          },
+          {
+            "bind": {
+              "elements": {
+                "one_of": [
+                  "ip",
+                  "scheme",
+                  "user-agent"
+                ],
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "cookie_domain": {
+              "type": "string"
+            }
+          },
+          {
+            "cookie_http_only": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "cookie_name": {
+              "default": "session",
+              "type": "string"
+            }
+          },
+          {
+            "cookie_path": {
+              "default": "/",
+              "type": "string"
+            }
+          },
+          {
+            "cookie_same_site": {
+              "default": "Strict",
+              "one_of": [
+                "Default",
+                "Lax",
+                "None",
+                "Strict"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "cookie_secure": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "hash_subject": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "idling_timeout": {
+              "default": 900,
+              "type": "number"
+            }
+          },
+          {
+            "logout_methods": {
+              "default": [
+                "POST",
+                "DELETE"
+              ],
+              "elements": {
+                "one_of": [
+                  "DELETE",
+                  "GET",
+                  "POST"
+                ],
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "logout_post_arg": {
+              "default": "session_logout",
+              "type": "string"
+            }
+          },
+          {
+            "logout_query_arg": {
+              "default": "session_logout",
+              "type": "string"
+            }
+          },
+          {
+            "read_body_for_logout": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "remember": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "remember_absolute_timeout": {
+              "default": 2592000,
+              "type": "number"
+            }
+          },
+          {
+            "remember_cookie_name": {
+              "default": "remember",
+              "type": "string"
+            }
+          },
+          {
+            "remember_rolling_timeout": {
+              "default": 604800,
+              "type": "number"
+            }
+          },
+          {
+            "request_headers": {
+              "elements": {
+                "one_of": [
+                  "absolute-timeout",
+                  "audience",
+                  "id",
+                  "idling-timeout",
+                  "rolling-timeout",
+                  "subject",
+                  "timeout"
+                ],
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "response_headers": {
+              "elements": {
+                "one_of": [
+                  "absolute-timeout",
+                  "audience",
+                  "id",
+                  "idling-timeout",
+                  "rolling-timeout",
+                  "subject",
+                  "timeout"
+                ],
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "rolling_timeout": {
+              "default": 3600,
+              "type": "number"
+            }
+          },
+          {
+            "secret": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "stale_ttl": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "storage": {
+              "default": "cookie",
+              "one_of": [
+                "cookie",
+                "kong"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "store_metadata": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "shorthand_fields": [
+          {
+            "cookie_discard": {
+              "type": "number"
+            }
+          },
+          {
+            "cookie_httponly": {
+              "type": "boolean"
+            }
+          },
+          {
+            "cookie_idletime": {
+              "type": "number"
+            }
+          },
+          {
+            "cookie_lifetime": {
+              "type": "number"
+            }
+          },
+          {
+            "cookie_persistent": {
+              "type": "boolean"
+            }
+          },
+          {
+            "cookie_renew": {
+              "type": "number"
+            }
+          },
+          {
+            "cookie_samesite": {
+              "type": "string"
+            }
+          }
+        ],
+        "type": "record"
+      }
+    }
+  ]
+}

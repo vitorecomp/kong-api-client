@@ -1,0 +1,67 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "body": {
+              "type": "string"
+            }
+          },
+          {
+            "content_type": {
+              "type": "string"
+            }
+          },
+          {
+            "echo": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "message": {
+              "type": "string"
+            }
+          },
+          {
+            "status_code": {
+              "default": 503,
+              "required": true,
+              "type": "integer"
+            }
+          },
+          {
+            "trigger": {
+              "type": "string"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

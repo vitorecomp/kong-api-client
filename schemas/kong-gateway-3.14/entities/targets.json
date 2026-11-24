@@ -1,0 +1,56 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "number"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "number"
+      }
+    },
+    {
+      "upstream": {
+        "reference": "upstreams",
+        "required": true,
+        "type": "foreign"
+      }
+    },
+    {
+      "target": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "weight": {
+        "default": 100,
+        "type": "integer"
+      }
+    },
+    {
+      "failover": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

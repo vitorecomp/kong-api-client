@@ -1,0 +1,105 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "apikey": {
+              "type": "string"
+            }
+          },
+          {
+            "appname": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "clientid": {
+              "type": "string"
+            }
+          },
+          {
+            "functionname": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "hostdomain": {
+              "default": "azurewebsites.net",
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "https": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "https_verify": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "keepalive": {
+              "default": 60000,
+              "type": "number"
+            }
+          },
+          {
+            "routeprefix": {
+              "default": "api",
+              "type": "string"
+            }
+          },
+          {
+            "timeout": {
+              "default": 600000,
+              "type": "number"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

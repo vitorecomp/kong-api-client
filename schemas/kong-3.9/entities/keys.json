@@ -1,0 +1,127 @@
+{
+  "entity_checks": [
+    {
+      "mutually_exclusive": [
+        "jwk",
+        "pem"
+      ]
+    },
+    {
+      "at_least_one_of": [
+        "jwk",
+        "pem"
+      ]
+    },
+    {
+      "custom_entity_check": {
+        "field_sources": [
+          "jwk",
+          "pem",
+          "kid"
+        ]
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "set": {
+        "description": "The id of the key-set with which to associate the key.",
+        "on_delete": "cascade",
+        "reference": "key_sets",
+        "required": false,
+        "type": "foreign"
+      }
+    },
+    {
+      "name": {
+        "description": "The name to associate with the given keys.",
+        "required": false,
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "kid": {
+        "description": "A unique identifier for a key.",
+        "required": true,
+        "type": "string",
+        "unique": false
+      }
+    },
+    {
+      "jwk": {
+        "description": "A JSON Web Key represented as a string.",
+        "encrypted": true,
+        "referenceable": true,
+        "type": "string"
+      }
+    },
+    {
+      "pem": {
+        "description": "A pair of PEM-encoded public and private keys, which can be either a string or a reference to a credential in Kong Vault. If provided as strings, they must be valid PEM-encoded keys.",
+        "entity_checks": [
+          {
+            "at_least_one_of": [
+              "private_key",
+              "public_key"
+            ]
+          }
+        ],
+        "fields": [
+          {
+            "private_key": {
+              "encrypted": true,
+              "referenceable": true,
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "public_key": {
+              "referenceable": true,
+              "required": false,
+              "type": "string"
+            }
+          }
+        ],
+        "required": false,
+        "type": "record"
+      }
+    },
+    {
+      "tags": {
+        "description": "A set of strings representing tags.",
+        "elements": {
+          "description": "A string representing a tag.",
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    }
+  ]
+}

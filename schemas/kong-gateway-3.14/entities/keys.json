@@ -1,0 +1,81 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "set": {
+        "reference": "key_sets",
+        "required": false,
+        "type": "foreign"
+      }
+    },
+    {
+      "name": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "kid": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "x5t": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "jwk": {
+        "type": "string"
+      }
+    },
+    {
+      "pem": {
+        "fields": [
+          {
+            "private_key": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "public_key": {
+              "required": false,
+              "type": "string"
+            }
+          }
+        ],
+        "required": false,
+        "type": "record"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    }
+  ]
+}

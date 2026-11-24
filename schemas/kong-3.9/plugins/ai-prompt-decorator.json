@@ -1,0 +1,139 @@
+{
+  "entity_checks": [
+    {
+      "at_least_one_of": [
+        "config.prompts.prepend",
+        "config.prompts.append"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "description": "A set of strings representing HTTP protocols.",
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "llm_format": {
+              "default": "openai",
+              "description": "LLM input and output format and schema to use",
+              "one_of": [
+                "bedrock",
+                "gemini",
+                "openai"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "max_request_body_size": {
+              "default": 8192,
+              "description": "max allowed body size allowed to be introspected",
+              "gt": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "prompts": {
+              "fields": [
+                {
+                  "append": {
+                    "description": "Insert chat messages at the end of the chat message array. This array preserves exact order when adding messages.",
+                    "elements": {
+                      "fields": [
+                        {
+                          "content": {
+                            "len_max": 500,
+                            "len_min": 1,
+                            "required": true,
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "role": {
+                            "default": "system",
+                            "one_of": [
+                              "assistant",
+                              "system",
+                              "user"
+                            ],
+                            "required": true,
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "required": false,
+                      "type": "record"
+                    },
+                    "len_max": 15,
+                    "required": false,
+                    "type": "array"
+                  }
+                },
+                {
+                  "prepend": {
+                    "description": "Insert chat messages at the beginning of the chat message array. This array preserves exact order when adding messages.",
+                    "elements": {
+                      "fields": [
+                        {
+                          "content": {
+                            "len_max": 500,
+                            "len_min": 1,
+                            "required": true,
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "role": {
+                            "default": "system",
+                            "one_of": [
+                              "assistant",
+                              "system",
+                              "user"
+                            ],
+                            "required": true,
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "required": false,
+                      "type": "record"
+                    },
+                    "len_max": 15,
+                    "required": false,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": false,
+              "type": "record"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

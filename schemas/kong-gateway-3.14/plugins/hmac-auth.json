@@ -1,0 +1,112 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "algorithms": {
+              "default": [
+                "hmac-sha224",
+                "hmac-sha256",
+                "hmac-sha384",
+                "hmac-sha512"
+              ],
+              "elements": {
+                "one_of": [
+                  "hmac-sha1",
+                  "hmac-sha224",
+                  "hmac-sha256",
+                  "hmac-sha384",
+                  "hmac-sha512"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "anonymous": {
+              "type": "string"
+            }
+          },
+          {
+            "clock_skew": {
+              "default": 300,
+              "type": "number"
+            }
+          },
+          {
+            "enforce_headers": {
+              "default": [],
+              "elements": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "hide_credentials": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "realm": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "validate_request_body": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

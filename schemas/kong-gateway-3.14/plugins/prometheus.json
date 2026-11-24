@@ -1,0 +1,87 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "ai_metrics": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "bandwidth_metrics": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "latency_metrics": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "per_consumer": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "status_code_metrics": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "upstream_health_metrics": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "wasm_metrics": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

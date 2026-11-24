@@ -1,0 +1,116 @@
+{
+  "entity_checks": [
+    {
+      "mutually_required": [
+        "cert_alt",
+        "key_alt"
+      ]
+    },
+    {
+      "custom_entity_check": {
+        "field_sources": [
+          "cert",
+          "key"
+        ]
+      }
+    },
+    {
+      "custom_entity_check": {
+        "field_sources": [
+          "cert_alt",
+          "key_alt"
+        ]
+      }
+    },
+    {
+      "custom_entity_check": {
+        "field_sources": [
+          "cert",
+          "cert_alt"
+        ]
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "cert": {
+        "description": "A string representing a certificate.",
+        "referenceable": true,
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "key": {
+        "description": "A string representing a key.",
+        "encrypted": true,
+        "referenceable": true,
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "cert_alt": {
+        "description": "A string representing a certificate.",
+        "referenceable": true,
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "key_alt": {
+        "description": "A string representing a key.",
+        "encrypted": true,
+        "referenceable": true,
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "tags": {
+        "description": "A set of strings representing tags.",
+        "elements": {
+          "description": "A string representing a tag.",
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "snis": {
+        "elements": {
+          "description": "A string representing a wildcard host name, such as *.example.com.",
+          "type": "string"
+        },
+        "required": false,
+        "transient": true,
+        "type": "array"
+      }
+    }
+  ]
+}

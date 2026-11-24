@@ -13,7 +13,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "NOTICE"
+    "NOTICE",
+    "LICENSES"
   ],
   "engines": {
     "node": ">=22.12"

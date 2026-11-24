@@ -1,0 +1,502 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "service": {
+        "eq": null,
+        "reference": "services",
+        "type": "foreign"
+      }
+    },
+    {
+      "route": {
+        "eq": null,
+        "reference": "routes",
+        "type": "foreign"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "account_email": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "account_key": {
+              "fields": [
+                {
+                  "key_id": {
+                    "required": true,
+                    "type": "string"
+                  }
+                },
+                {
+                  "key_set": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": false,
+              "type": "record"
+            }
+          },
+          {
+            "allow_any_domain": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "api_uri": {
+              "default": "https://acme-v02.api.letsencrypt.org/directory",
+              "type": "string"
+            }
+          },
+          {
+            "cert_type": {
+              "default": "rsa",
+              "one_of": [
+                "ecc",
+                "rsa"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "domains": {
+              "elements": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "eab_hmac_key": {
+              "type": "string"
+            }
+          },
+          {
+            "eab_kid": {
+              "type": "string"
+            }
+          },
+          {
+            "enable_ipv4_common_name": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "fail_backoff_minutes": {
+              "default": 5,
+              "type": "number"
+            }
+          },
+          {
+            "preferred_chain": {
+              "type": "string"
+            }
+          },
+          {
+            "renew_threshold_days": {
+              "default": 14,
+              "type": "number"
+            }
+          },
+          {
+            "rsa_key_size": {
+              "default": 4096,
+              "one_of": [
+                2048,
+                3072,
+                4096
+              ],
+              "type": "number"
+            }
+          },
+          {
+            "storage": {
+              "default": "shm",
+              "one_of": [
+                "consul",
+                "kong",
+                "redis",
+                "shm",
+                "vault"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "storage_config": {
+              "fields": [
+                {
+                  "consul": {
+                    "fields": [
+                      {
+                        "host": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "https": {
+                          "default": false,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "kv_path": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "port": {
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "timeout": {
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": true,
+                    "type": "record"
+                  }
+                },
+                {
+                  "kong": {
+                    "fields": [],
+                    "required": true,
+                    "type": "record"
+                  }
+                },
+                {
+                  "redis": {
+                    "fields": [
+                      {
+                        "cloud_authentication": {
+                          "fields": [
+                            {
+                              "auth_provider": {
+                                "one_of": [
+                                  "aws",
+                                  "azure",
+                                  "gcp"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_access_key_id": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_assume_role_arn": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_cache_name": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_is_serverless": {
+                                "default": true,
+                                "required": false,
+                                "type": "boolean"
+                              }
+                            },
+                            {
+                              "aws_region": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_role_session_name": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_secret_access_key": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "azure_client_id": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "azure_client_secret": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "azure_tenant_id": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "gcp_service_account_json": {
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "database": {
+                          "default": 0,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "extra_options": {
+                          "fields": [
+                            {
+                              "namespace": {
+                                "default": "",
+                                "required": true,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "scan_count": {
+                                "default": 10,
+                                "required": false,
+                                "type": "number"
+                              }
+                            }
+                          ],
+                          "required": true,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "host": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "password": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "port": {
+                          "default": 6379,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "server_name": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "ssl": {
+                          "default": false,
+                          "required": false,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "ssl_verify": {
+                          "default": true,
+                          "required": false,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "timeout": {
+                          "default": 2000,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "username": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": true,
+                    "shorthand_fields": [
+                      {
+                        "auth": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "namespace": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "scan_count": {
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "ssl_server_name": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "type": "record"
+                  }
+                },
+                {
+                  "shm": {
+                    "fields": [
+                      {
+                        "shm_name": {
+                          "default": "kong",
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": true,
+                    "type": "record"
+                  }
+                },
+                {
+                  "vault": {
+                    "fields": [
+                      {
+                        "auth_method": {
+                          "default": "token",
+                          "one_of": [
+                            "kubernetes",
+                            "token"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "auth_path": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "auth_role": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "host": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "https": {
+                          "default": false,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "jwt_path": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "kv_path": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "port": {
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "timeout": {
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "tls_server_name": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "tls_verify": {
+                          "default": true,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "token": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": true,
+                    "type": "record"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "tos_accepted": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

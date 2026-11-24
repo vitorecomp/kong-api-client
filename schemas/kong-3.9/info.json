@@ -1,0 +1,6 @@
+{
+  "edition": "community",
+  "image": "kong:3.9.5",
+  "target": "kong-3.9",
+  "version": "3.9.5"
+}

@@ -5,6 +5,7 @@ export type LiveTarget = 'oss-3.9' | 'ee-3.14';
 export interface LiveEnv {
   target: LiveTarget;
   adminUrl: string;
+  dblessAdminUrl: string;
   proxyUrl: string;
   upstreamUrl: string;
   upstreamInternalUrl: string;
@@ -40,6 +41,7 @@ export function getLiveEnv(): LiveEnv {
   return {
     target: rawTarget,
     adminUrl: requireEnv('KONG_ADMIN_URL'),
+    dblessAdminUrl: requireEnv('KONG_DBLESS_ADMIN_URL'),
     proxyUrl: requireEnv('KONG_PROXY_URL'),
     upstreamUrl: requireEnv('KONG_UPSTREAM_URL'),
     upstreamInternalUrl: requireEnv('KONG_UPSTREAM_INTERNAL_URL'),

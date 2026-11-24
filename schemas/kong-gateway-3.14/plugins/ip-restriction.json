@@ -1,0 +1,69 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "http",
+          "https",
+          "tcp",
+          "tls",
+          "grpc",
+          "grpcs"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "allow": {
+              "elements": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "deny": {
+              "elements": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "message": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "status": {
+              "required": false,
+              "type": "number"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

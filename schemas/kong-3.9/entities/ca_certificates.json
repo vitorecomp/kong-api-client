@@ -1,0 +1,61 @@
+{
+  "entity_checks": [
+    {
+      "custom_entity_check": {
+        "field_sources": [
+          "cert"
+        ]
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "cert": {
+        "description": "A string representing a certificate.",
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "cert_digest": {
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "tags": {
+        "description": "A set of strings representing tags.",
+        "elements": {
+          "description": "A string representing a tag.",
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

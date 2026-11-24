@@ -1,0 +1,38 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "consumer": {
+        "reference": "consumers",
+        "required": true,
+        "type": "foreign"
+      }
+    },
+    {
+      "group": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

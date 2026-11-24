@@ -1,0 +1,317 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "block_on_first_violation": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "fault_tolerant": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "header_name": {
+              "default": "x-kong-limit",
+              "type": "string"
+            }
+          },
+          {
+            "hide_client_headers": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "limit_by": {
+              "default": "consumer",
+              "one_of": [
+                "consumer",
+                "credential",
+                "ip"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "limits": {
+              "keys": {
+                "type": "string"
+              },
+              "required": true,
+              "type": "map",
+              "values": {
+                "fields": [
+                  {
+                    "day": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "hour": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "minute": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "month": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "second": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "year": {
+                      "type": "number"
+                    }
+                  }
+                ],
+                "required": true,
+                "type": "record"
+              }
+            }
+          },
+          {
+            "policy": {
+              "default": "local",
+              "one_of": [
+                "cluster",
+                "local",
+                "redis"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "redis": {
+              "fields": [
+                {
+                  "cloud_authentication": {
+                    "fields": [
+                      {
+                        "auth_provider": {
+                          "one_of": [
+                            "aws",
+                            "azure",
+                            "gcp"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_access_key_id": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_assume_role_arn": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_cache_name": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_is_serverless": {
+                          "default": true,
+                          "required": false,
+                          "type": "boolean"
+                        }
+                      },
+                      {
+                        "aws_region": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_role_session_name": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "aws_secret_access_key": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_client_id": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_client_secret": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_tenant_id": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "gcp_service_account_json": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": false,
+                    "type": "record"
+                  }
+                },
+                {
+                  "database": {
+                    "default": 0,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "host": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "port": {
+                    "default": 6379,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "server_name": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "ssl": {
+                    "default": false,
+                    "required": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "ssl_verify": {
+                    "default": true,
+                    "required": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "timeout": {
+                    "default": 2000,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          }
+        ],
+        "required": true,
+        "shorthand_fields": [
+          {
+            "redis_database": {
+              "type": "integer"
+            }
+          },
+          {
+            "redis_host": {
+              "type": "string"
+            }
+          },
+          {
+            "redis_password": {
+              "type": "string"
+            }
+          },
+          {
+            "redis_port": {
+              "type": "integer"
+            }
+          },
+          {
+            "redis_server_name": {
+              "type": "string"
+            }
+          },
+          {
+            "redis_ssl": {
+              "type": "boolean"
+            }
+          },
+          {
+            "redis_ssl_verify": {
+              "type": "boolean"
+            }
+          },
+          {
+            "redis_timeout": {
+              "type": "integer"
+            }
+          },
+          {
+            "redis_username": {
+              "type": "string"
+            }
+          }
+        ],
+        "type": "record"
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "cert": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "key": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "cert_alt": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "key_alt": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "snis": {
+        "elements": {
+          "type": "string"
+        },
+        "required": false,
+        "type": "array"
+      }
+    }
+  ]
+}

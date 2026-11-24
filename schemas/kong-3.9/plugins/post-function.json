@@ -1,0 +1,131 @@
+{
+  "entity_checks": [
+    {
+      "at_least_one_of": [
+        "config.certificate",
+        "config.rewrite",
+        "config.access",
+        "config.header_filter",
+        "config.body_filter",
+        "config.log"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "consumer": {
+        "description": "Custom type for representing a foreign key with a null value allowed.",
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "description": "A set of strings representing protocols.",
+        "elements": {
+          "description": "A string representing a protocol, such as HTTP or HTTPS.",
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "access": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "body_filter": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "certificate": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "header_filter": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "log": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "rewrite": {
+              "default": [],
+              "description": "Custom functions, which can be user-defined, are cached and executed sequentially during specific phases: `certificate`, `rewrite`, `access`, `header_filter`, `body_filter`, and `log`.",
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

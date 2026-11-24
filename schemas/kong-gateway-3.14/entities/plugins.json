@@ -1,0 +1,170 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "name": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "instance_name": {
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "route": {
+        "default": null,
+        "reference": "routes",
+        "type": "foreign"
+      }
+    },
+    {
+      "service": {
+        "default": null,
+        "reference": "services",
+        "type": "foreign"
+      }
+    },
+    {
+      "consumer": {
+        "default": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "consumer_group": {
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "abstract": true,
+        "type": "record"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "enabled": {
+        "default": true,
+        "required": true,
+        "type": "boolean"
+      }
+    },
+    {
+      "condition": {
+        "default": null,
+        "type": "string"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "ordering": {
+        "keys": {
+          "one_of": [
+            "after",
+            "before"
+          ],
+          "type": "string"
+        },
+        "type": "map",
+        "values": {
+          "keys": {
+            "one_of": [
+              "access"
+            ],
+            "type": "string"
+          },
+          "type": "map",
+          "values": {
+            "elements": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        }
+      }
+    },
+    {
+      "partials": {
+        "elements": {
+          "fields": [
+            {
+              "id": {
+                "auto": true,
+                "type": "string"
+              }
+            },
+            {
+              "name": {
+                "type": "string"
+              }
+            },
+            {
+              "path": {
+                "default": null,
+                "required": false,
+                "type": "string"
+              }
+            }
+          ],
+          "type": "record"
+        },
+        "type": "array"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "entity_checks": [],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "service": {
+        "default": null,
+        "on_delete": "cascade",
+        "reference": "services",
+        "type": "foreign"
+      }
+    },
+    {
+      "credential": {
+        "on_delete": "cascade",
+        "reference": "oauth2_credentials",
+        "required": true,
+        "type": "foreign"
+      }
+    },
+    {
+      "token_type": {
+        "default": "bearer",
+        "one_of": [
+          "bearer"
+        ],
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "expires_in": {
+        "required": true,
+        "type": "integer"
+      }
+    },
+    {
+      "access_token": {
+        "auto": true,
+        "required": false,
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "refresh_token": {
+        "required": false,
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "authenticated_userid": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "scope": {
+        "type": "string"
+      }
+    }
+  ]
+}

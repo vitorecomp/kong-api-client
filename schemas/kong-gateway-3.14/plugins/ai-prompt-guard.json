@@ -1,0 +1,102 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "allow_all_conversation_history": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "allow_patterns": {
+              "elements": {
+                "type": "string"
+              },
+              "required": false,
+              "type": "array"
+            }
+          },
+          {
+            "deny_patterns": {
+              "elements": {
+                "type": "string"
+              },
+              "required": false,
+              "type": "array"
+            }
+          },
+          {
+            "genai_category": {
+              "default": "text/generation",
+              "one_of": [
+                "audio/speech",
+                "audio/transcription",
+                "image/generation",
+                "realtime/generation",
+                "text/embeddings",
+                "text/generation",
+                "video/generation"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "llm_format": {
+              "default": "openai",
+              "one_of": [
+                "anthropic",
+                "bedrock",
+                "cohere",
+                "gemini",
+                "huggingface",
+                "openai"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "match_all_roles": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "max_request_body_size": {
+              "default": 1048576,
+              "type": "integer"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

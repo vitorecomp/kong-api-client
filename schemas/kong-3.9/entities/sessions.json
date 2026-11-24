@@ -1,0 +1,38 @@
+{
+  "entity_checks": [],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "session_id": {
+        "required": true,
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "expires": {
+        "type": "integer"
+      }
+    },
+    {
+      "data": {
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    }
+  ]
+}

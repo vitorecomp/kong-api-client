@@ -1,0 +1,155 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "name": {
+        "type": "string"
+      }
+    },
+    {
+      "retries": {
+        "default": 5,
+        "type": "integer"
+      }
+    },
+    {
+      "protocol": {
+        "default": "http",
+        "one_of": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https",
+          "tcp",
+          "tls",
+          "tls_passthrough",
+          "udp",
+          "ws",
+          "wss"
+        ],
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "host": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "port": {
+        "default": 80,
+        "required": true,
+        "type": "integer"
+      }
+    },
+    {
+      "path": {
+        "type": "string"
+      }
+    },
+    {
+      "connect_timeout": {
+        "default": 60000,
+        "type": "integer"
+      }
+    },
+    {
+      "write_timeout": {
+        "default": 60000,
+        "type": "integer"
+      }
+    },
+    {
+      "read_timeout": {
+        "default": 60000,
+        "type": "integer"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "client_certificate": {
+        "reference": "certificates",
+        "type": "foreign"
+      }
+    },
+    {
+      "tls_sans": {
+        "fields": [
+          {
+            "dnsnames": {
+              "elements": {
+                "type": "string"
+              },
+              "required": false,
+              "type": "array"
+            }
+          },
+          {
+            "uris": {
+              "elements": {
+                "type": "string"
+              },
+              "required": false,
+              "type": "array"
+            }
+          }
+        ],
+        "required": false,
+        "type": "record"
+      }
+    },
+    {
+      "tls_verify": {
+        "type": "boolean"
+      }
+    },
+    {
+      "tls_verify_depth": {
+        "default": null,
+        "type": "integer"
+      }
+    },
+    {
+      "ca_certificates": {
+        "elements": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    {
+      "enabled": {
+        "default": true,
+        "required": true,
+        "type": "boolean"
+      }
+    }
+  ]
+}

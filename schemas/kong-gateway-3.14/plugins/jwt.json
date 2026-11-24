@@ -1,0 +1,127 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "anonymous": {
+              "type": "string"
+            }
+          },
+          {
+            "claims_to_verify": {
+              "elements": {
+                "one_of": [
+                  "exp",
+                  "nbf"
+                ],
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "cookie_names": {
+              "default": [],
+              "elements": {
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "header_names": {
+              "default": [
+                "authorization"
+              ],
+              "elements": {
+                "type": "string"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "key_claim_name": {
+              "default": "iss",
+              "type": "string"
+            }
+          },
+          {
+            "maximum_expiration": {
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "realm": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "run_on_preflight": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "secret_is_base64": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "uri_param_names": {
+              "default": [
+                "jwt"
+              ],
+              "elements": {
+                "type": "string"
+              },
+              "type": "set"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "entity_checks": [],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "prefix": {
+        "description": "The unique prefix (or identifier) for this Vault configuration.",
+        "match": "^[a-z][a-z%d-]-[a-z%d]+$",
+        "not_one_of": [
+          "env"
+        ],
+        "required": true,
+        "type": "string",
+        "unique": true,
+        "unique_across_ws": true
+      }
+    },
+    {
+      "name": {
+        "description": "The name of the Vault that's going to be added.",
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "description": {
+        "description": "The description of the Vault entity.",
+        "type": "string"
+      }
+    },
+    {
+      "config": {
+        "abstract": true,
+        "description": "The configuration properties for the Vault which can be found on the vaults' documentation page.",
+        "type": "record"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    },
+    {
+      "tags": {
+        "description": "A set of strings representing tags.",
+        "elements": {
+          "description": "A string representing a tag.",
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

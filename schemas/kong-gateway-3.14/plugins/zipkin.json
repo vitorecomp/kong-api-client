@@ -1,0 +1,332 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "connect_timeout": {
+              "default": 2000,
+              "type": "integer"
+            }
+          },
+          {
+            "default_header_type": {
+              "default": "b3",
+              "one_of": [
+                "aws",
+                "b3",
+                "b3-single",
+                "datadog",
+                "gcp",
+                "instana",
+                "jaeger",
+                "ot",
+                "w3c"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "default_service_name": {
+              "type": "string"
+            }
+          },
+          {
+            "header_type": {
+              "default": "preserve",
+              "one_of": [
+                "aws",
+                "b3",
+                "b3-single",
+                "datadog",
+                "gcp",
+                "ignore",
+                "instana",
+                "jaeger",
+                "ot",
+                "preserve",
+                "w3c"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "http_endpoint": {
+              "type": "string"
+            }
+          },
+          {
+            "http_response_header_for_traceid": {
+              "type": "string"
+            }
+          },
+          {
+            "http_span_name": {
+              "default": "method",
+              "one_of": [
+                "method",
+                "method_path"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "include_credential": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "local_service_name": {
+              "default": "kong",
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "phase_duration_flavor": {
+              "default": "annotations",
+              "one_of": [
+                "annotations",
+                "tags"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "propagation": {
+              "default": {
+                "default_format": "b3"
+              },
+              "fields": [
+                {
+                  "clear": {
+                    "elements": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                {
+                  "default_format": {
+                    "one_of": [
+                      "aws",
+                      "b3",
+                      "b3-single",
+                      "datadog",
+                      "gcp",
+                      "instana",
+                      "jaeger",
+                      "ot",
+                      "w3c"
+                    ],
+                    "required": true,
+                    "type": "string"
+                  }
+                },
+                {
+                  "extract": {
+                    "elements": {
+                      "one_of": [
+                        "aws",
+                        "b3",
+                        "datadog",
+                        "gcp",
+                        "instana",
+                        "jaeger",
+                        "ot",
+                        "w3c"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                {
+                  "inject": {
+                    "elements": {
+                      "one_of": [
+                        "aws",
+                        "b3",
+                        "b3-single",
+                        "datadog",
+                        "gcp",
+                        "instana",
+                        "jaeger",
+                        "ot",
+                        "preserve",
+                        "w3c"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "queue": {
+              "fields": [
+                {
+                  "concurrency_limit": {
+                    "default": 1,
+                    "one_of": [
+                      -1,
+                      1
+                    ],
+                    "type": "integer"
+                  }
+                },
+                {
+                  "initial_retry_delay": {
+                    "default": 0.01,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_batch_size": {
+                    "default": 1,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_bytes": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_coalescing_delay": {
+                    "default": 1,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_entries": {
+                    "default": 10000,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_retry_delay": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_retry_time": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "read_timeout": {
+              "default": 5000,
+              "type": "integer"
+            }
+          },
+          {
+            "sample_ratio": {
+              "default": 0.001,
+              "type": "number"
+            }
+          },
+          {
+            "send_timeout": {
+              "default": 5000,
+              "type": "integer"
+            }
+          },
+          {
+            "static_tags": {
+              "elements": {
+                "fields": [
+                  {
+                    "name": {
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "value": {
+                      "required": true,
+                      "type": "string"
+                    }
+                  }
+                ],
+                "type": "record"
+              },
+              "type": "array"
+            }
+          },
+          {
+            "tags_header": {
+              "default": "Zipkin-Tags",
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "traceid_byte_count": {
+              "default": 16,
+              "one_of": [
+                8,
+                16
+              ],
+              "required": true,
+              "type": "integer"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

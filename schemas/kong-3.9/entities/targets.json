@@ -1,0 +1,67 @@
+{
+  "entity_checks": [],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "A number representing an automatic Unix timestamp in milliseconds.",
+        "timestamp": true,
+        "type": "number"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "description": "A number representing an automatic Unix timestamp in milliseconds.",
+        "timestamp": true,
+        "type": "number"
+      }
+    },
+    {
+      "upstream": {
+        "description": "The unique identifier or the name of the upstream for which to update the target.",
+        "on_delete": "cascade",
+        "reference": "upstreams",
+        "required": true,
+        "type": "foreign"
+      }
+    },
+    {
+      "target": {
+        "description": "The target address (ip or hostname) and port.",
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "weight": {
+        "between": [
+          0,
+          65535
+        ],
+        "default": 100,
+        "description": "The weight this target gets within the upstream loadbalancer (0-65535).",
+        "type": "integer"
+      }
+    },
+    {
+      "tags": {
+        "description": "A set of strings representing tags.",
+        "elements": {
+          "description": "A string representing a tag.",
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    }
+  ]
+}

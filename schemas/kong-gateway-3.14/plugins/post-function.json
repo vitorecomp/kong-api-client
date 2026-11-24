@@ -1,0 +1,163 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "access": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "body_filter": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "certificate": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "header_filter": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "log": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "rewrite": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "ws_client_frame": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "ws_close": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "ws_handshake": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "ws_upstream_frame": {
+              "default": [],
+              "elements": {
+                "required": false,
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

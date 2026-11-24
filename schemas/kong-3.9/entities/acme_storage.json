@@ -1,0 +1,36 @@
+{
+  "entity_checks": [],
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "description": "A string representing a UUID (universally unique identifier).",
+        "type": "string",
+        "uuid": true
+      }
+    },
+    {
+      "key": {
+        "auto": true,
+        "required": true,
+        "type": "string",
+        "unique": true
+      }
+    },
+    {
+      "value": {
+        "auto": true,
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "description": "An integer representing an automatic Unix timestamp in seconds.",
+        "timestamp": true,
+        "type": "integer"
+      }
+    }
+  ]
+}

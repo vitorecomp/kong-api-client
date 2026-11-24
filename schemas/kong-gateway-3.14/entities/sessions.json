@@ -1,0 +1,37 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "session_id": {
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "expires": {
+        "type": "integer"
+      }
+    },
+    {
+      "data": {
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "ttl": {
+        "type": "number"
+      }
+    }
+  ]
+}

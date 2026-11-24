@@ -1,0 +1,99 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "custom_fields_by_lua": {
+              "keys": {
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "host": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "keepalive": {
+              "default": 60000,
+              "type": "number"
+            }
+          },
+          {
+            "port": {
+              "required": true,
+              "type": "integer"
+            }
+          },
+          {
+            "ssl_verify": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "timeout": {
+              "default": 10000,
+              "type": "number"
+            }
+          },
+          {
+            "tls": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "tls_sni": {
+              "type": "string"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "content_type": {
+              "default": "application/json",
+              "one_of": [
+                "application/json",
+                "application/json; charset=utf-8"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "custom_fields_by_lua": {
+              "keys": {
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "flush_timeout": {
+              "type": "number"
+            }
+          },
+          {
+            "headers": {
+              "keys": {
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "http_endpoint": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "keepalive": {
+              "default": 60000,
+              "type": "number"
+            }
+          },
+          {
+            "method": {
+              "default": "POST",
+              "one_of": [
+                "PATCH",
+                "POST",
+                "PUT"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "queue": {
+              "fields": [
+                {
+                  "concurrency_limit": {
+                    "default": 1,
+                    "one_of": [
+                      -1,
+                      1
+                    ],
+                    "type": "integer"
+                  }
+                },
+                {
+                  "initial_retry_delay": {
+                    "default": 0.01,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_batch_size": {
+                    "default": 1,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_bytes": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_coalescing_delay": {
+                    "default": 1,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_entries": {
+                    "default": 10000,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_retry_delay": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_retry_time": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "queue_size": {
+              "type": "integer"
+            }
+          },
+          {
+            "retry_count": {
+              "type": "integer"
+            }
+          },
+          {
+            "ssl_verify": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "timeout": {
+              "default": 10000,
+              "type": "number"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

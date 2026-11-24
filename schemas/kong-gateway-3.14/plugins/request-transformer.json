@@ -1,0 +1,239 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "add": {
+              "fields": [
+                {
+                  "body": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "headers": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "querystring": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "append": {
+              "fields": [
+                {
+                  "body": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "headers": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "querystring": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "http_method": {
+              "type": "string"
+            }
+          },
+          {
+            "remove": {
+              "fields": [
+                {
+                  "body": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "headers": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "querystring": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "rename": {
+              "fields": [
+                {
+                  "body": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "headers": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "querystring": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "replace": {
+              "fields": [
+                {
+                  "body": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "headers": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "querystring": {
+                    "default": [],
+                    "elements": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "type": "array"
+                  }
+                },
+                {
+                  "uri": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

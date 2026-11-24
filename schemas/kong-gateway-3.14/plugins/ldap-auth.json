@@ -1,0 +1,140 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "anonymous": {
+              "type": "string"
+            }
+          },
+          {
+            "attribute": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "base_dn": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "cache_ttl": {
+              "default": 60,
+              "required": true,
+              "type": "number"
+            }
+          },
+          {
+            "header_type": {
+              "default": "ldap",
+              "type": "string"
+            }
+          },
+          {
+            "hide_credentials": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "keepalive": {
+              "default": 60000,
+              "type": "number"
+            }
+          },
+          {
+            "ldap_host": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "ldap_port": {
+              "default": 389,
+              "required": true,
+              "type": "integer"
+            }
+          },
+          {
+            "ldaps": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "realm": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "start_tls": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "timeout": {
+              "default": 10000,
+              "type": "number"
+            }
+          },
+          {
+            "verify_ldap_host": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "edition": "enterprise",
+  "image": "kong/kong-gateway:3.14.0.18",
+  "other_endpoints": 545,
+  "target": "kong-gateway-3.14",
+  "version": "3.14.0.18"
+}

@@ -1,0 +1,53 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "updated_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "username": {
+        "type": "string"
+      }
+    },
+    {
+      "custom_id": {
+        "type": "string"
+      }
+    },
+    {
+      "type": {
+        "default": 0,
+        "required": true,
+        "type": "integer"
+      }
+    },
+    {
+      "tags": {
+        "elements": {
+          "required": true,
+          "type": "string"
+        },
+        "type": "set"
+      }
+    },
+    {
+      "username_lower": {
+        "type": "string"
+      }
+    }
+  ]
+}

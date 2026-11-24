@@ -1,0 +1,655 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "auth": {
+              "fields": [
+                {
+                  "allow_override": {
+                    "default": false,
+                    "required": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "aws_access_key_id": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "aws_secret_access_key": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "azure_client_id": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "azure_client_secret": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "azure_tenant_id": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "azure_use_managed_identity": {
+                    "default": false,
+                    "required": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "gcp_metadata_url": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "gcp_oauth_token_url": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "gcp_service_account_json": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "gcp_use_service_account": {
+                    "default": false,
+                    "required": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "header_name": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "header_value": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "param_location": {
+                    "one_of": [
+                      "body",
+                      "query"
+                    ],
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "param_name": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "param_value": {
+                    "required": false,
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": false,
+              "type": "record"
+            }
+          },
+          {
+            "genai_category": {
+              "default": "text/generation",
+              "one_of": [
+                "audio/speech",
+                "audio/transcription",
+                "image/generation",
+                "text/embeddings",
+                "text/generation",
+                "video/generation"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "llm_format": {
+              "default": "openai",
+              "one_of": [
+                "anthropic",
+                "bedrock",
+                "cohere",
+                "gemini",
+                "huggingface",
+                "openai"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "logging": {
+              "fields": [
+                {
+                  "log_payloads": {
+                    "default": false,
+                    "required": true,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "log_statistics": {
+                    "default": false,
+                    "required": true,
+                    "type": "boolean"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "max_request_body_size": {
+              "default": 1048576,
+              "type": "integer"
+            }
+          },
+          {
+            "model": {
+              "fields": [
+                {
+                  "model_alias": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "name": {
+                    "required": false,
+                    "type": "string"
+                  }
+                },
+                {
+                  "options": {
+                    "fields": [
+                      {
+                        "anthropic_version": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_api_version": {
+                          "default": "2023-05-15",
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_deployment_id": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "azure_instance": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "bedrock": {
+                          "fields": [
+                            {
+                              "aws_assume_role_arn": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_region": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_role_session_name": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "aws_sts_endpoint_url": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "batch_bucket_prefix": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "batch_role_arn": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "embeddings_normalize": {
+                                "default": false,
+                                "type": "boolean"
+                              }
+                            },
+                            {
+                              "performance_config_latency": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "video_output_s3_uri": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "cache_read_cost": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "cache_write_cost": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "cache_write_cost_list": {
+                          "elements": {
+                            "fields": [
+                              {
+                                "cost": {
+                                  "required": true,
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "ttl": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            ],
+                            "type": "record"
+                          },
+                          "required": false,
+                          "type": "array"
+                        }
+                      },
+                      {
+                        "cohere": {
+                          "fields": [
+                            {
+                              "embedding_input_type": {
+                                "default": "classification",
+                                "one_of": [
+                                  "classification",
+                                  "clustering",
+                                  "image",
+                                  "search_document",
+                                  "search_query"
+                                ],
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "wait_for_model": {
+                                "required": false,
+                                "type": "boolean"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "context_window_factor": {
+                          "elements": {
+                            "fields": [
+                              {
+                                "above": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              },
+                              {
+                                "input_factor": {
+                                  "required": true,
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "output_factor": {
+                                  "required": true,
+                                  "type": "number"
+                                }
+                              }
+                            ],
+                            "type": "record"
+                          },
+                          "required": false,
+                          "type": "array"
+                        }
+                      },
+                      {
+                        "dashscope": {
+                          "fields": [
+                            {
+                              "international": {
+                                "default": true,
+                                "required": false,
+                                "type": "boolean"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "databricks": {
+                          "fields": [
+                            {
+                              "workspace_instance_id": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "embeddings_dimensions": {
+                          "required": false,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "gemini": {
+                          "fields": [
+                            {
+                              "api_endpoint": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "endpoint_id": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "location_id": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "project_id": {
+                                "required": false,
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "huggingface": {
+                          "fields": [
+                            {
+                              "use_cache": {
+                                "required": false,
+                                "type": "boolean"
+                              }
+                            },
+                            {
+                              "wait_for_model": {
+                                "required": false,
+                                "type": "boolean"
+                              }
+                            }
+                          ],
+                          "required": false,
+                          "type": "record"
+                        }
+                      },
+                      {
+                        "input_cost": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "llama2_format": {
+                          "one_of": [
+                            "ollama",
+                            "openai",
+                            "raw"
+                          ],
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "max_tokens": {
+                          "required": false,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "mistral_format": {
+                          "one_of": [
+                            "ollama",
+                            "openai"
+                          ],
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "output_cost": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "service_tier_factor": {
+                          "elements": {
+                            "fields": [
+                              {
+                                "factor": {
+                                  "required": true,
+                                  "type": "number"
+                                }
+                              },
+                              {
+                                "tier": {
+                                  "required": true,
+                                  "type": "string"
+                                }
+                              }
+                            ],
+                            "type": "record"
+                          },
+                          "required": false,
+                          "type": "array"
+                        }
+                      },
+                      {
+                        "temperature": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "top_k": {
+                          "required": false,
+                          "type": "integer"
+                        }
+                      },
+                      {
+                        "top_p": {
+                          "required": false,
+                          "type": "number"
+                        }
+                      },
+                      {
+                        "upstream_path": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "upstream_url": {
+                          "required": false,
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "required": false,
+                    "type": "record"
+                  }
+                },
+                {
+                  "provider": {
+                    "one_of": [
+                      "anthropic",
+                      "azure",
+                      "bedrock",
+                      "cerebras",
+                      "cohere",
+                      "dashscope",
+                      "databricks",
+                      "deepseek",
+                      "gemini",
+                      "huggingface",
+                      "llama2",
+                      "mistral",
+                      "ollama",
+                      "openai",
+                      "vllm",
+                      "xai"
+                    ],
+                    "required": true,
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "model_name_header": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "response_streaming": {
+              "default": "allow",
+              "one_of": [
+                "allow",
+                "always",
+                "deny"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "route_type": {
+              "one_of": [
+                "audio/v1/audio/speech",
+                "audio/v1/audio/transcriptions",
+                "audio/v1/audio/translations",
+                "image/v1/images/edits",
+                "image/v1/images/generations",
+                "llm/v1/assistants",
+                "llm/v1/batches",
+                "llm/v1/chat",
+                "llm/v1/completions",
+                "llm/v1/embeddings",
+                "llm/v1/files",
+                "llm/v1/responses",
+                "preserve",
+                "realtime/v1/realtime",
+                "video/v1/videos/generations"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

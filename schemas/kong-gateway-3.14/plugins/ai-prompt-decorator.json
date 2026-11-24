@@ -1,0 +1,122 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "llm_format": {
+              "default": "openai",
+              "one_of": [
+                "anthropic",
+                "bedrock",
+                "cohere",
+                "gemini",
+                "huggingface",
+                "openai"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "max_request_body_size": {
+              "default": 1048576,
+              "type": "integer"
+            }
+          },
+          {
+            "prompts": {
+              "fields": [
+                {
+                  "append": {
+                    "elements": {
+                      "fields": [
+                        {
+                          "content": {
+                            "required": true,
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "role": {
+                            "default": "system",
+                            "one_of": [
+                              "assistant",
+                              "system",
+                              "user"
+                            ],
+                            "required": true,
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "required": false,
+                      "type": "record"
+                    },
+                    "required": false,
+                    "type": "array"
+                  }
+                },
+                {
+                  "prepend": {
+                    "elements": {
+                      "fields": [
+                        {
+                          "content": {
+                            "required": true,
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "role": {
+                            "default": "system",
+                            "one_of": [
+                              "assistant",
+                              "system",
+                              "user"
+                            ],
+                            "required": true,
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "required": false,
+                      "type": "record"
+                    },
+                    "required": false,
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": false,
+              "type": "record"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}

@@ -1,0 +1,379 @@
+{
+  "fields": [
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "tcp",
+            "tls",
+            "tls_passthrough",
+            "udp",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "access_logs": {
+              "fields": [
+                {
+                  "custom_attributes_by_lua": {
+                    "keys": {
+                      "type": "string"
+                    },
+                    "required": false,
+                    "type": "map",
+                    "values": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "endpoint": {
+                    "required": false,
+                    "type": "string"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "batch_flush_delay": {
+              "type": "integer"
+            }
+          },
+          {
+            "batch_span_count": {
+              "type": "integer"
+            }
+          },
+          {
+            "connect_timeout": {
+              "default": 1000,
+              "type": "integer"
+            }
+          },
+          {
+            "header_type": {
+              "default": "preserve",
+              "one_of": [
+                "aws",
+                "b3",
+                "b3-single",
+                "datadog",
+                "gcp",
+                "ignore",
+                "instana",
+                "jaeger",
+                "ot",
+                "preserve",
+                "w3c"
+              ],
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "headers": {
+              "keys": {
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "http_response_header_for_traceid": {
+              "type": "string"
+            }
+          },
+          {
+            "logs_endpoint": {
+              "type": "string"
+            }
+          },
+          {
+            "metrics": {
+              "fields": [
+                {
+                  "enable_ai_metrics": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "enable_bandwidth_metrics": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "enable_consumer_attribute": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "enable_latency_metrics": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "enable_request_metrics": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "enable_upstream_health_metrics": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                {
+                  "endpoint": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "push_interval": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "propagation": {
+              "default": {
+                "default_format": "w3c"
+              },
+              "fields": [
+                {
+                  "clear": {
+                    "elements": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                {
+                  "default_format": {
+                    "one_of": [
+                      "aws",
+                      "b3",
+                      "b3-single",
+                      "datadog",
+                      "gcp",
+                      "instana",
+                      "jaeger",
+                      "ot",
+                      "w3c"
+                    ],
+                    "required": true,
+                    "type": "string"
+                  }
+                },
+                {
+                  "extract": {
+                    "elements": {
+                      "one_of": [
+                        "aws",
+                        "b3",
+                        "datadog",
+                        "gcp",
+                        "instana",
+                        "jaeger",
+                        "ot",
+                        "w3c"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                {
+                  "inject": {
+                    "elements": {
+                      "one_of": [
+                        "aws",
+                        "b3",
+                        "b3-single",
+                        "datadog",
+                        "gcp",
+                        "instana",
+                        "jaeger",
+                        "ot",
+                        "preserve",
+                        "w3c"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "queue": {
+              "default": {
+                "max_batch_size": 200
+              },
+              "fields": [
+                {
+                  "concurrency_limit": {
+                    "default": 1,
+                    "one_of": [
+                      -1,
+                      1
+                    ],
+                    "type": "integer"
+                  }
+                },
+                {
+                  "initial_retry_delay": {
+                    "default": 0.01,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_batch_size": {
+                    "default": 1,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_bytes": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_coalescing_delay": {
+                    "default": 1,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_entries": {
+                    "default": 10000,
+                    "type": "integer"
+                  }
+                },
+                {
+                  "max_retry_delay": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                },
+                {
+                  "max_retry_time": {
+                    "default": 60,
+                    "type": "number"
+                  }
+                }
+              ],
+              "required": true,
+              "type": "record"
+            }
+          },
+          {
+            "read_timeout": {
+              "default": 5000,
+              "type": "integer"
+            }
+          },
+          {
+            "resource_attributes": {
+              "keys": {
+                "required": true,
+                "type": "string"
+              },
+              "type": "map",
+              "values": {
+                "required": true,
+                "type": "string"
+              }
+            }
+          },
+          {
+            "sampling_rate": {
+              "required": false,
+              "type": "number"
+            }
+          },
+          {
+            "sampling_strategy": {
+              "default": "parent_drop_probability_fallback",
+              "one_of": [
+                "parent_drop_probability_fallback",
+                "parent_probability_fallback"
+              ],
+              "required": true,
+              "type": "string"
+            }
+          },
+          {
+            "send_timeout": {
+              "default": 5000,
+              "type": "integer"
+            }
+          },
+          {
+            "traces_endpoint": {
+              "type": "string"
+            }
+          }
+        ],
+        "required": true,
+        "shorthand_fields": [
+          {
+            "access_logs_endpoint": {
+              "type": "string"
+            }
+          },
+          {
+            "endpoint": {
+              "type": "string"
+            }
+          }
+        ],
+        "type": "record"
+      }
+    }
+  ]
+}

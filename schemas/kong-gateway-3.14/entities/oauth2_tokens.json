@@ -1,0 +1,75 @@
+{
+  "fields": [
+    {
+      "id": {
+        "auto": true,
+        "type": "string"
+      }
+    },
+    {
+      "created_at": {
+        "auto": true,
+        "type": "integer"
+      }
+    },
+    {
+      "service": {
+        "default": null,
+        "reference": "services",
+        "type": "foreign"
+      }
+    },
+    {
+      "credential": {
+        "reference": "oauth2_credentials",
+        "required": true,
+        "type": "foreign"
+      }
+    },
+    {
+      "token_type": {
+        "default": "bearer",
+        "one_of": [
+          "bearer"
+        ],
+        "required": true,
+        "type": "string"
+      }
+    },
+    {
+      "expires_in": {
+        "required": true,
+        "type": "integer"
+      }
+    },
+    {
+      "access_token": {
+        "auto": true,
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "refresh_token": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "authenticated_userid": {
+        "required": false,
+        "type": "string"
+      }
+    },
+    {
+      "scope": {
+        "type": "string"
+      }
+    },
+    {
+      "ttl": {
+        "type": "number"
+      }
+    }
+  ]
+}

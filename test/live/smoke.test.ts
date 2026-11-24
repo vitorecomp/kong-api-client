@@ -12,6 +12,14 @@ interface EchoResponse {
   body: string;
 }
 
+interface ConfigResponse {
+  config: string;
+}
+
+interface ServicesPage {
+  data: Array<{ id: string; name: string | null }>;
+}
+
 const EXPECTED_VERSION_PREFIX: Record<'oss-3.9' | 'ee-3.14', string> = {
   'oss-3.9': '3.9.',
   'ee-3.14': '3.14.',
@@ -98,6 +106,44 @@ describe('live smoke test', () => {
         });
         expect([204, 404]).toContain(delService.status);
       }
+    }
+  });
+
+  it('reads and applies declarative config on the DB-less Kong instance', async () => {
+    const serviceName = unique('dbless-smoke-svc');
+
+    try {
+      const initialConfig = await fetch(`${env.dblessAdminUrl}/config`);
+      expect(initialConfig.status).toBe(200);
+      const configBody = (await initialConfig.json()) as ConfigResponse;
+      expect(typeof configBody.config).toBe('string');
+
+      const applyConfig = await fetch(`${env.dblessAdminUrl}/config`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          _format_version: '3.0',
+          services: [
+            {
+              name: serviceName,
+              url: `${env.upstreamInternalUrl}/echo`,
+            },
+          ],
+        }),
+      });
+      expect(applyConfig.status).toBe(201);
+
+      const servicesRes = await fetch(`${env.dblessAdminUrl}/services`);
+      expect(servicesRes.status).toBe(200);
+      const services = (await servicesRes.json()) as ServicesPage;
+      expect(services.data.some((svc) => svc.name === serviceName)).toBe(true);
+    } finally {
+      const resetConfig = await fetch(`${env.dblessAdminUrl}/config`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ _format_version: '3.0' }),
+      });
+      expect(resetConfig.status).toBe(201);
     }
   });
 });

@@ -1,0 +1,146 @@
+{
+  "fields": [
+    {
+      "consumer": {
+        "eq": null,
+        "reference": "consumers",
+        "type": "foreign"
+      }
+    },
+    {
+      "protocols": {
+        "default": [
+          "grpc",
+          "grpcs",
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "elements": {
+          "one_of": [
+            "grpc",
+            "grpcs",
+            "http",
+            "https",
+            "ws",
+            "wss"
+          ],
+          "type": "string"
+        },
+        "required": true,
+        "type": "set"
+      }
+    },
+    {
+      "consumer_group": {
+        "eq": null,
+        "reference": "consumer_groups",
+        "type": "foreign"
+      }
+    },
+    {
+      "config": {
+        "fields": [
+          {
+            "anonymous": {
+              "type": "string"
+            }
+          },
+          {
+            "hide_credentials": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "identity_realms": {
+              "default": [
+                {
+                  "id": null,
+                  "region": null,
+                  "scope": "cp"
+                }
+              ],
+              "elements": {
+                "fields": [
+                  {
+                    "id": {
+                      "auto": false,
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "region": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "scope": {
+                      "one_of": [
+                        "cp",
+                        "realm"
+                      ],
+                      "type": "string"
+                    }
+                  }
+                ],
+                "type": "record"
+              },
+              "type": "set"
+            }
+          },
+          {
+            "key_in_body": {
+              "default": false,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "key_in_header": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "key_in_query": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "key_names": {
+              "default": [
+                "apikey"
+              ],
+              "elements": {
+                "type": "string"
+              },
+              "required": true,
+              "type": "array"
+            }
+          },
+          {
+            "realm": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          {
+            "run_on_preflight": {
+              "default": true,
+              "required": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "required": true,
+        "type": "record"
+      }
+    }
+  ]
+}
