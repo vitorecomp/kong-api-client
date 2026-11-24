@@ -3,6 +3,7 @@ import {
   KongHttpError,
   type Collection,
   type ListParams,
+  type Patch,
   type Singleton,
 } from '../../src/index.js';
 import { unique } from './live.js';
@@ -26,7 +27,7 @@ export interface CollectionCrudOptions<E extends { id: string }, I> {
    * the changed field and that an untouched field retained its previous value.
    */
   update: {
-    patch: Partial<I> | ((current: E, tag?: string) => Partial<I>);
+    patch: Patch<I> | ((current: E, tag?: string) => Patch<I>);
     assertUpdated: (updated: E, before: E) => void;
   };
   /**
@@ -58,7 +59,7 @@ export interface SingletonCrudOptions<E, I> {
    * the changed field and that an untouched field retained its previous value.
    */
   update: {
-    patch: Partial<I> | ((current: E) => Partial<I>);
+    patch: Patch<I> | ((current: E) => Patch<I>);
     assertUpdated: (updated: E, before: E) => void;
   };
   /**
@@ -70,6 +71,12 @@ export interface SingletonCrudOptions<E, I> {
     makeInput: (current: E) => I;
     assertUpserted: (upserted: E, before: E) => void;
   };
+}
+
+function isPatchBuilder<I, Args extends unknown[]>(
+  value: Patch<I> | ((...args: Args) => Patch<I>),
+): value is (...args: Args) => Patch<I> {
+  return typeof value === 'function';
 }
 
 /** Runs a cleanup deletion, ignoring a 404 response when the entity was already removed. */
@@ -123,8 +130,7 @@ export function exerciseCollection<E extends { id: string }, I>(
       }
 
       // 3. Partial update (PATCH) — verify changed field and preserved field
-      const patchBody =
-        typeof update.patch === 'function' ? update.patch(created, tag) : update.patch;
+      const patchBody = isPatchBuilder(update.patch) ? update.patch(created, tag) : update.patch;
       const updated = await collection.update(created.id, patchBody);
       expect(updated.id).toBe(created.id);
       update.assertUpdated(updated, created);
@@ -219,7 +225,7 @@ export function exerciseSingleton<E, I>(
     const found = await singleton.find();
     expect(found).toBeDefined();
 
-    const patchBody = typeof update.patch === 'function' ? update.patch(initial) : update.patch;
+    const patchBody = isPatchBuilder(update.patch) ? update.patch(initial) : update.patch;
     const updated = await singleton.update(patchBody);
     update.assertUpdated(updated, initial);
 

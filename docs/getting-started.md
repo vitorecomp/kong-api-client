@@ -168,6 +168,7 @@ Fields or enum values specific to one target are documented in the generated JSD
 ## Next steps
 
 - [Resources](./resources.md) — collections, nested resources, singletons, pagination, and tag filters
+- [Admin Endpoints](./admin-endpoints.md) — node status, schemas, tags, cache, DB-less config, log levels, clustering, ACME, proxy-cache, and upstream health
 - [Error Handling](./errors.md) — error classes, Kong validation details, timeouts, and aborts
 - [Plugin Reference](./plugins/index.md) — configuration tables for all 45 first-class plugins
 - [Migration from 2.x](./migration.md) — call-by-call upgrade table from `kong-api-client` 2.x

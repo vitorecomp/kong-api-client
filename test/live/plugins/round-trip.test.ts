@@ -4,9 +4,7 @@ import type { PluginName } from '../../../src/generated/plugins.js';
 import type { PluginCollection } from '../../../src/plugin-collection.js';
 import { deleteIgnoringNotFound } from '../../support/crud.js';
 import { getLiveEnv, liveKong, unique } from '../../support/live.js';
-import { PLUGIN_FIXTURES, resolvePluginFixture } from '../../support/plugin-fixtures.js';
-
-const pluginNames = Object.keys(PLUGIN_FIXTURES).sort() as PluginName[];
+import { PLUGIN_NAMES, resolvePluginFixture } from '../../support/plugin-fixtures.js';
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -102,7 +100,7 @@ describe('live plugin round trip for all 45 plugins', () => {
     }
   }
 
-  it.each(pluginNames)('round-trips %s (create, get, update, delete, find)', async (name) => {
+  it.each(PLUGIN_NAMES)('round-trips %s (create, get, update, delete, find)', async (name) => {
     const fixture = resolvePluginFixture(name, env.target);
     const collection = collectionForScope(fixture.scope);
     const setPaths = new Set(SET_FIELDS[`plugin:${name}`] ?? []);

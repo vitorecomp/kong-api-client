@@ -9,28 +9,28 @@ group: Guides
 
 ## Top-level resources
 
-| Property              | Admin API path     | Secondary lookup key |
-| --------------------- | ------------------ | -------------------- |
-| `kong.services`       | `/services`        | `name`               |
-| `kong.routes`         | `/routes`          | `name`               |
-| `kong.consumers`      | `/consumers`       | `username`           |
-| `kong.plugins`        | `/plugins`         | `instance_name`      |
-| `kong.upstreams`      | `/upstreams`       | `name`               |
-| `kong.certificates`   | `/certificates`    | SNI name (`GET`)     |
-| `kong.snis`           | `/snis`            | `name`               |
-| `kong.caCertificates` | `/ca_certificates` | `id` only            |
-| `kong.vaults`         | `/vaults`          | `prefix`             |
-| `kong.keys`           | `/keys`            | `name` (`GET`)       |
-| `kong.keySets`        | `/key-sets`        | `name` (`GET`)       |
-| `kong.acls`           | `/acls`            | `id` only            |
-| `kong.basicAuths`     | `/basic-auths`     | `username`           |
-| `kong.hmacAuths`      | `/hmac-auths`      | `username`           |
-| `kong.jwts`           | `/jwts`            | `key`                |
-| `kong.keyAuths`       | `/key-auths`       | `key`                |
-| `kong.oauth2`         | `/oauth2`          | `client_id`          |
-| `kong.oauth2Tokens`   | `/oauth2_tokens`   | `access_token`       |
-| `kong.sessions`       | `/sessions`        | `session_id`         |
-| `kong.acmeStorage`    | `/acme_storage`    | `id` only            |
+| Property              | Admin API path     | Secondary lookup key                                   |
+| --------------------- | ------------------ | ------------------------------------------------------ |
+| `kong.services`       | `/services`        | `name`                                                 |
+| `kong.routes`         | `/routes`          | `name`                                                 |
+| `kong.consumers`      | `/consumers`       | `username`                                             |
+| `kong.plugins`        | `/plugins`         | `instance_name`                                        |
+| `kong.upstreams`      | `/upstreams`       | `name`                                                 |
+| `kong.certificates`   | `/certificates`    | SNI name (`GET`)                                       |
+| `kong.snis`           | `/snis`            | `name`                                                 |
+| `kong.caCertificates` | `/ca_certificates` | `id` only                                              |
+| `kong.vaults`         | `/vaults`          | `prefix`                                               |
+| `kong.keys`           | `/keys`            | `name` (`GET`, `PATCH`, `DELETE`; `PUT` requires `id`) |
+| `kong.keySets`        | `/key-sets`        | `name` (`GET`, `PATCH`, `DELETE`; `PUT` requires `id`) |
+| `kong.acls`           | `/acls`            | `id` only                                              |
+| `kong.basicAuths`     | `/basic-auths`     | `username`                                             |
+| `kong.hmacAuths`      | `/hmac-auths`      | `username`                                             |
+| `kong.jwts`           | `/jwts`            | `key`                                                  |
+| `kong.keyAuths`       | `/key-auths`       | `key`                                                  |
+| `kong.oauth2`         | `/oauth2`          | `client_id`                                            |
+| `kong.oauth2Tokens`   | `/oauth2_tokens`   | `access_token`                                         |
+| `kong.sessions`       | `/sessions`        | `session_id`                                           |
+| `kong.acmeStorage`    | `/acme_storage`    | `id` only                                              |
 
 Kong serves `targets` only underneath an upstream, so targets are accessed exclusively via `kong.upstreams.targets(upstream)` rather than a top-level property.
 
@@ -50,7 +50,7 @@ Every top-level and nested collection extends `Collection<E, I>`, where `E` is t
 | `iterate(params?, options?)`   | `GET <base>` (repeated) | Async generator yielding every entity across all pages.        |
 | `all(params?, options?)`       | `GET <base>` (repeated) | Collects every entity across all pages into an array.          |
 
-Keys passed to `get`, `find`, `update`, `upsert`, `delete`, and nested accessors are URL-encoded automatically with `segment()`. Passing an empty string throws `KongError`.
+Keys passed to `get`, `find`, `update`, `upsert`, `delete`, and nested accessors are URL-encoded automatically with `segment()` — reserved and non-ASCII characters (spaces, `/`, `?`, `#`, `%`, `+`, `&`, `:`, and UTF-8 letters such as `café`) are percent-encoded by the library and decoded by Kong on resource paths. Passing an empty string throws `KongError`.
 
 ### `update` (`PATCH`) vs. `upsert` (`PUT`)
 
@@ -81,6 +81,13 @@ const replaced = await kong.services.upsert('catalog', {
 });
 console.log(replaced.retries, replaced.path); // 5, null
 ```
+
+### Resource-specific Kong behaviours
+
+A few resources deviate from Kong's general `PUT` semantics on both Kong 3.9 and Kong Gateway 3.14:
+
+- **`keys` and `key-sets`**: `get`, `find`, `update` (`PATCH`), and `delete` all accept `name` as well as `id`, but **`upsert` (`PUT`) only works by `id`**. Sending `PUT /keys/{name}`, `PUT /key-sets/{name}`, or `PUT /key-sets/{keySet}/keys/{name}` causes Kong to answer `500 An unexpected error occurred` for both existing and new names (leaving existing entities unchanged and not creating new ones).
+- **Upstream `targets`**: `upsert` (`PUT /upstreams/{upstream}/targets/{key}`) **never creates** a missing target — Kong answers `404` when the target address does not exist. On an existing target (keyed by `id` or `host:port`), `PUT` merges like `PATCH`: omitted fields such as `weight` and `tags` keep their existing values instead of resetting to defaults.
 
 ## Nested collections
 

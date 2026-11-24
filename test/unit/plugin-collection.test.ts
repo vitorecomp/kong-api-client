@@ -1,8 +1,9 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { KongError } from '../../src/errors.js';
 import type { Plugin } from '../../src/generated/entities.js';
-import type { HttpLogConfig } from '../../src/generated/plugins.js';
+import type { ConfigOf, HttpLogConfig } from '../../src/generated/plugins.js';
 import { PluginCollection } from '../../src/plugin-collection.js';
+import type { Patch } from '../../src/resource.js';
 import { Transport } from '../../src/transport.js';
 import { createFakeFetch } from '../support/fake-fetch.js';
 
@@ -154,8 +155,10 @@ describe('PluginCollection', () => {
     ]);
   });
 
-  it('rejects unknown config fields on known plugins at compile time', () => {
+  it('enforces recursive Patch<PluginInput<N>> semantics on update at compile time', () => {
     const { plugins } = makeCollection();
+
+    expectTypeOf<Patch<ConfigOf<'my-custom-plugin'>>>().toEqualTypeOf<Record<string, unknown>>();
 
     const checkTypes = async () => {
       await plugins.create({
@@ -172,6 +175,110 @@ describe('PluginCollection', () => {
         name: 'http-log',
         // @ts-expect-error unknown field on a known plugin
         config: { http_endpoint: 'https://x', nope: true },
+      });
+
+      // Nested patch on a record with required members compiles (provider & route_type omitted)
+      const aiUpdated = await plugins.update<'ai-proxy'>('k', {
+        config: { model: { options: { temperature: 0.9 } } },
+      });
+      expectTypeOf(aiUpdated).toEqualTypeOf<Plugin<'ai-proxy'>>();
+
+      // Inferred plugin name also allows deeply nested partial records
+      const aiInferred = await plugins.update('k', {
+        name: 'ai-proxy',
+        config: { model: { options: { temperature: 0.9 } } },
+      });
+      expectTypeOf(aiInferred).toEqualTypeOf<Plugin<'ai-proxy'>>();
+
+      // Unknown field at any depth is a compile error
+      await plugins.update<'ai-proxy'>('k', {
+        // @ts-expect-error unknown top-level field on plugin patch
+        nope: true,
+      });
+      await plugins.update<'ai-proxy'>('k', {
+        // @ts-expect-error unknown config field
+        config: { nope: true },
+      });
+      await plugins.update<'ai-proxy'>('k', {
+        // @ts-expect-error unknown nested field in model
+        config: { model: { nope: true } },
+      });
+      await plugins.update<'ai-proxy'>('k', {
+        // @ts-expect-error unknown deeply nested field in model.options
+        config: { model: { options: { nope: true } } },
+      });
+      await plugins.update('k', {
+        name: 'ai-proxy',
+        // @ts-expect-error unknown deeply nested field via inferred plugin name
+        config: { model: { options: { nope: true } } },
+      });
+
+      // Arrays must be given whole with element types unchanged
+      await plugins.update<'ai-proxy'>('k', {
+        config: { model: { options: { cache_write_cost_list: [{ cost: 1, ttl: '5m' }] } } },
+      });
+      await plugins.update<'ai-proxy'>('k', {
+        config: {
+          model: {
+            options: {
+              // @ts-expect-error missing required ttl on array element
+              cache_write_cost_list: [{ cost: 1 }],
+            },
+          },
+        },
+      });
+      await plugins.update<'request-transformer'>('k', {
+        config: { add: { headers: ['x-a:1'] } },
+      });
+      await plugins.update<'request-transformer'>('k', {
+        config: {
+          add: {
+            // @ts-expect-error array element must remain string
+            headers: [123],
+          },
+        },
+      });
+
+      // Maps (Record<string, V>) are taken whole with value type preserved
+      await plugins.update<'http-log'>('k', {
+        config: { headers: { 'x-c': '3' } },
+      });
+      await plugins.update<'http-log'>('k', {
+        config: {
+          headers: {
+            // @ts-expect-error map value must remain string
+            'x-c': 3,
+          },
+        },
+      });
+
+      // Null stays allowed where the input type allows it, and rejected where it does not
+      await plugins.update<'http-log'>('k', { config: null });
+      await plugins.update<'http-log'>('k', { config: { queue: null, headers: null } });
+      await plugins.update<'http-log'>('k', { config: { queue: { max_coalescing_delay: null } } });
+      await plugins.update<'ai-proxy'>('k', { config: { model: { options: null } } });
+      await plugins.update<'ai-proxy'>('k', {
+        config: { model: { options: { temperature: null } } },
+      });
+      await plugins.update<'ai-proxy'>('k', {
+        // @ts-expect-error model is not nullable on AiProxyConfig
+        config: { model: null },
+      });
+      await plugins.update<'http-log'>('k', {
+        // @ts-expect-error http_endpoint is not nullable on HttpLogConfig
+        config: { http_endpoint: null },
+      });
+
+      // Unknown plugins accept arbitrary config shapes
+      await plugins.update('k', {
+        name: 'my-custom-plugin',
+        config: { anything: { nested: [1, 'two', true] } },
+      });
+      await plugins.update<'my-custom-plugin'>('k', {
+        config: { anything: { nested: [1, 'two', true] } },
+      });
+      await plugins.update('k', {
+        config: { anything: { nested: [1, 'two', true] } },
       });
     };
 

@@ -208,6 +208,7 @@ describe('documentation TypeScript examples contract', () => {
   it('finds TypeScript examples in README.md and every guide under docs/*.md', () => {
     expect(markdownFiles).toEqual([
       'README.md',
+      'docs/admin-endpoints.md',
       'docs/errors.md',
       'docs/getting-started.md',
       'docs/migration.md',

@@ -2,11 +2,14 @@ import type { PluginConfigs, PluginName, PluginScopeName } from '../../src/gener
 import type { LiveTarget } from './live.js';
 import {
   PLUGIN_EXAMPLES,
+  PLUGIN_NAMES,
   type PluginExample,
   type PluginExampleOverride,
   type PluginExamplesMap,
   type PluginExampleUpdate,
 } from './plugin-examples.js';
+
+export { PLUGIN_NAMES };
 
 /** Small config update specification for a plugin fixture. */
 export type PluginFixtureUpdate<N extends PluginName> = PluginExampleUpdate<N>;

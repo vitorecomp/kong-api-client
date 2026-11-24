@@ -7,6 +7,9 @@ import {
   Singleton,
   Transport,
   type Page,
+  type Patch,
+  type Upstream,
+  type UpstreamInput,
 } from '../../src/index.js';
 import { createFakeFetch } from '../support/fake-fetch.js';
 
@@ -324,6 +327,92 @@ describe('Singleton', () => {
       // Partial input is allowed on update()
       void singleton.update({ enabled: false });
     };
+    expect(typeof typeChecks).toBe('function');
+  });
+});
+
+describe('Patch<T>', () => {
+  it('merges nested records recursively while keeping arrays, maps, primitives, and nullability intact', () => {
+    interface NestedInput {
+      requiredTop: string;
+      nullableTop?: string | null;
+      record: {
+        requiredInner: string;
+        deep: {
+          requiredLeaf: number;
+          nullableLeaf?: number | null;
+        };
+      };
+      nullableRecord?: {
+        requiredField: boolean;
+      } | null;
+      items: Array<{ cost: number; ttl: string }>;
+      readonlyTags: readonly string[];
+      map: Record<string, { requiredVal: number; optionalVal?: string }>;
+      nullableMap?: Record<string, string> | null;
+    }
+
+    expectTypeOf<Patch<string>>().toEqualTypeOf<string>();
+    expectTypeOf<Patch<string | null>>().toEqualTypeOf<string | null>();
+    expectTypeOf<Patch<Array<{ cost: number; ttl: string }>>>().toEqualTypeOf<
+      Array<{ cost: number; ttl: string }>
+    >();
+    expectTypeOf<Patch<readonly string[]>>().toEqualTypeOf<readonly string[]>();
+    expectTypeOf<Patch<Record<string, string>>>().toEqualTypeOf<Record<string, string>>();
+    expectTypeOf<
+      Patch<Record<string, { requiredVal: number; optionalVal?: string }>>
+    >().toEqualTypeOf<Record<string, { requiredVal: number; optionalVal?: string }>>();
+    expectTypeOf<Patch<Record<string, unknown>>>().toEqualTypeOf<Record<string, unknown>>();
+    expectTypeOf<Patch<Record<string, string> | null>>().toEqualTypeOf<Record<
+      string,
+      string
+    > | null>();
+
+    const { transport } = makeClient();
+    const nested = new Collection<Widget, NestedInput>(transport, '/nested');
+    const nestedSingleton = new Singleton<Widget, NestedInput>(transport, '/nested/single');
+    const upstreams = new Collection<Upstream, UpstreamInput>(transport, '/upstreams');
+
+    const typeChecks = () => {
+      // Nested patch on a record with required members compiles
+      void nested.update('k', { record: { deep: { requiredLeaf: 42 } } });
+      void nestedSingleton.update({ record: { deep: { nullableLeaf: null } } });
+      void upstreams.update('u', { healthchecks: { active: { concurrency: 5 } } });
+
+      // Null stays allowed where input type allows it
+      void nested.update('k', { nullableTop: null, nullableRecord: null, nullableMap: null });
+
+      // Arrays and maps are given whole
+      void nested.update('k', { items: [{ cost: 1, ttl: '5m' }] });
+      void nested.update('k', { map: { primary: { requiredVal: 1 } } });
+
+      // Unknown field at any depth is an error
+      // @ts-expect-error unknown top-level field
+      void nested.update('k', { nope: true });
+      // @ts-expect-error unknown nested field
+      void nested.update('k', { record: { nope: true } });
+      // @ts-expect-error unknown deeply nested field
+      void nested.update('k', { record: { deep: { nope: true } } });
+      // @ts-expect-error unknown deeply nested field on singleton
+      void nestedSingleton.update({ record: { deep: { nope: true } } });
+      // @ts-expect-error unknown deeply nested field on UpstreamInput
+      void upstreams.update('u', { healthchecks: { active: { nope: 1 } } });
+
+      // Array element type is unchanged (required fields stay required)
+      // @ts-expect-error missing required ttl on array element
+      void nested.update('k', { items: [{ cost: 1 }] });
+
+      // Map value type is unchanged (required fields stay required)
+      // @ts-expect-error missing required requiredVal on map value
+      void nested.update('k', { map: { primary: {} } });
+
+      // Null is rejected where input type does not allow it
+      // @ts-expect-error requiredTop is not nullable
+      void nested.update('k', { requiredTop: null });
+      // @ts-expect-error record is not nullable
+      void nested.update('k', { record: null });
+    };
+
     expect(typeof typeChecks).toBe('function');
   });
 });

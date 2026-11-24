@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { PluginName } from '../../../src/generated/plugins.js';
 import { Transport } from '../../../src/transport.js';
 import { captureHttpError } from '../../support/errors.js';
 import { getLiveEnv } from '../../support/live.js';
-import { PLUGIN_FIXTURES, resolvePluginFixture } from '../../support/plugin-fixtures.js';
+import { PLUGIN_NAMES, resolvePluginFixture } from '../../support/plugin-fixtures.js';
 
 interface ValidationResponse {
   message: string;
 }
-
-const pluginNames = Object.keys(PLUGIN_FIXTURES).sort() as PluginName[];
 
 describe('plugin fixtures validation against live Kong', () => {
   const env = getLiveEnv();
@@ -37,7 +34,7 @@ describe('plugin fixtures validation against live Kong', () => {
     expect(typeof error.fields).toBe('object');
   });
 
-  it.each(pluginNames)('accepts %s fixture config and updated config', async (name) => {
+  it.each(PLUGIN_NAMES)('accepts %s fixture config and updated config', async (name) => {
     const fixture = resolvePluginFixture(name, env.target);
 
     const initial = await transport.request<ValidationResponse>({

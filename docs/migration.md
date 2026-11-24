@@ -83,6 +83,7 @@ In 2.x, internal `src/libs/*.lib.js` classes wrapped entity payloads and exposed
 | `Entity.findAll(url)`                                                               | `kong.<resource>.all()`                                                           |
 | `Entity.findById(url, id)`                                                          | `kong.<resource>.get(key)` or `kong.<resource>.find(key)`                         |
 | `Entity.delete(url, id)`                                                            | `kong.<resource>.delete(key)`                                                     |
+| `Entity.builder()` / `Entity.endpoint()` / `entity.endpoint()`                      | Internals of 2.x; no equivalent in 3.0                                            |
 | `entity.create(url)`                                                                | `kong.<resource>.create(input)`                                                   |
 | `entity.update(url)`                                                                | `kong.<resource>.update(key, patch)`                                              |
 | `entity.delete(url)`                                                                | `kong.<resource>.delete(key)`                                                     |

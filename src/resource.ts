@@ -2,6 +2,15 @@ import { KongHttpError } from './errors.js';
 import { collectAll, paginate, toListQuery, type ListParams, type Page } from './pagination.js';
 import { segment, type CallOptions, type Transport } from './transport.js';
 
+/** What `update` accepts. Kong merges records field by field, at any depth, and replaces arrays and maps as a whole. */
+export type Patch<T> = T extends readonly unknown[]
+  ? T
+  : T extends object
+    ? string extends keyof T
+      ? T
+      : { [K in keyof T]?: Patch<T[K]> }
+    : T;
+
 /**
  * Generic CRUD and pagination client for a Kong Admin API collection endpoint
  * (for example `/services` or `/services/billing/routes`).
@@ -74,7 +83,7 @@ export class Collection<E, I> {
   }
 
   /** Partially updates an existing entity by key (`PATCH`). */
-  async update(key: string, patch: Partial<I>, options?: CallOptions): Promise<E> {
+  async update(key: string, patch: Patch<I>, options?: CallOptions): Promise<E> {
     const encoded = segment(key);
     return this.transport.request<E>({
       method: 'PATCH',
@@ -143,7 +152,7 @@ export class Singleton<E, I> {
   }
 
   /** Partially updates the singleton entity (`PATCH`). */
-  update(patch: Partial<I>, options?: CallOptions): Promise<E> {
+  update(patch: Patch<I>, options?: CallOptions): Promise<E> {
     return this.transport.request<E>({
       method: 'PATCH',
       path: this.path,

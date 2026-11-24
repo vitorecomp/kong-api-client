@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import type { Collection, Consumer, ConsumerInput, Singleton } from '../../src/index.js';
+import type { Collection, Consumer, ConsumerInput, Patch, Singleton } from '../../src/index.js';
 import { deleteIgnoringNotFound, exerciseSingleton } from './crud.js';
 import { unique } from './live.js';
 
@@ -21,7 +21,7 @@ export interface CollectionTagResetOptions<
    * the changed field and that an untouched field retained its previous value.
    */
   update: {
-    patch: Partial<I>;
+    patch: Patch<I>;
     assertUpdated: (updated: E, before: E) => void;
   };
   /**

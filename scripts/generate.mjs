@@ -986,11 +986,11 @@ function generateResourcesSource(resourcesJson, entityContext) {
   return chunks.join('\n');
 }
 
-function collectSetPaths(node, currentPath, paths) {
+function collectSchemaPathsByType(node, targetType, currentPath, paths) {
   if (!isPlainObject(node)) {
     return;
   }
-  if (node.type === 'set' && currentPath) {
+  if (node.type === targetType && currentPath) {
     paths.add(currentPath);
   }
   if (Array.isArray(node.fields)) {
@@ -1000,18 +1000,42 @@ function collectSetPaths(node, currentPath, paths) {
       }
       for (const [fieldName, fieldDef] of Object.entries(entry)) {
         const nextPath = currentPath ? `${currentPath}.${fieldName}` : fieldName;
-        collectSetPaths(fieldDef, nextPath, paths);
+        collectSchemaPathsByType(fieldDef, targetType, nextPath, paths);
       }
     }
   }
   if ((node.type === 'array' || node.type === 'set') && isPlainObject(node.elements)) {
     const nextPath = currentPath ? `${currentPath}[]` : '[]';
-    collectSetPaths(node.elements, nextPath, paths);
+    collectSchemaPathsByType(node.elements, targetType, nextPath, paths);
   }
   if (node.type === 'map' && isPlainObject(node.values)) {
     const nextPath = currentPath ? `${currentPath}.*` : '*';
-    collectSetPaths(node.values, nextPath, paths);
+    collectSchemaPathsByType(node.values, targetType, nextPath, paths);
   }
+}
+
+function buildMetaEntries(entityNames, entityContext, pluginRecords, targetType) {
+  const entries = [];
+
+  for (const entity of entityNames) {
+    const paths = new Set();
+    collectSchemaPathsByType(entityContext.schemas39.get(entity), targetType, '', paths);
+    collectSchemaPathsByType(entityContext.schemas314.get(entity), targetType, '', paths);
+    const sorted = [...paths].sort();
+    entries.push(`${formatPropName(entity)}: [${sorted.map(formatLiteral).join(', ')}],`);
+  }
+
+  for (const plugin of pluginRecords) {
+    const paths = new Set();
+    collectSchemaPathsByType(plugin.config39, targetType, 'config', paths);
+    collectSchemaPathsByType(plugin.config314, targetType, 'config', paths);
+    const sorted = [...paths].sort();
+    entries.push(
+      `${formatPropName(`plugin:${plugin.name}`)}: [${sorted.map(formatLiteral).join(', ')}],`,
+    );
+  }
+
+  return entries;
 }
 
 function generateMetaSource(resourcesJson, entityContext, pluginRecords) {
@@ -1019,32 +1043,19 @@ function generateMetaSource(resourcesJson, entityContext, pluginRecords) {
     ...new Set(Object.values(resourcesJson.resources).map((resource) => resource.entity)),
   ].sort();
 
-  const entries = [];
-
-  for (const entity of entityNames) {
-    const paths = new Set();
-    collectSetPaths(entityContext.schemas39.get(entity), '', paths);
-    collectSetPaths(entityContext.schemas314.get(entity), '', paths);
-    const sorted = [...paths].sort();
-    entries.push(`${formatPropName(entity)}: [${sorted.map(formatLiteral).join(', ')}],`);
-  }
-
-  for (const plugin of pluginRecords) {
-    const paths = new Set();
-    collectSetPaths(plugin.config39, 'config', paths);
-    collectSetPaths(plugin.config314, 'config', paths);
-    const sorted = [...paths].sort();
-    entries.push(
-      `${formatPropName(`plugin:${plugin.name}`)}: [${sorted.map(formatLiteral).join(', ')}],`,
-    );
-  }
+  const setEntries = buildMetaEntries(entityNames, entityContext, pluginRecords, 'set');
+  const mapEntries = buildMetaEntries(entityNames, entityContext, pluginRecords, 'map');
 
   return (
     GENERATED_BANNER +
     formatJsDoc([
       'Paths of schema fields typed as `set` in Kong 3.9 or Kong Gateway 3.14, keyed by entity name and `plugin:<name>`.',
     ]) +
-    `export const SET_FIELDS: Readonly<Record<string, readonly string[]>> = {\n${entries.join('\n')}\n};\n`
+    `export const SET_FIELDS: Readonly<Record<string, readonly string[]>> = {\n${setEntries.join('\n')}\n};\n\n` +
+    formatJsDoc([
+      'Paths of schema fields typed as `map` in Kong 3.9 or Kong Gateway 3.14, keyed by entity name and `plugin:<name>`.',
+    ]) +
+    `export const MAP_FIELDS: Readonly<Record<string, readonly string[]>> = {\n${mapEntries.join('\n')}\n};\n`
   );
 }
 
@@ -1126,7 +1137,9 @@ function generatePluginExamplesSource(examplesJson, pluginRecords) {
     '  [N in PluginName]: PluginExample<N>;\n' +
     '};\n\n' +
     '/** Minimal valid plugin configs and updates generated from `schemas/plugin-examples.json`. */\n' +
-    `export const PLUGIN_EXAMPLES = {\n${entries.join(',\n')},\n} satisfies PluginExamplesMap;\n`
+    `export const PLUGIN_EXAMPLES = {\n${entries.join(',\n')},\n} satisfies PluginExamplesMap;\n\n` +
+    '/** Sorted names of all first-class plugins covered by `PLUGIN_EXAMPLES`. */\n' +
+    `export const PLUGIN_NAMES = [\n${[...pluginRecords.map((plugin) => plugin.name)].sort().map(formatLiteral).join(',\n')},\n] as const satisfies readonly PluginName[];\n`
   );
 }
 
