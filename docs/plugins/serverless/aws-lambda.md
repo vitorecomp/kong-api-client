@@ -1,0 +1,58 @@
+---
+title: AWS Lambda
+---
+
+# AWS Lambda (`aws-lambda`)
+
+- **Category:** Serverless
+- **Kong documentation:** [https://developer.konghq.com/plugins/aws-lambda/](https://developer.konghq.com/plugins/aws-lambda/)
+- **Targets:** `kong-3.9`, `kong-gateway-3.14`
+- **Scopes:** `global`, `service`, `route`, `consumer`
+- **Protocols:** `grpc`, `grpcs`, `http`, `https`
+
+## Example
+
+```ts
+import { Kong } from 'kong-api-client';
+
+const kong = new Kong({ adminUrl: 'http://localhost:8001' });
+
+await kong.plugins.enable('aws-lambda', {
+  on: { route: 'my-route' },
+  config: { aws_region: 'us-east-1', function_name: 'hello' },
+});
+```
+
+## Configuration fields
+
+| Field                                   | Type                                       | Required | Default             | Description                                                                                                                                                                                                                           |
+| --------------------------------------- | ------------------------------------------ | -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aws_assume_role_arn`                   | `string`                                   | No       | —                   | The target AWS IAM role ARN used to invoke the Lambda function.                                                                                                                                                                       |
+| `aws_imds_protocol_version`             | `'v1' \| 'v2'`                             | No       | `'v1'`              | Identifier to select the IMDS protocol version to use: `v1` or `v2`.                                                                                                                                                                  |
+| `aws_key`                               | `string`                                   | No       | —                   | The AWS key credential to be used when invoking the function.                                                                                                                                                                         |
+| `aws_region`                            | `string`                                   | No       | —                   | A string representing a host name, such as example.com.                                                                                                                                                                               |
+| `aws_role_session_name`                 | `string`                                   | No       | `'kong'`            | The identifier of the assumed role session.                                                                                                                                                                                           |
+| `aws_secret`                            | `string`                                   | No       | —                   | The AWS secret credential to be used when invoking the function.                                                                                                                                                                      |
+| `aws_sts_endpoint_url`                  | `string`                                   | No       | —                   | A string representing a URL, such as https://example.com/path/to/resource?q=search.                                                                                                                                                   |
+| `awsgateway_compatible`                 | `boolean`                                  | No       | `false`             | An optional value that defines whether the plugin should wrap requests into the Amazon API gateway.                                                                                                                                   |
+| `base64_encode_body`                    | `boolean`                                  | No       | `true`              | An optional value that Base64-encodes the request body.                                                                                                                                                                               |
+| `disable_https`                         | `boolean`                                  | No       | `false`             | —                                                                                                                                                                                                                                     |
+| `empty_arrays_mode`                     | `'correct' \| 'legacy'`                    | No       | `'legacy'`          | An optional value that defines whether Kong should send empty arrays (returned by Lambda function) as `[]` arrays or `{}` objects in JSON responses. The value `legacy` means Kong will send empty arrays as `{}` objects in response |
+| `forward_request_body`                  | `boolean`                                  | No       | `false`             | An optional value that defines whether the request body is sent in the request_body field of the JSON-encoded request. If the body arguments can be parsed, they are sent in the separate request_body_args field of the request.     |
+| `forward_request_headers`               | `boolean`                                  | No       | `false`             | An optional value that defines whether the original HTTP request headers are sent as a map in the request_headers field of the JSON-encoded request.                                                                                  |
+| `forward_request_method`                | `boolean`                                  | No       | `false`             | An optional value that defines whether the original HTTP request method verb is sent in the request_method field of the JSON-encoded request.                                                                                         |
+| `forward_request_uri`                   | `boolean`                                  | No       | `false`             | An optional value that defines whether the original HTTP request URI is sent in the request_uri field of the JSON-encoded request.                                                                                                    |
+| `function_name`                         | `string`                                   | No       | —                   | The AWS Lambda function to invoke. Both function name and function ARN (including partial) are supported.                                                                                                                             |
+| `host`                                  | `string`                                   | No       | —                   | A string representing a host name, such as example.com.                                                                                                                                                                               |
+| `invocation_type`                       | `'DryRun' \| 'Event' \| 'RequestResponse'` | No       | `'RequestResponse'` | The InvocationType to use when invoking the function. Available types are RequestResponse, Event, DryRun.                                                                                                                             |
+| `is_proxy_integration`                  | `boolean`                                  | No       | `false`             | An optional value that defines whether the response format to receive from the Lambda to this format.                                                                                                                                 |
+| `keepalive`                             | `number`                                   | No       | `60000`             | An optional value in milliseconds that defines how long an idle connection lives before being closed.                                                                                                                                 |
+| `log_type`                              | `'None' \| 'Tail'`                         | No       | `'Tail'`            | The LogType to use when invoking the function. By default, None and Tail are supported.                                                                                                                                               |
+| `port`                                  | `number`                                   | No       | `443`               | An integer representing a port number between 0 and 65535, inclusive.                                                                                                                                                                 |
+| `proxy_url`                             | `string`                                   | No       | —                   | A string representing a URL, such as https://example.com/path/to/resource?q=search.                                                                                                                                                   |
+| `qualifier`                             | `string`                                   | No       | —                   | The qualifier to use when invoking the function.                                                                                                                                                                                      |
+| `skip_large_bodies`                     | `boolean`                                  | No       | `true`              | An optional value that defines whether Kong should send large bodies that are buffered to disk                                                                                                                                        |
+| `timeout`                               | `number`                                   | No       | `60000`             | An optional timeout in milliseconds when invoking the function.                                                                                                                                                                       |
+| `unhandled_status`                      | `number`                                   | No       | —                   | The response status code to use (instead of the default 200, 202, or 204) in the case of an Unhandled Function Error.                                                                                                                 |
+| `awsgateway_compatible_payload_version` | `'1.0' \| '2.0'`                           | No       | `'1.0'`             | Kong Gateway 3.14 only.                                                                                                                                                                                                               |
+| `ssl_verify`                            | `boolean`                                  | No       | `true`              | Kong Gateway 3.14 only.                                                                                                                                                                                                               |

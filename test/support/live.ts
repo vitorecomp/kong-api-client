@@ -1,4 +1,8 @@
 import { randomBytes } from 'node:crypto';
+import { appendFileSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Kong, type KongOptions } from '../../src/index.js';
 
 export type LiveTarget = 'oss-3.9' | 'ee-3.14';
 
@@ -46,6 +50,53 @@ export function getLiveEnv(): LiveEnv {
     upstreamUrl: requireEnv('KONG_UPSTREAM_URL'),
     upstreamInternalUrl: requireEnv('KONG_UPSTREAM_INTERNAL_URL'),
   };
+}
+
+export function liveRequestLogPath(target: LiveTarget = getLiveEnv().target): string {
+  return fileURLToPath(new URL(`../../coverage/live-requests-${target}.jsonl`, import.meta.url));
+}
+
+function createLoggingFetch(
+  logPath: string,
+  baseFetch: typeof globalThis.fetch = globalThis.fetch,
+): typeof globalThis.fetch {
+  mkdirSync(dirname(logPath), { recursive: true });
+  return async (input, init) => {
+    const response = await baseFetch(input, init);
+    const rawUrl =
+      typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    const parsed = new URL(rawUrl);
+    const method = (
+      init?.method ?? (input instanceof Request ? input.method : 'GET')
+    ).toUpperCase();
+    const record = JSON.stringify({
+      method,
+      path: parsed.pathname,
+      status: response.status,
+    });
+    appendFileSync(logPath, `${record}\n`, 'utf8');
+    return response;
+  };
+}
+
+export function liveKong(options: Partial<Omit<KongOptions, 'adminUrl'>> = {}): Kong {
+  const env = getLiveEnv();
+  const logPath = liveRequestLogPath(env.target);
+  return new Kong({
+    ...options,
+    adminUrl: env.adminUrl,
+    fetch: createLoggingFetch(logPath, options.fetch),
+  });
+}
+
+export function liveDblessKong(options: Partial<Omit<KongOptions, 'adminUrl'>> = {}): Kong {
+  const env = getLiveEnv();
+  const logPath = liveRequestLogPath(env.target);
+  return new Kong({
+    ...options,
+    adminUrl: env.dblessAdminUrl,
+    fetch: createLoggingFetch(logPath, options.fetch),
+  });
 }
 
 export function getProxyUrl(): string {

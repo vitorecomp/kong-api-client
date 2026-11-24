@@ -1,0 +1,623 @@
+{
+  "$comment": "Minimal valid plugin configurations and update patches used by both the live fixture suite and the generated plugin reference pages.",
+  "plugins": {
+    "acl": {
+      "scope": "route",
+      "config": {
+        "allow": ["admins"]
+      },
+      "update": {
+        "patch": {
+          "hide_groups_header": true
+        },
+        "field": "hide_groups_header",
+        "value": true
+      }
+    },
+    "acme": {
+      "scope": "global",
+      "config": {
+        "account_email": "admin@example.com",
+        "tos_accepted": true
+      },
+      "update": {
+        "patch": {
+          "renew_threshold_days": 7
+        },
+        "field": "renew_threshold_days",
+        "value": 7
+      }
+    },
+    "ai-prompt-decorator": {
+      "scope": "route",
+      "config": {
+        "prompts": {
+          "prepend": [
+            {
+              "role": "system",
+              "content": "Answer concisely."
+            }
+          ]
+        }
+      },
+      "update": {
+        "patch": {
+          "max_request_body_size": 16384
+        },
+        "field": "max_request_body_size",
+        "value": 16384
+      }
+    },
+    "ai-prompt-guard": {
+      "scope": "route",
+      "config": {
+        "deny_patterns": ["ignore previous instructions"]
+      },
+      "update": {
+        "patch": {
+          "max_request_body_size": 16384
+        },
+        "field": "max_request_body_size",
+        "value": 16384
+      }
+    },
+    "ai-prompt-template": {
+      "scope": "route",
+      "config": {
+        "templates": [
+          {
+            "name": "greet",
+            "template": "{\"messages\":[{\"role\":\"user\",\"content\":\"Hello {{name}}\"}]}"
+          }
+        ]
+      },
+      "update": {
+        "patch": {
+          "log_original_request": true
+        },
+        "field": "log_original_request",
+        "value": true
+      }
+    },
+    "ai-proxy": {
+      "scope": "route",
+      "config": {
+        "route_type": "llm/v1/chat",
+        "model": {
+          "provider": "openai",
+          "name": "gpt-4o-mini"
+        },
+        "auth": {
+          "header_name": "Authorization",
+          "header_value": "Bearer test-key"
+        }
+      },
+      "update": {
+        "patch": {
+          "model_name_header": false
+        },
+        "field": "model_name_header",
+        "value": false
+      }
+    },
+    "ai-request-transformer": {
+      "scope": "route",
+      "config": {
+        "prompt": "Normalize the incoming request payload.",
+        "llm": {
+          "route_type": "llm/v1/chat",
+          "model": {
+            "provider": "openai",
+            "name": "gpt-4o-mini"
+          },
+          "auth": {
+            "header_name": "Authorization",
+            "header_value": "Bearer test-key"
+          }
+        }
+      },
+      "update": {
+        "patch": {
+          "http_timeout": 30000
+        },
+        "field": "http_timeout",
+        "value": 30000
+      }
+    },
+    "ai-response-transformer": {
+      "scope": "route",
+      "config": {
+        "prompt": "Summarize the upstream response.",
+        "llm": {
+          "route_type": "llm/v1/chat",
+          "model": {
+            "provider": "openai",
+            "name": "gpt-4o-mini"
+          },
+          "auth": {
+            "header_name": "Authorization",
+            "header_value": "Bearer test-key"
+          }
+        }
+      },
+      "update": {
+        "patch": {
+          "http_timeout": 30000
+        },
+        "field": "http_timeout",
+        "value": 30000
+      }
+    },
+    "aws-lambda": {
+      "scope": "route",
+      "config": {
+        "aws_region": "us-east-1",
+        "function_name": "hello"
+      },
+      "update": {
+        "patch": {
+          "timeout": 30000
+        },
+        "field": "timeout",
+        "value": 30000
+      }
+    },
+    "azure-functions": {
+      "scope": "route",
+      "config": {
+        "appname": "example-app",
+        "functionname": "hello"
+      },
+      "update": {
+        "patch": {
+          "timeout": 30000
+        },
+        "field": "timeout",
+        "value": 30000
+      }
+    },
+    "basic-auth": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "realm": "api"
+        },
+        "field": "realm",
+        "value": "api"
+      }
+    },
+    "bot-detection": {
+      "scope": "route",
+      "config": {
+        "deny": ["badbot"]
+      },
+      "update": {
+        "patch": {
+          "allow": ["goodbot"]
+        },
+        "field": "allow",
+        "value": ["goodbot"]
+      }
+    },
+    "correlation-id": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "echo_downstream": true
+        },
+        "field": "echo_downstream",
+        "value": true
+      }
+    },
+    "cors": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "credentials": true
+        },
+        "field": "credentials",
+        "value": true
+      }
+    },
+    "datadog": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "prefix": "kong_test"
+        },
+        "field": "prefix",
+        "value": "kong_test"
+      }
+    },
+    "file-log": {
+      "scope": "route",
+      "config": {
+        "path": "/tmp/kong-file-log.log"
+      },
+      "update": {
+        "patch": {
+          "reopen": true
+        },
+        "field": "reopen",
+        "value": true
+      }
+    },
+    "grpc-gateway": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "proto": "example.proto"
+        },
+        "field": "proto",
+        "value": "example.proto"
+      }
+    },
+    "grpc-web": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "allow_origin_header": "https://example.com"
+        },
+        "field": "allow_origin_header",
+        "value": "https://example.com"
+      }
+    },
+    "hmac-auth": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "clock_skew": 600
+        },
+        "field": "clock_skew",
+        "value": 600
+      }
+    },
+    "http-log": {
+      "scope": "route",
+      "config": {
+        "http_endpoint": "http://upstream:8080/collect"
+      },
+      "update": {
+        "patch": {
+          "timeout": 5000
+        },
+        "field": "timeout",
+        "value": 5000
+      }
+    },
+    "ip-restriction": {
+      "scope": "route",
+      "config": {
+        "allow": ["127.0.0.1"]
+      },
+      "update": {
+        "patch": {
+          "status": 403
+        },
+        "field": "status",
+        "value": 403
+      }
+    },
+    "jwt": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "key_claim_name": "sub"
+        },
+        "field": "key_claim_name",
+        "value": "sub"
+      }
+    },
+    "key-auth": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "key_in_body": true
+        },
+        "field": "key_in_body",
+        "value": true
+      }
+    },
+    "ldap-auth": {
+      "scope": "route",
+      "config": {
+        "ldap_host": "ldap.example.com",
+        "base_dn": "dc=example,dc=com",
+        "attribute": "cn"
+      },
+      "update": {
+        "patch": {
+          "cache_ttl": 120
+        },
+        "field": "cache_ttl",
+        "value": 120
+      }
+    },
+    "loggly": {
+      "scope": "route",
+      "config": {
+        "key": "00000000-0000-0000-0000-000000000000"
+      },
+      "update": {
+        "patch": {
+          "port": 1514
+        },
+        "field": "port",
+        "value": 1514
+      }
+    },
+    "oauth2": {
+      "scope": "route",
+      "config": {
+        "enable_client_credentials": true
+      },
+      "update": {
+        "patch": {
+          "token_expiration": 3600
+        },
+        "field": "token_expiration",
+        "value": 3600
+      }
+    },
+    "opentelemetry": {
+      "scope": "route",
+      "config": {
+        "traces_endpoint": "http://upstream:8080/collect"
+      },
+      "update": {
+        "patch": {
+          "connect_timeout": 2000
+        },
+        "field": "connect_timeout",
+        "value": 2000
+      }
+    },
+    "post-function": {
+      "scope": "route",
+      "config": {
+        "access": ["return"]
+      },
+      "update": {
+        "patch": {
+          "log": ["return"]
+        },
+        "field": "log",
+        "value": ["return"]
+      }
+    },
+    "pre-function": {
+      "scope": "route",
+      "config": {
+        "access": ["return"]
+      },
+      "update": {
+        "patch": {
+          "log": ["return"]
+        },
+        "field": "log",
+        "value": ["return"]
+      }
+    },
+    "prometheus": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "per_consumer": true
+        },
+        "field": "per_consumer",
+        "value": true
+      }
+    },
+    "proxy-cache": {
+      "scope": "route",
+      "config": {
+        "strategy": "memory"
+      },
+      "update": {
+        "patch": {
+          "cache_ttl": 60
+        },
+        "field": "cache_ttl",
+        "value": 60
+      }
+    },
+    "rate-limiting": {
+      "scope": "route",
+      "config": {
+        "minute": 100
+      },
+      "update": {
+        "patch": {
+          "minute": 200
+        },
+        "field": "minute",
+        "value": 200
+      }
+    },
+    "redirect": {
+      "scope": "route",
+      "config": {
+        "location": "https://example.com"
+      },
+      "update": {
+        "patch": {
+          "status_code": 302
+        },
+        "field": "status_code",
+        "value": 302
+      }
+    },
+    "request-size-limiting": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "allowed_payload_size": 64
+        },
+        "field": "allowed_payload_size",
+        "value": 64
+      }
+    },
+    "request-termination": {
+      "scope": "route",
+      "config": {
+        "status_code": 503
+      },
+      "update": {
+        "patch": {
+          "message": "maintenance"
+        },
+        "field": "message",
+        "value": "maintenance"
+      }
+    },
+    "request-transformer": {
+      "scope": "route",
+      "config": {
+        "add": {
+          "headers": ["X-Test:1"]
+        }
+      },
+      "update": {
+        "patch": {
+          "http_method": "POST"
+        },
+        "field": "http_method",
+        "value": "POST"
+      }
+    },
+    "response-ratelimiting": {
+      "scope": "route",
+      "config": {
+        "limits": {
+          "video": {
+            "minute": 10
+          }
+        }
+      },
+      "update": {
+        "patch": {
+          "header_name": "x-custom-limit"
+        },
+        "field": "header_name",
+        "value": "x-custom-limit"
+      }
+    },
+    "response-transformer": {
+      "scope": "route",
+      "config": {
+        "add": {
+          "headers": ["X-Test:1"]
+        }
+      },
+      "update": {
+        "patch": {
+          "remove": {
+            "headers": ["X-Remove"],
+            "json": []
+          }
+        },
+        "field": "remove",
+        "value": {
+          "headers": ["X-Remove"],
+          "json": []
+        }
+      }
+    },
+    "session": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "cookie_name": "kong_session"
+        },
+        "field": "cookie_name",
+        "value": "kong_session"
+      }
+    },
+    "standard-webhooks": {
+      "scope": "route",
+      "config": {
+        "secret_v1": "dGVzdC1zZWNyZXQ="
+      },
+      "update": {
+        "patch": {
+          "tolerance_second": 600
+        },
+        "field": "tolerance_second",
+        "value": 600
+      }
+    },
+    "statsd": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "prefix": "kong_test"
+        },
+        "field": "prefix",
+        "value": "kong_test"
+      }
+    },
+    "syslog": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "log_level": "notice"
+        },
+        "field": "log_level",
+        "value": "notice"
+      }
+    },
+    "tcp-log": {
+      "scope": "route",
+      "config": {
+        "host": "127.0.0.1",
+        "port": 9999
+      },
+      "update": {
+        "patch": {
+          "timeout": 5000
+        },
+        "field": "timeout",
+        "value": 5000
+      }
+    },
+    "udp-log": {
+      "scope": "route",
+      "config": {
+        "host": "127.0.0.1",
+        "port": 9999
+      },
+      "update": {
+        "patch": {
+          "timeout": 5000
+        },
+        "field": "timeout",
+        "value": 5000
+      }
+    },
+    "zipkin": {
+      "scope": "route",
+      "config": {},
+      "update": {
+        "patch": {
+          "connect_timeout": 3000
+        },
+        "field": "connect_timeout",
+        "value": 3000
+      }
+    }
+  }
+}

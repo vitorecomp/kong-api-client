@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { eventually, getLiveEnv, getUpstreamRequests, unique } from '../support/live.js';
+import { deleteIgnoringNotFound } from '../support/crud.js';
+import {
+  eventually,
+  getLiveEnv,
+  getUpstreamRequests,
+  liveDblessKong,
+  liveKong,
+  unique,
+} from '../support/live.js';
 
 interface NodeInfo {
   version: string;
@@ -16,10 +24,6 @@ interface ConfigResponse {
   config: string;
 }
 
-interface ServicesPage {
-  data: Array<{ id: string; name: string | null }>;
-}
-
 const EXPECTED_VERSION_PREFIX: Record<'oss-3.9' | 'ee-3.14', string> = {
   'oss-3.9': '3.9.',
   'ee-3.14': '3.14.',
@@ -27,11 +31,11 @@ const EXPECTED_VERSION_PREFIX: Record<'oss-3.9' | 'ee-3.14', string> = {
 
 describe('live smoke test', () => {
   const env = getLiveEnv();
+  const kong = liveKong();
+  const dbless = liveDblessKong();
 
   it('reports the expected Kong version from GET /', async () => {
-    const response = await fetch(`${env.adminUrl}/`);
-    expect(response.status).toBe(200);
-    const info = (await response.json()) as NodeInfo;
+    const info = await kong.request<NodeInfo>({ path: '/' });
     expect(info.version.startsWith(EXPECTED_VERSION_PREFIX[env.target])).toBe(true);
   });
 
@@ -46,27 +50,19 @@ describe('live smoke test', () => {
     let serviceCreated = false;
 
     try {
-      const createService = await fetch(`${env.adminUrl}/services`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name: serviceName,
-          url: `${env.upstreamInternalUrl}/echo`,
-        }),
+      const service = await kong.services.create({
+        name: serviceName,
+        url: `${env.upstreamInternalUrl}/echo`,
       });
-      expect(createService.status).toBe(201);
+      expect(service.name).toBe(serviceName);
       serviceCreated = true;
 
-      const createRoute = await fetch(`${env.adminUrl}/services/${serviceName}/routes`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name: routeName,
-          paths: [routePrefix],
-          protocols: ['http', 'https'],
-        }),
+      const route = await kong.services.routes(serviceName).create({
+        name: routeName,
+        paths: [routePrefix],
+        protocols: ['http', 'https'],
       });
-      expect(createRoute.status).toBe(201);
+      expect(route.name).toBe(routeName);
       routeCreated = true;
 
       const echo = await eventually<EchoResponse>(async () => {
@@ -95,16 +91,10 @@ describe('live smoke test', () => {
       ).toBe(true);
     } finally {
       if (routeCreated) {
-        const delRoute = await fetch(`${env.adminUrl}/routes/${routeName}`, {
-          method: 'DELETE',
-        });
-        expect([204, 404]).toContain(delRoute.status);
+        await deleteIgnoringNotFound(() => kong.routes.delete(routeName));
       }
       if (serviceCreated) {
-        const delService = await fetch(`${env.adminUrl}/services/${serviceName}`, {
-          method: 'DELETE',
-        });
-        expect([204, 404]).toContain(delService.status);
+        await deleteIgnoringNotFound(() => kong.services.delete(serviceName));
       }
     }
   });
@@ -113,15 +103,13 @@ describe('live smoke test', () => {
     const serviceName = unique('dbless-smoke-svc');
 
     try {
-      const initialConfig = await fetch(`${env.dblessAdminUrl}/config`);
-      expect(initialConfig.status).toBe(200);
-      const configBody = (await initialConfig.json()) as ConfigResponse;
+      const configBody = await dbless.request<ConfigResponse>({ path: '/config' });
       expect(typeof configBody.config).toBe('string');
 
-      const applyConfig = await fetch(`${env.dblessAdminUrl}/config`, {
+      await dbless.request({
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
+        path: '/config',
+        body: {
           _format_version: '3.0',
           services: [
             {
@@ -129,21 +117,17 @@ describe('live smoke test', () => {
               url: `${env.upstreamInternalUrl}/echo`,
             },
           ],
-        }),
+        },
       });
-      expect(applyConfig.status).toBe(201);
 
-      const servicesRes = await fetch(`${env.dblessAdminUrl}/services`);
-      expect(servicesRes.status).toBe(200);
-      const services = (await servicesRes.json()) as ServicesPage;
+      const services = await dbless.services.list();
       expect(services.data.some((svc) => svc.name === serviceName)).toBe(true);
     } finally {
-      const resetConfig = await fetch(`${env.dblessAdminUrl}/config`, {
+      await dbless.request({
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ _format_version: '3.0' }),
+        path: '/config',
+        body: { _format_version: '3.0' },
       });
-      expect(resetConfig.status).toBe(201);
     }
   });
 });

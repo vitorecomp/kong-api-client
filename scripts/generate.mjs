@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * Generates TypeScript types, metadata, and resource classes from recorded Kong Admin API schemas.
+ * Generates TypeScript types, metadata, resource classes, typed plugin examples,
+ * and plugin reference documentation from recorded Kong Admin API schemas.
  *
  * Usage:
  *   node scripts/generate.mjs          # write generated files
  *   node scripts/generate.mjs --check  # verify committed files are up to date
  */
 
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'prettier';
@@ -110,6 +111,13 @@ function capitalize(str) {
 
 function lowerCamel(str) {
   return str ? str[0].toLowerCase() + str.slice(1) : '';
+}
+
+function slugifyCategory(category) {
+  return category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function pluginConfigInterfaceName(pluginName) {
@@ -518,6 +526,28 @@ async function listJsonNames(dirPath) {
     .sort();
 }
 
+async function listFilesRecursive(dirPath, prefix = '') {
+  let entries;
+  try {
+    entries = await readdir(dirPath, { withFileTypes: true });
+  } catch (err) {
+    if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
+      return [];
+    }
+    throw err;
+  }
+  const files = [];
+  for (const entry of entries) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      files.push(...(await listFilesRecursive(path.join(dirPath, entry.name), rel)));
+    } else if (entry.isFile()) {
+      files.push(rel);
+    }
+  }
+  return files.sort();
+}
+
 async function loadEntityContext(resourcesJson) {
   const dir39 = path.join(REPO_ROOT, 'schemas', TARGET_39, 'entities');
   const dir314 = path.join(REPO_ROOT, 'schemas', TARGET_314, 'entities');
@@ -595,7 +625,7 @@ function findForeignFieldsReferencing(childEntity, parentEntity, entityContext) 
   return matches;
 }
 
-async function generatePluginsSource(entityContext) {
+async function loadPluginRecords() {
   const categoriesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'plugin-categories.json'));
   const dir39 = path.join(REPO_ROOT, 'schemas', TARGET_39, 'plugins');
   const dir314 = path.join(REPO_ROOT, 'schemas', TARGET_314, 'plugins');
@@ -604,30 +634,14 @@ async function generatePluginsSource(entityContext) {
   const names314Set = new Set(await listJsonNames(dir314));
   const pluginNames = [...new Set([...names39, ...names314Set])].sort();
 
-  const chunks = [GENERATED_BANNER];
-  const configMapEntries = [];
-  const pluginsMetadataEntries = [];
-
-  for (const pluginName of pluginNames) {
-    const schema39 = await readJsonIfExists(path.join(dir39, `${pluginName}.json`));
-    const schema314 = await readJsonIfExists(path.join(dir314, `${pluginName}.json`));
-    const config39 = fieldsArrayToMap(schema39?.fields).get('config');
-    const config314 = fieldsArrayToMap(schema314?.fields).get('config');
-
-    const meta = categoriesJson.plugins[pluginName];
+  const records = [];
+  for (const name of pluginNames) {
+    const schema39 = await readJsonIfExists(path.join(dir39, `${name}.json`));
+    const schema314 = await readJsonIfExists(path.join(dir314, `${name}.json`));
+    const meta = categoriesJson.plugins[name];
     if (!meta) {
-      throw new Error(`Plugin "${pluginName}" is missing from schemas/plugin-categories.json`);
+      throw new Error(`Plugin "${name}" is missing from schemas/plugin-categories.json`);
     }
-
-    const ifaceName = pluginConfigInterfaceName(pluginName);
-    const members = renderRecordMembers(config39, config314, 'accepted', false, entityContext);
-    const ifaceDoc = formatJsDoc([
-      `Configuration for the \`${pluginName}\` (${meta.title}) plugin.`,
-    ]);
-    chunks.push(`${ifaceDoc}export interface ${ifaceName} {\n${members}}\n`);
-
-    configMapEntries.push(`${formatPropName(pluginName)}: ${ifaceName};`);
-
     const targets = [];
     if (schema39) {
       targets.push(TARGET_39);
@@ -635,16 +649,50 @@ async function generatePluginsSource(entityContext) {
     if (schema314) {
       targets.push(TARGET_314);
     }
-    const scopes = extractPluginScopes(schema39, schema314);
-    const protocols = extractPluginProtocols(schema39, schema314);
+    records.push({
+      name,
+      category: meta.category,
+      categorySlug: slugifyCategory(meta.category),
+      title: meta.title,
+      targets,
+      scopes: extractPluginScopes(schema39, schema314),
+      protocols: extractPluginProtocols(schema39, schema314),
+      config39: fieldsArrayToMap(schema39?.fields).get('config'),
+      config314: fieldsArrayToMap(schema314?.fields).get('config'),
+    });
+  }
+
+  return records;
+}
+
+function generatePluginsSource(pluginRecords, entityContext) {
+  const chunks = [GENERATED_BANNER];
+  const configMapEntries = [];
+  const pluginsMetadataEntries = [];
+
+  for (const plugin of pluginRecords) {
+    const ifaceName = pluginConfigInterfaceName(plugin.name);
+    const members = renderRecordMembers(
+      plugin.config39,
+      plugin.config314,
+      'accepted',
+      false,
+      entityContext,
+    );
+    const ifaceDoc = formatJsDoc([
+      `Configuration for the \`${plugin.name}\` (${plugin.title}) plugin.`,
+    ]);
+    chunks.push(`${ifaceDoc}export interface ${ifaceName} {\n${members}}\n`);
+
+    configMapEntries.push(`${formatPropName(plugin.name)}: ${ifaceName};`);
 
     pluginsMetadataEntries.push(
-      `${formatPropName(pluginName)}: {\n` +
-        `category: ${formatLiteral(meta.category)},\n` +
-        `title: ${formatLiteral(meta.title)},\n` +
-        `targets: [${targets.map(formatLiteral).join(', ')}],\n` +
-        `scopes: [${scopes.map(formatLiteral).join(', ')}],\n` +
-        `protocols: [${protocols.map(formatLiteral).join(', ')}],\n` +
+      `${formatPropName(plugin.name)}: {\n` +
+        `category: ${formatLiteral(plugin.category)},\n` +
+        `title: ${formatLiteral(plugin.title)},\n` +
+        `targets: [${plugin.targets.map(formatLiteral).join(', ')}],\n` +
+        `scopes: [${plugin.scopes.map(formatLiteral).join(', ')}],\n` +
+        `protocols: [${plugin.protocols.map(formatLiteral).join(', ')}],\n` +
         `},`,
     );
   }
@@ -912,6 +960,439 @@ function generateResourcesSource(resourcesJson, entityContext) {
   return chunks.join('\n');
 }
 
+function renderTsValue(value) {
+  if (value === null) {
+    return 'null';
+  }
+  if (typeof value === 'string') {
+    return formatLiteral(value);
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(renderTsValue).join(', ')}]`;
+  }
+  if (isPlainObject(value)) {
+    const entries = Object.entries(value).map(
+      ([k, v]) => `${formatPropName(k)}: ${renderTsValue(v)}`,
+    );
+    return `{ ${entries.join(', ')} }`;
+  }
+  throw new Error(`Unsupported value in plugin-examples.json: ${typeof value}`);
+}
+
+function generatePluginExamplesSource(examplesJson, pluginRecords) {
+  const entries = [];
+  for (const plugin of pluginRecords) {
+    const example = examplesJson.plugins[plugin.name];
+    if (!example) {
+      throw new Error(`Plugin "${plugin.name}" is missing from schemas/plugin-examples.json`);
+    }
+    const fields = [
+      `config: ${renderTsValue(example.config)}`,
+      `scope: ${formatLiteral(example.scope)}`,
+      `update: { patch: ${renderTsValue(example.update.patch)}, field: ${formatLiteral(example.update.field)}, value: ${renderTsValue(example.update.value)} }`,
+    ];
+    if (example.only !== undefined) {
+      fields.push(`only: ${renderTsValue(example.only)}`);
+    }
+    entries.push(`${formatPropName(plugin.name)}: {\n${fields.join(',\n')},\n}`);
+  }
+
+  return (
+    GENERATED_BANNER +
+    "import type { PluginConfigs, PluginName, PluginScopeName } from '../../src/generated/plugins.js';\n" +
+    "import type { LiveTarget } from './live.js';\n\n" +
+    '/** Small config update specification for a plugin example. */\n' +
+    'export type PluginExampleUpdate<N extends PluginName> = N extends PluginName\n' +
+    '  ? {\n' +
+    '      [K in keyof PluginConfigs[N] & string]: {\n' +
+    '        /** Partial config patch merged onto `config` for an update test. */\n' +
+    '        patch: Partial<PluginConfigs[N]>;\n' +
+    '        /** Top-level config field expected to match `value` after applying `patch`. */\n' +
+    '        field: K;\n' +
+    '        /** Expected value of `config[field]` after applying `patch`. */\n' +
+    '        value: PluginConfigs[N][K];\n' +
+    '      };\n' +
+    '    }[keyof PluginConfigs[N] & string]\n' +
+    '  : never;\n\n' +
+    '/** Target-specific overrides for a plugin example when Kong 3.9 and 3.14 differ. */\n' +
+    'export interface PluginExampleOverride<N extends PluginName> {\n' +
+    '  config?: PluginConfigs[N];\n' +
+    '  update?: PluginExampleUpdate<N>;\n' +
+    '}\n\n' +
+    '/** Validated example describing a minimal working configuration for plugin `N`. */\n' +
+    'export interface PluginExample<N extends PluginName> {\n' +
+    '  /** Minimal valid config accepted by Kong for plugin `N`. */\n' +
+    '  config: PluginConfigs[N];\n' +
+    '  /** Scope where tests attach this plugin, taken from `PLUGINS[N].scopes`. */\n' +
+    '  scope: PluginScopeName;\n' +
+    '  /** Small config change for an update test plus the field and value expected afterwards. */\n' +
+    '  update: PluginExampleUpdate<N>;\n' +
+    '  /** Target-specific overrides when a config or update differs between targets. */\n' +
+    '  only?: Partial<Record<LiveTarget, PluginExampleOverride<N>>>;\n' +
+    '}\n\n' +
+    '/** Exhaustive map of plugin examples keyed by every first-class `PluginName`. */\n' +
+    'export type PluginExamplesMap = {\n' +
+    '  [N in PluginName]: PluginExample<N>;\n' +
+    '};\n\n' +
+    '/** Minimal valid plugin configs and updates generated from `schemas/plugin-examples.json`. */\n' +
+    `export const PLUGIN_EXAMPLES = {\n${entries.join(',\n')},\n} satisfies PluginExamplesMap;\n`
+  );
+}
+
+function escapeMarkdownCell(text) {
+  return String(text).replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').trim().replaceAll('|', '\\|');
+}
+
+function formatMarkdownCode(text) {
+  const escaped = escapeMarkdownCell(text);
+  if (escaped.includes('`')) {
+    return `\`\` ${escaped} \`\``;
+  }
+  return `\`${escaped}\``;
+}
+
+function formatDocDefaultValue(value) {
+  if (Array.isArray(value) && value.length > 0 && value.every((item) => isPlainObject(item))) {
+    const serialized = JSON.stringify(value);
+    if (serialized.length > 100) {
+      return `${value.length} default items`;
+    }
+  }
+  if (isPlainObject(value)) {
+    const serialized = JSON.stringify(value);
+    if (serialized.length > 100) {
+      return 'object (see nested defaults)';
+    }
+  }
+  return formatMarkdownCode(
+    typeof value === 'string' ? formatLiteral(value) : JSON.stringify(value),
+  );
+}
+
+function formatDocDefaultCell(def39, def314) {
+  const has39 = hasNonNullDefault(def39);
+  const has314 = hasNonNullDefault(def314);
+  if (def39 && def314) {
+    if (has39 && has314) {
+      if (stableStringify(def39.default) === stableStringify(def314.default)) {
+        return formatDocDefaultValue(def39.default);
+      }
+      return `${LABEL_39}: ${formatDocDefaultValue(def39.default)}; ${LABEL_314}: ${formatDocDefaultValue(def314.default)}`;
+    }
+    if (has39) {
+      return `${LABEL_39}: ${formatDocDefaultValue(def39.default)}; ${LABEL_314}: none`;
+    }
+    if (has314) {
+      return `${LABEL_39}: none; ${LABEL_314}: ${formatDocDefaultValue(def314.default)}`;
+    }
+    return '—';
+  }
+  if (has39) {
+    return formatDocDefaultValue(def39.default);
+  }
+  if (has314) {
+    return formatDocDefaultValue(def314.default);
+  }
+  return '—';
+}
+
+function formatDocTypeSingle(def39, def314, entityContext) {
+  const sole = def39 ?? def314;
+  const kongType = sole.type;
+
+  switch (kongType) {
+    case 'string': {
+      const merged = mergeOneOf(def39?.one_of, def314?.one_of);
+      if (merged && merged.values.length > 0) {
+        return merged.values.map(formatLiteral).join(' | ');
+      }
+      return 'string';
+    }
+    case 'integer':
+    case 'number': {
+      const merged = mergeOneOf(def39?.one_of, def314?.one_of);
+      if (merged && merged.values.length > 0) {
+        return merged.values.map(formatLiteral).join(' | ');
+      }
+      return 'number';
+    }
+    case 'boolean':
+      return 'boolean';
+    case 'array':
+    case 'set': {
+      const elem39 = def39?.elements;
+      const elem314 = def314?.elements;
+      if (!elem39 && !elem314) {
+        return 'Array<unknown>';
+      }
+      return `Array<${formatDocType(elem39, elem314, entityContext)}>`;
+    }
+    case 'map': {
+      const val39 = def39?.values;
+      const val314 = def314?.values;
+      if (!val39 && !val314) {
+        return 'Record<string, unknown>';
+      }
+      return `Record<string, ${formatDocType(val39, val314, entityContext)}>`;
+    }
+    case 'foreign': {
+      const ref = def39?.reference ?? def314?.reference;
+      return renderForeignAcceptedType(ref, entityContext);
+    }
+    case 'json':
+      return 'unknown';
+    case 'record': {
+      if (isAbstractOrEmptyRecord(def39) && isAbstractOrEmptyRecord(def314)) {
+        return 'Record<string, unknown>';
+      }
+      return 'object';
+    }
+    default:
+      return 'unknown';
+  }
+}
+
+function formatDocType(def39, def314, entityContext) {
+  const type39 = def39?.type;
+  const type314 = def314?.type;
+  if (type39 && type314 && type39 !== type314) {
+    const t39 = formatDocTypeSingle(def39, undefined, entityContext);
+    const t314 = formatDocTypeSingle(undefined, def314, entityContext);
+    return t39 === t314 ? t39 : `${t39} | ${t314}`;
+  }
+  return formatDocTypeSingle(def39, def314, entityContext);
+}
+
+function buildDocDescriptionCell(def39, def314, options = {}) {
+  const { isShorthand = false, only39Parent = false, only314Parent = false } = options;
+
+  // Fields that exist only on 3.14 must have no description, only the target notice.
+  if (only314Parent || (!def39 && def314)) {
+    return `${LABEL_314} only.`;
+  }
+
+  const parts = [];
+  if (def39?.description) {
+    parts.push(escapeMarkdownCell(def39.description));
+  }
+
+  if (only39Parent || (def39 && !def314)) {
+    parts.push(`${LABEL_39} only.`);
+  }
+
+  const oneOfNotes = [];
+  collectNestedOneOfNotes(def39, def314, oneOfNotes);
+  for (const note of oneOfNotes) {
+    parts.push(escapeMarkdownCell(note));
+  }
+
+  if (def39?.deprecation) {
+    const dep = def39.deprecation;
+    if (isPlainObject(dep) && typeof dep.message === 'string' && dep.message.trim()) {
+      parts.push(`Deprecated: ${escapeMarkdownCell(dep.message)}`);
+    } else {
+      parts.push('Deprecated.');
+    }
+  } else if (isShorthand && def39?.description?.toLowerCase().includes('deprecated')) {
+    parts.push('Deprecated.');
+  }
+
+  return parts.length > 0
+    ? parts
+        .map((part, idx) => (idx === parts.length - 1 || /[.!?]$/.test(part) ? part : `${part}.`))
+        .join(' ')
+    : '—';
+}
+
+function collectDocFieldRows(
+  rec39,
+  rec314,
+  prefix,
+  rows,
+  entityContext,
+  parentState = { only39: false, only314: false, insideSingleTarget: false },
+) {
+  const regularFields = mergeFieldMaps(rec39?.fields, rec314?.fields);
+  const regularNames = new Set(regularFields.map((f) => f.name));
+
+  for (const { name, def39, def314 } of regularFields) {
+    const fieldPath = prefix ? `${prefix}${name}` : name;
+    const only39 = parentState.only39 || (def39 !== undefined && def314 === undefined);
+    const only314 = parentState.only314 || (def39 === undefined && def314 !== undefined);
+    const insideSingleTarget = parentState.insideSingleTarget || only39 || only314;
+
+    const required = isRequiredInInput(def39, def314, parentState.insideSingleTarget);
+    const typeText = formatDocType(def39, def314, entityContext);
+    const defaultText = formatDocDefaultCell(def39, def314);
+    const descriptionText = buildDocDescriptionCell(def39, def314, {
+      only39Parent: parentState.only39,
+      only314Parent: parentState.only314,
+    });
+
+    rows.push({
+      field: formatMarkdownCode(fieldPath),
+      type: formatMarkdownCode(typeText),
+      required: required ? 'Yes' : 'No',
+      defaultVal: defaultText,
+      description: descriptionText,
+    });
+
+    const soleType = (def39 ?? def314)?.type;
+    if (
+      soleType === 'record' &&
+      !(isAbstractOrEmptyRecord(def39) && isAbstractOrEmptyRecord(def314))
+    ) {
+      collectDocFieldRows(def39, def314, `${fieldPath}.`, rows, entityContext, {
+        only39,
+        only314,
+        insideSingleTarget,
+      });
+    } else if (soleType === 'array' || soleType === 'set') {
+      const elem39 = def39?.elements;
+      const elem314 = def314?.elements;
+      const elemType = (elem39 ?? elem314)?.type;
+      if (
+        elemType === 'record' &&
+        !(isAbstractOrEmptyRecord(elem39) && isAbstractOrEmptyRecord(elem314))
+      ) {
+        collectDocFieldRows(elem39, elem314, `${fieldPath}[].`, rows, entityContext, {
+          only39,
+          only314,
+          insideSingleTarget,
+        });
+      }
+    } else if (soleType === 'map') {
+      const val39 = def39?.values;
+      const val314 = def314?.values;
+      const valType = (val39 ?? val314)?.type;
+      if (
+        valType === 'record' &&
+        !(isAbstractOrEmptyRecord(val39) && isAbstractOrEmptyRecord(val314))
+      ) {
+        collectDocFieldRows(val39, val314, `${fieldPath}.*.`, rows, entityContext, {
+          only39,
+          only314,
+          insideSingleTarget,
+        });
+      }
+    }
+  }
+
+  const shorthandFields = mergeFieldMaps(rec39?.shorthand_fields, rec314?.shorthand_fields);
+  for (const { name, def39, def314 } of shorthandFields) {
+    if (regularNames.has(name)) {
+      continue;
+    }
+    const fieldPath = prefix ? `${prefix}${name}` : name;
+    const only39 = parentState.only39 || (def39 !== undefined && def314 === undefined);
+    const only314 = parentState.only314 || (def39 === undefined && def314 !== undefined);
+
+    rows.push({
+      field: formatMarkdownCode(fieldPath),
+      type: formatMarkdownCode(formatDocType(def39, def314, entityContext)),
+      required: 'No',
+      defaultVal: formatDocDefaultCell(def39, def314),
+      description: buildDocDescriptionCell(def39, def314, {
+        isShorthand: true,
+        only39Parent: parentState.only39 || only39,
+        only314Parent: parentState.only314 || only314,
+      }),
+    });
+  }
+}
+
+async function generatePluginPageSource(plugin, example, entityContext, prettierConfig) {
+  const isGlobalOnly = plugin.scopes.length === 1 && plugin.scopes[0] === 'global';
+  const enableOptionsParts = [];
+  if (!isGlobalOnly) {
+    enableOptionsParts.push("on: { route: 'my-route' }");
+  }
+  enableOptionsParts.push(`config: ${renderTsValue(example.config)}`);
+
+  const rawExampleTs =
+    "import { Kong } from 'kong-api-client';\n\n" +
+    "const kong = new Kong({ adminUrl: 'http://localhost:8001' });\n\n" +
+    `await kong.plugins.enable(${formatLiteral(plugin.name)}, {\n${enableOptionsParts.join(',\n')},\n});\n`;
+
+  const formattedExampleTs = (
+    await prettier.format(rawExampleTs, {
+      ...prettierConfig,
+      parser: 'typescript',
+    })
+  ).trimEnd();
+
+  const rows = [];
+  collectDocFieldRows(plugin.config39, plugin.config314, '', rows, entityContext);
+
+  const tableLines = [
+    '| Field | Type | Required | Default | Description |',
+    '| --- | --- | --- | --- | --- |',
+    ...rows.map(
+      (row) =>
+        `| ${row.field} | ${row.type} | ${row.required} | ${row.defaultVal} | ${row.description} |`,
+    ),
+  ];
+
+  const kongUrl = `https://developer.konghq.com/plugins/${plugin.name}/`;
+  const frontMatterTitle = /[:#[\]{}&*!|>'"%@`]/.test(plugin.title)
+    ? JSON.stringify(plugin.title)
+    : plugin.title;
+
+  return (
+    `---\ntitle: ${frontMatterTitle}\n---\n\n` +
+    `# ${plugin.title} (\`${plugin.name}\`)\n\n` +
+    `- **Category:** ${plugin.category}\n` +
+    `- **Kong documentation:** [${kongUrl}](${kongUrl})\n` +
+    `- **Targets:** ${plugin.targets.map((t) => `\`${t}\``).join(', ')}\n` +
+    `- **Scopes:** ${plugin.scopes.map((s) => `\`${s}\``).join(', ')}\n` +
+    `- **Protocols:** ${plugin.protocols.map((p) => `\`${p}\``).join(', ')}\n\n` +
+    '## Example\n\n' +
+    `\`\`\`ts\n${formattedExampleTs}\n\`\`\`\n\n` +
+    '## Configuration fields\n\n' +
+    `${tableLines.join('\n')}\n`
+  );
+}
+
+function generatePluginsIndexSource(pluginRecords) {
+  const byCategory = new Map();
+  for (const plugin of pluginRecords) {
+    let list = byCategory.get(plugin.category);
+    if (!list) {
+      list = [];
+      byCategory.set(plugin.category, list);
+    }
+    list.push(plugin);
+  }
+
+  const sections = [];
+  for (const category of [...byCategory.keys()].sort()) {
+    const plugins = byCategory.get(category);
+    const lines = [
+      `## ${category}`,
+      '',
+      '| Plugin | Name | Scopes | Targets |',
+      '| --- | --- | --- | --- |',
+    ];
+    for (const plugin of plugins) {
+      const link = `./${plugin.categorySlug}/${plugin.name}.md`;
+      lines.push(
+        `| [${plugin.title}](${link}) | \`${plugin.name}\` | ${plugin.scopes.map((s) => `\`${s}\``).join(', ')} | ${plugin.targets.map((t) => `\`${t}\``).join(', ')} |`,
+      );
+    }
+    sections.push(lines.join('\n'));
+  }
+
+  return (
+    '---\ntitle: Plugins\n---\n\n' +
+    '# Plugins\n\n' +
+    `Reference pages for all ${pluginRecords.length} first-class Kong Gateway plugins supported by \`kong-api-client\`, grouped by category.\n\n` +
+    `${sections.join('\n\n')}\n`
+  );
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const checkOnly = args.includes('--check');
@@ -922,12 +1403,14 @@ async function main() {
 
   const prettierConfig = await readJson(path.join(REPO_ROOT, '.prettierrc.json'));
   const resourcesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'resources.json'));
+  const examplesJson = await readJson(path.join(REPO_ROOT, 'schemas', 'plugin-examples.json'));
   const entityContext = await loadEntityContext(resourcesJson);
+  const pluginRecords = await loadPluginRecords();
 
   const outputs = [
     {
       relPath: 'src/generated/plugins.ts',
-      raw: await generatePluginsSource(entityContext),
+      raw: generatePluginsSource(pluginRecords, entityContext),
     },
     {
       relPath: 'src/generated/entities.ts',
@@ -937,7 +1420,34 @@ async function main() {
       relPath: 'src/generated/resources.ts',
       raw: generateResourcesSource(resourcesJson, entityContext),
     },
+    {
+      relPath: 'test/support/plugin-examples.ts',
+      raw: generatePluginExamplesSource(examplesJson, pluginRecords),
+    },
+    {
+      relPath: 'docs/plugins/index.md',
+      raw: generatePluginsIndexSource(pluginRecords),
+    },
   ];
+
+  for (const plugin of pluginRecords) {
+    const example = examplesJson.plugins[plugin.name];
+    if (!example) {
+      throw new Error(`Plugin "${plugin.name}" is missing from schemas/plugin-examples.json`);
+    }
+    outputs.push({
+      relPath: `docs/plugins/${plugin.categorySlug}/${plugin.name}.md`,
+      raw: await generatePluginPageSource(plugin, example, entityContext, prettierConfig),
+    });
+  }
+
+  const expectedDocPaths = new Set(
+    outputs.filter((item) => item.relPath.startsWith('docs/plugins/')).map((item) => item.relPath),
+  );
+  const existingDocFiles = (await listFilesRecursive(path.join(REPO_ROOT, 'docs', 'plugins'))).map(
+    (rel) => `docs/plugins/${rel}`,
+  );
+  const staleDocFiles = existingDocFiles.filter((rel) => !expectedDocPaths.has(rel));
 
   const mismatched = [];
   for (const item of outputs) {
@@ -966,16 +1476,20 @@ async function main() {
   }
 
   if (checkOnly) {
-    if (mismatched.length > 0) {
+    const problems = [...mismatched, ...staleDocFiles.map((rel) => `${rel} (unexpected file)`)];
+    if (problems.length > 0) {
       console.error('Generated files are out of date:');
-      for (const relPath of mismatched) {
+      for (const relPath of problems) {
         console.error(`  - ${relPath}`);
       }
       process.exit(1);
     }
     console.log(`Generated files are up to date (${outputs.length} files).`);
   } else {
-    console.log(`Generated ${outputs.map((o) => o.relPath).join(', ')}`);
+    for (const stale of staleDocFiles) {
+      await rm(path.join(REPO_ROOT, stale), { force: true });
+    }
+    console.log(`Generated ${outputs.length} files.`);
   }
 }
 
