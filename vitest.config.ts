@@ -30,11 +30,8 @@ export default defineConfig({
           name: 'live',
           include: ['test/live/**/*.test.ts'],
           pool: 'forks',
-          poolOptions: {
-            forks: {
-              singleFork: true,
-            },
-          },
+          fileParallelism: false,
+          maxWorkers: 1,
           testTimeout: 30_000,
           hookTimeout: 30_000,
         },
@@ -44,11 +41,8 @@ export default defineConfig({
           name: 'live-destructive',
           include: ['test/live-destructive/**/*.test.ts'],
           pool: 'forks',
-          poolOptions: {
-            forks: {
-              singleFork: true,
-            },
-          },
+          fileParallelism: false,
+          maxWorkers: 1,
           testTimeout: 30_000,
           hookTimeout: 30_000,
         },

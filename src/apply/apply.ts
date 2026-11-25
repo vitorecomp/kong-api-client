@@ -129,17 +129,12 @@ function readStringKey(record: object, field: string): string {
   return typeof id === 'string' ? id : '';
 }
 
-/**
- * Returns a copy of `desired` with `tags` replaced by the managed tag list.
- * Spreading a generic `I extends TaggedInput` with `tags: string[]` produces
- * `I & { tags: string[] }`, which TypeScript does not reduce back to `I` even
- * though every Kong entity input accepts `string[]` for `tags`.
- */
+/** Returns a copy of `desired` with `tags` replaced by the managed tag list. */
 function withManagedTags<I extends TaggedInput>(desired: I, managedTag: string): I {
   return {
     ...desired,
     tags: buildCreateTags(desired.tags, managedTag),
-  } as I;
+  };
 }
 
 /**
