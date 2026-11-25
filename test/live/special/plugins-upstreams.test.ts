@@ -76,8 +76,9 @@ describe('live special: plugins and upstreams special endpoints', () => {
         true,
       );
 
-      // Toggle target health without address
-      await kong.upstreams.setTargetHealth(upstreamName, target.id, 'unhealthy');
+      // Toggle target health without address (retried with eventually because Kong builds
+      // per-worker balancers asynchronously and may briefly answer 400 "has no balancer").
+      await eventually(() => kong.upstreams.setTargetHealth(upstreamName, target.id, 'unhealthy'));
       await eventually(async () => {
         const h = await kong.upstreams.health(upstreamName);
         if (h.data[0]?.health !== 'UNHEALTHY') {
@@ -85,7 +86,7 @@ describe('live special: plugins and upstreams special endpoints', () => {
         }
       });
 
-      await kong.upstreams.setTargetHealth(upstreamName, target.id, 'healthy');
+      await eventually(() => kong.upstreams.setTargetHealth(upstreamName, target.id, 'healthy'));
       await eventually(async () => {
         const h = await kong.upstreams.health(upstreamName);
         if (h.data[0]?.health !== 'HEALTHY') {
@@ -94,7 +95,9 @@ describe('live special: plugins and upstreams special endpoints', () => {
       });
 
       // Toggle health for a specific ip:port address (exercises colon preservation)
-      await kong.upstreams.setTargetHealth(upstreamName, target.id, 'unhealthy', targetAddress);
+      await eventually(() =>
+        kong.upstreams.setTargetHealth(upstreamName, target.id, 'unhealthy', targetAddress),
+      );
       await eventually(async () => {
         const h = await kong.upstreams.health(upstreamName);
         if (h.data[0]?.health !== 'UNHEALTHY') {
@@ -102,7 +105,9 @@ describe('live special: plugins and upstreams special endpoints', () => {
         }
       });
 
-      await kong.upstreams.setTargetHealth(upstreamName, target.id, 'healthy', targetAddress);
+      await eventually(() =>
+        kong.upstreams.setTargetHealth(upstreamName, target.id, 'healthy', targetAddress),
+      );
       await eventually(async () => {
         const h = await kong.upstreams.health(upstreamName);
         if (h.data[0]?.health !== 'HEALTHY') {

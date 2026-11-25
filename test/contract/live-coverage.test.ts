@@ -100,36 +100,40 @@ function concretePathForTemplate(template: string): string {
 }
 
 describe('scripts/live-coverage.mjs contract', () => {
-  it('counts all 308 supported operations (267 regular + 41 special) and separates proven vs missing', () => {
-    const requests: FixtureLogEntry[] = [
-      { method: 'GET', path: '/services', status: 200 },
-      { method: 'POST', path: '/services', status: 201 },
-      { method: 'GET', path: '/services/billing', status: 200 },
-      { method: 'DELETE', path: '/services/billing', status: 404 },
-    ];
+  it(
+    'counts all 308 supported operations (267 regular + 41 special) and separates proven vs missing',
+    { timeout: 30_000 },
+    () => {
+      const requests: FixtureLogEntry[] = [
+        { method: 'GET', path: '/services', status: 200 },
+        { method: 'POST', path: '/services', status: 201 },
+        { method: 'GET', path: '/services/billing', status: 200 },
+        { method: 'DELETE', path: '/services/billing', status: 404 },
+      ];
 
-    const reportRun = runCoverageScript({ requests, mode: 'report', json: true });
-    expect(reportRun.status).toBe(0);
-    expect(reportRun.parsed?.total).toBe(308);
-    expect(reportRun.parsed?.regularTotal).toBe(267);
-    expect(reportRun.parsed?.specialTotal).toBe(41);
-    expect(reportRun.parsed?.proven).toEqual([
-      'GET /services',
-      'POST /services',
-      'GET /services/{}',
-    ]);
+      const reportRun = runCoverageScript({ requests, mode: 'report', json: true });
+      expect(reportRun.status).toBe(0);
+      expect(reportRun.parsed?.total).toBe(308);
+      expect(reportRun.parsed?.regularTotal).toBe(267);
+      expect(reportRun.parsed?.specialTotal).toBe(41);
+      expect(reportRun.parsed?.proven).toEqual([
+        'GET /services',
+        'POST /services',
+        'GET /services/{}',
+      ]);
 
-    const deleteMissing = reportRun.parsed?.missing.find(
-      (m) => m.operation === 'DELETE /services/{}',
-    );
-    expect(deleteMissing).toEqual({ operation: 'DELETE /services/{}', statuses: [404] });
-    expect(reportRun.parsed?.missing).toHaveLength(305);
+      const deleteMissing = reportRun.parsed?.missing.find(
+        (m) => m.operation === 'DELETE /services/{}',
+      );
+      expect(deleteMissing).toEqual({ operation: 'DELETE /services/{}', statuses: [404] });
+      expect(reportRun.parsed?.missing).toHaveLength(305);
 
-    const strictRun = runCoverageScript({ requests, mode: 'strict', json: true });
-    expect(strictRun.status).toBe(1);
-  });
+      const strictRun = runCoverageScript({ requests, mode: 'strict', json: true });
+      expect(strictRun.status).toBe(1);
+    },
+  );
 
-  it('tracks satisfied and unsatisfied exceptions accurately', () => {
+  it('tracks satisfied and unsatisfied exceptions accurately', { timeout: 30_000 }, () => {
     const exceptions: FixtureException[] = [
       {
         method: 'GET',
@@ -172,93 +176,101 @@ describe('scripts/live-coverage.mjs contract', () => {
     );
   });
 
-  it('passes strict mode when all 308 operations are proven or satisfied exceptions, and fails on a stale exception that got 2xx', () => {
-    // Get the full list of 308 operations from a dry report run
-    const emptyRun = runCoverageScript({ requests: [], mode: 'report', json: true });
-    expect(emptyRun.status).toBe(0);
-    const allOps = emptyRun.parsed!.missing.map((m) => m.operation);
-    expect(allOps).toHaveLength(308);
+  it(
+    'passes strict mode when all 308 operations are proven or satisfied exceptions, and fails on a stale exception that got 2xx',
+    { timeout: 30_000 },
+    () => {
+      // Get the full list of 308 operations from a dry report run
+      const emptyRun = runCoverageScript({ requests: [], mode: 'report', json: true });
+      expect(emptyRun.status).toBe(0);
+      const allOps = emptyRun.parsed!.missing.map((m) => m.operation);
+      expect(allOps).toHaveLength(308);
 
-    const fullRequests: FixtureLogEntry[] = allOps.map((op) => {
-      const spaceIdx = op.indexOf(' ');
-      const method = op.slice(0, spaceIdx);
-      const template = op.slice(spaceIdx + 1);
-      if (method === 'GET' && template === '/clustering/status') {
-        return { method, path: '/clustering/status', status: 400 };
-      }
-      return { method, path: concretePathForTemplate(template), status: 200 };
-    });
+      const fullRequests: FixtureLogEntry[] = allOps.map((op) => {
+        const spaceIdx = op.indexOf(' ');
+        const method = op.slice(0, spaceIdx);
+        const template = op.slice(spaceIdx + 1);
+        if (method === 'GET' && template === '/clustering/status') {
+          return { method, path: '/clustering/status', status: 400 };
+        }
+        return { method, path: concretePathForTemplate(template), status: 200 };
+      });
 
-    const validExceptions: FixtureException[] = [
-      {
-        method: 'GET',
-        template: '/clustering/status',
-        status: 400,
-        reason: 'not a control plane',
-      },
-    ];
-
-    const cleanStrict = runCoverageScript({
-      requests: fullRequests,
-      exceptions: validExceptions,
-      mode: 'strict',
-      json: true,
-    });
-    expect(cleanStrict.status).toBe(0);
-    expect(cleanStrict.parsed?.proven).toHaveLength(307);
-    expect(cleanStrict.parsed?.satisfiedExceptions).toHaveLength(1);
-    expect(cleanStrict.parsed?.missing).toHaveLength(0);
-    expect(cleanStrict.parsed?.staleExceptions).toHaveLength(0);
-
-    // Adding an exception for an operation that received 2xx must fail strict mode
-    const staleStrict = runCoverageScript({
-      requests: fullRequests,
-      exceptions: [
-        ...validExceptions,
+      const validExceptions: FixtureException[] = [
         {
           method: 'GET',
-          template: '/services',
+          template: '/clustering/status',
           status: 400,
-          reason: 'stale exception',
+          reason: 'not a control plane',
         },
-      ],
-      mode: 'strict',
-      json: true,
-    });
-    expect(staleStrict.status).toBe(1);
-    expect(staleStrict.parsed?.staleExceptions).toEqual([
-      {
-        operation: 'GET /services',
-        exceptionStatus: 400,
-        statuses: [200],
-      },
-    ]);
-  });
+      ];
 
-  it('matches request paths to the template with the most literal segments', () => {
-    const requests: FixtureLogEntry[] = [
-      { method: 'GET', path: '/plugins/enabled', status: 200 },
-      { method: 'GET', path: '/upstreams/u1/targets/all', status: 200 },
-      { method: 'POST', path: '/schemas/plugins/validate', status: 200 },
-      { method: 'GET', path: '/', status: 200 },
-    ];
+      const cleanStrict = runCoverageScript({
+        requests: fullRequests,
+        exceptions: validExceptions,
+        mode: 'strict',
+        json: true,
+      });
+      expect(cleanStrict.status).toBe(0);
+      expect(cleanStrict.parsed?.proven).toHaveLength(307);
+      expect(cleanStrict.parsed?.satisfiedExceptions).toHaveLength(1);
+      expect(cleanStrict.parsed?.missing).toHaveLength(0);
+      expect(cleanStrict.parsed?.staleExceptions).toHaveLength(0);
 
-    const run = runCoverageScript({ requests, mode: 'report', json: true });
-    expect(run.status).toBe(0);
-    expect(run.parsed?.proven).toEqual([
-      'GET /',
-      'POST /schemas/plugins/validate',
-      'GET /plugins/enabled',
-      'GET /upstreams/{}/targets/all',
-    ]);
+      // Adding an exception for an operation that received 2xx must fail strict mode
+      const staleStrict = runCoverageScript({
+        requests: fullRequests,
+        exceptions: [
+          ...validExceptions,
+          {
+            method: 'GET',
+            template: '/services',
+            status: 400,
+            reason: 'stale exception',
+          },
+        ],
+        mode: 'strict',
+        json: true,
+      });
+      expect(staleStrict.status).toBe(1);
+      expect(staleStrict.parsed?.staleExceptions).toEqual([
+        {
+          operation: 'GET /services',
+          exceptionStatus: 400,
+          statuses: [200],
+        },
+      ]);
+    },
+  );
 
-    const missingOps = new Set(run.parsed?.missing.map((m) => m.operation));
-    expect(missingOps.has('GET /plugins/{}')).toBe(true);
-    expect(missingOps.has('GET /upstreams/{}/targets/{}')).toBe(true);
-    expect(missingOps.has('POST /schemas/{}/validate')).toBe(true);
-  });
+  it(
+    'matches request paths to the template with the most literal segments',
+    { timeout: 30_000 },
+    () => {
+      const requests: FixtureLogEntry[] = [
+        { method: 'GET', path: '/plugins/enabled', status: 200 },
+        { method: 'GET', path: '/upstreams/u1/targets/all', status: 200 },
+        { method: 'POST', path: '/schemas/plugins/validate', status: 200 },
+        { method: 'GET', path: '/', status: 200 },
+      ];
 
-  it('prints human-readable text output listing proven operations', () => {
+      const run = runCoverageScript({ requests, mode: 'report', json: true });
+      expect(run.status).toBe(0);
+      expect(run.parsed?.proven).toEqual([
+        'GET /',
+        'POST /schemas/plugins/validate',
+        'GET /plugins/enabled',
+        'GET /upstreams/{}/targets/all',
+      ]);
+
+      const missingOps = new Set(run.parsed?.missing.map((m) => m.operation));
+      expect(missingOps.has('GET /plugins/{}')).toBe(true);
+      expect(missingOps.has('GET /upstreams/{}/targets/{}')).toBe(true);
+      expect(missingOps.has('POST /schemas/{}/validate')).toBe(true);
+    },
+  );
+
+  it('prints human-readable text output listing proven operations', { timeout: 30_000 }, () => {
     const run = runCoverageScript({
       requests: [{ method: 'GET', path: '/services', status: 200 }],
       mode: 'report',

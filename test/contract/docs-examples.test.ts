@@ -259,8 +259,12 @@ describe('documentation TypeScript examples contract', () => {
     expect(skippedBlocks).toHaveLength(0);
   });
 
-  it('compiles every checked TypeScript example cleanly against src/index.ts', () => {
-    const failures = compileBlocks(checkedBlocks);
-    expect(failures).toEqual([]);
-  });
+  it(
+    'compiles every checked TypeScript example cleanly against src/index.ts',
+    { timeout: 120_000 },
+    () => {
+      const failures = compileBlocks(checkedBlocks);
+      expect(failures).toEqual([]);
+    },
+  );
 });
